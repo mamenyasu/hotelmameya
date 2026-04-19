@@ -11,7 +11,7 @@ class RoomAvailabilityRepository{
         //せっかくインデックスを設定しているので、速度改善のためSQLでLIKEは使わない。
     try{
         $startYearMonth=sprintf('%04d-%02d-01',$year,$month);
-        $endYearMonth=date('Y-m-d',strtotime("$startYearMonth +1 Month"));
+        $endYearMonth=date('Y-m-d',strtotime("$startYearMonth +1 Month")); //シングルクォートで囲まないように。変数展開されません。
 
         $stmt=$this->pdo->prepare("SELECT * FROM room_availablity WHERE stay_date >= :startYearMonth AND stay_date <:endYearMonth");
         $stmt->bindValue(':startYearMonth',$startYearMonth,PDO::PARAM_STR);

@@ -21,7 +21,7 @@ try{
             $stmt->bindValue(':booked_rooms',0,PDO::PARAM_INT);
             $stmt->bindValue(':total_rooms',$total_rooms,PDO::PARAM_INT);
             $stmt->execute();
-            $date=date('Y-m-d',strtotime("$date +1 day"));
+            $date=date('Y-m-d',strtotime("$date +1 day")); //シングルクォートで囲まないように。変数展開されません。
         }
         $room_id++;
         if($i==0){
