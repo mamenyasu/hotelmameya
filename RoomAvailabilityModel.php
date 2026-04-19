@@ -29,7 +29,7 @@ class RoomAvailabilityModel{
     }
 
     //予約時にbooked_rooms（その日の予約数）を＋１するメソッド。
-    public function plusBookedRooms($request){
+    public function increaseBookedRooms($request){
         try{
         $checkin_date=$request['checkin_date'];
         $checkout_date=$request['checkout_date'];
