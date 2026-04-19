@@ -2,10 +2,12 @@
 class ReservationsModel{
     private $pdo;
 
+    //コンストラクタ（PDOをもらう）
     public function __construct(PDO $pdo){
         $this->pdo=$pdo;
     }
 
+    //予約にて、個人の予約データをreservationsテーブルにINSERTするメソッド。
     public function insert($request){
         $room_id=$request['room_id'];
         $user_name=$request['user_name'];

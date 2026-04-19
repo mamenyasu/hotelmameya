@@ -1,9 +1,7 @@
 <?php
 class CalendarMarkArray{
 
-    public function getRemaining(PDO $pdo,int $year,int $month){
-        $rep=new RoomAvailabilityRepository($pdo);
-        $availability=$rep->getAvailability($year,$month);
+    public function getCalendarMarkArray($availability){
 
         $days=count($availability);
         $calendarMarkArray=[];
