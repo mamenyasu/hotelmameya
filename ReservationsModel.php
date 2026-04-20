@@ -7,17 +7,18 @@ class ReservationsModel{
         $this->pdo=$pdo;
     }
 
-    //一か月の予約状況を取得するメソッド。主に管理者用。
-    public function getReservationMonthAll($year,$month){
+    //指定した種類の部屋の、一か月の予約状況を取得するメソッド。主に管理者用。
+    public function getReservationRoomMonthAll($room_id,$year,$month){
         $startdate=sprintf('%04d-%02d-01',$year,$month);
         $enddate=date('Y-m-d',strtotime("$startdate +1 Month"));
         try{
-        $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE checkin_date >= :startdate AND checkin_date < :enddate');
+        $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE room_id=:room_id AND checkin_date >= :startdate AND checkin_date < :enddate');
+        $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
         $stmt->bindValue(':startdate',$startdate,PDO::PARAM_STR);
         $stmt->bindValue(':enddate',$enddate,PDO::PARAM_STR);
         $stmt->execute();
-        $reservationMonthAll=$stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $reservationMonthAll;
+        $reservationRoomMonthAll=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $reservationRoomMonthAll;
         }catch(Exception $e){
             throw new Exception('データベースエラー：予約情報を取得できませんでした');
         }

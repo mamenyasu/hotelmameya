@@ -8,13 +8,17 @@ class MasterService{
         $this->RoomAvailabilityModel=new RoomAvailabilityModel($pdo);
     }
 
-    //その月の予約状況一覧を返す操作。
-    public function getReservationMonthAll($year,$month){
-    $reservationMonthAll=$this->reservationsModel->getReservationMonthAll($year,$month);
-    if(!$reservationMonthAll){
-        return ['success'=>false,'Message'=>'該当する予約がありません。'];
-    }
-    return ['success'=>true,'reservationMonthAll'=>$reservationMonthAll];
+    //指定した種類の部屋の、その月の予約状況一覧を返す操作。
+    public function getReservationRoomMonthAll($room_id,$year,$month){
+        try{
+            $reservationRoomMonthAll=$this->reservationsModel->getReservationRoomMonthAll($room_id,$year,$month);
+            if(!$reservationRoomMonthAll){
+            return ['success'=>false,'Message'=>'該当する予約がありません。'];
+            }
+            return ['success'=>true,'reservationMonthAll'=>$reservationRoomMonthAll];
+        }catch(Exception $e){
+            throw $e;
+        }
     }
 
 
