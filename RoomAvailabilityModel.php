@@ -20,7 +20,7 @@ class RoomAvailabilityModel{
         $stmt->bindValue(':endYearMonth',$endYearMonth,PDO::PARAM_STR);
         $stmt->execute();
         }catch(Exception $e){
-        exit('エラー：'.$e->getMessage());
+            throw new Exception('エラー：月の在庫データを取得できませんでした');
         }
 
         $availablity=$stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -28,7 +28,7 @@ class RoomAvailabilityModel{
 
     }
 
-    //予約時にbooked_rooms（その日の予約数）を＋１するメソッド。
+    //予約時にbooked_rooms（予約数）を＋１するメソッド。
     public function increaseBookedRooms($request){
         try{
         $checkin_date=$request['checkin_date'];
@@ -39,11 +39,11 @@ class RoomAvailabilityModel{
         $stmt->bindValue(':checkout_date',$checkout_date,PDO::PARAM_STR);
         $stmt->execute();
         }catch(Exception $e){
-            exit('エラー：'.$e->getMessage());
+            throw new Exception('エラー：在庫を加算できませんでした');    
         }
     }
 
-    //キャンセル時にbooked_rooms(その日の予約数)をー１するメソッド。
+    //キャンセル時にbooked_rooms(予約数)をー１するメソッド。
     public function decreaseBookedRooms($request){
         try{
         $checkin_date=$request['checkin_date'];
@@ -54,7 +54,7 @@ class RoomAvailabilityModel{
         $stmt->bindValue(':checkout_date',$checkout_date,PDO::PARAM_STR);
         $stmt->execute();
         }catch(Exception $e){
-            exit('エラー：'.$e->getMessage());
+            throw new Exception('エラー：在庫を減算できませんでした');
         }
     }
 }

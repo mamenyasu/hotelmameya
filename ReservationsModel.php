@@ -8,7 +8,8 @@ class ReservationsModel{
     }
 
     //予約IDから予約情報を取得するメソッド。
-    public function getReservationById($reservation_id){
+    public function getReservationById($request){
+        $reservation_id=$request['id'];
         try{
         $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE id=:id');
         $stmt->bindValue(':id',$reservation_id,PDO::PARAM_INT);
@@ -19,7 +20,7 @@ class ReservationsModel{
         }
         return $reservation;
         }catch(Exception $e){
-            exit('エラー：'.$e->getMessage());
+            throw new Exception('データベースエラー：予約情報を取得できませんでした');
         }
     }
 
@@ -39,7 +40,7 @@ class ReservationsModel{
         $stmt->bindValue(':checkout_date',$checkout_date,PDO::PARAM_STR);
         $stmt->execute();
         }catch(Exception $e){
-        exit('エラー：'.$e->getMessage());
+            throw new Exception('データベースエラー：予約の登録に失敗しました');
         }
     }
 
@@ -50,7 +51,7 @@ class ReservationsModel{
         $stmt->bindValue(':id',$request['id']);
         $stmt->execute();
         }catch(Exception $e){
-            exit('エラー：'.$e->getMessage());
+            throw new Exception('データベースエラー：予約の取り消しに失敗しました');
         }
     }
 
@@ -66,7 +67,28 @@ class ReservationsModel{
         $stmt->bindValue(':id',$request['id'],PDO::PARAM_INT);
         $stmt->execute();
         }catch(Exception $e){
-            exit('エラー：'.$e->getMessage());
+            throw new Exception('データベースエラー：予約の変更に失敗しました');
+        }
+    }
+
+    //予約操作時開始時に、本当に空きがまだあるか確認するメソッド。trueかfalseを返す。
+    public function hasStock($request){
+        try{
+        $stmt=$this->pdo->prepare('SELECT booked_rooms,total_rooms FROM room_availability WHERE staydate >=:checkin_date AND staydate < :checkout_date');
+        $stmt->bindValue(':checkin_date',$request['checkin_date'],PDO::PARAM_STR);
+        $stmt->bindValue(':checkout_date',$request['checkout_date'],PDO::PARAM_STR);
+        $stmt->execute();
+
+        $found=false; //万が一、該当データが無く(10年先とか変なPOSTされた場合)、whileに入れなかった場合はfalseを返す為の変数。
+        while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+            $found=true;
+            if($row['total_rooms']<=$row['booked_rooms']){
+                return false;
+            }
+        }
+        return $found;
+        }catch(Exception $e){
+            throw new Exception('データベースエラー：空き室状況の確認に失敗しました');
         }
     }
 }
