@@ -1,6 +1,7 @@
 <?php
 $room_id=1;
 $total_rooms=5;
+$price=6000;
 $start_date=date('Y-m-d');
 
 echo "room_id=1:シングル(5部屋)、room_id=2:ツイン(4部屋)、room_id=3:ダブル(3部屋)";
@@ -15,19 +16,22 @@ try{
     for($i=0; $i<3; $i++){
         $date=$start_date;
         for($j=0; $j<365; $j++){
-            $stmt=$db->prepare('INSERT IGNORE INTO room_availability (room_id,stay_date,booked_rooms,total_rooms) VALUES (:room_id,:stay_date,:booked_rooms,:total_rooms)');
+            $stmt=$db->prepare('INSERT IGNORE INTO room_availability (room_id,stay_date,booked_rooms,total_rooms,price) VALUES (:room_id,:stay_date,:booked_rooms,:total_rooms,:price)');
             $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
             $stmt->bindValue(':stay_date',$date,PDO::PARAM_STR);
             $stmt->bindValue(':booked_rooms',0,PDO::PARAM_INT);
             $stmt->bindValue(':total_rooms',$total_rooms,PDO::PARAM_INT);
+            $stmt->bindValue(':price',$price,PDO::PARAM_STR);
             $stmt->execute();
             $date=date('Y-m-d',strtotime("$date +1 day")); //シングルクォートで囲まないように。変数展開されません。
         }
         $room_id++;
         if($i==0){
             $total_rooms=4;
+            $price=8000;
         }else if($i==1){
             $total_rooms=3;
+            $price=8000;
         }
     }
 
