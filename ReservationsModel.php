@@ -7,17 +7,29 @@ class ReservationsModel{
         $this->pdo=$pdo;
     }
 
+    //一か月の予約状況を取得するメソッド。主に管理者用。
+    public function getReservationMonthAll($year,$month){
+        $startdate=sprintf('%04d-%02d-01',$year,$month);
+        $enddate=date('Y-m-d',strtotime("$startdate +1 Month"));
+        try{
+        $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE checkin_date >= :startdate AND checkin_date < :enddate');
+        $stmt->bindValue(':startdate',$startdate,PDO::PARAM_STR);
+        $stmt->bindValue(':enddate',$enddate,PDO::PARAM_STR);
+        $stmt->execute();
+        $reservationMonthAll=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $reservationMonthAll;
+        }catch(Exception $e){
+            throw new Exception('データベースエラー：予約情報を取得できませんでした');
+        }
+    }
+
     //予約IDから予約情報を取得するメソッド。
     public function getReservationById($request){
-        $reservation_id=$request['id'];
         try{
         $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE id=:id');
-        $stmt->bindValue(':id',$reservation_id,PDO::PARAM_INT);
+        $stmt->bindValue(':id',$request['id'],PDO::PARAM_INT);
         $stmt->execute();
         $reservation=$stmt->fetch(PDO::FETCH_ASSOC);
-        if(!$reservation){
-            throw new Exception('予約が見つかりません');
-        }
         return $reservation;
         }catch(Exception $e){
             throw new Exception('データベースエラー：予約情報を取得できませんでした');

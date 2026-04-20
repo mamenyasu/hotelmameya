@@ -21,7 +21,7 @@ class ReservationService{
             //部屋（在庫）を減らす。
             $this->roomAvailabilityModel->decreaseBookedRooms($request);
             //結果をコントローラーに返す。
-            return ['success'=>true];
+            return ['success'=>true,'message'=>'予約が完了しました。'];
         }catch(Exception $e){
             throw $e;
         }
@@ -32,12 +32,15 @@ class ReservationService{
         try{
             //キャンセル予定の予約が実在するか確認する。予約IDから既予約情報(DBの連想配列)が返ってくる。
             $reservation=$this->reservationsModel->getReservationById($request);
+            if(!$reservation){
+                return ['success'=>false, 'message'=>'予約が存在しません。'];
+            }
             //予約取り消し操作。
             $this->reservationsModel->deleteReservation($reservation);
             //在庫を復活させる。
             $this->roomAvailabilityModel->increaseBookedRooms($reservation);
             //結果をコントローラーに返す。
-            return ['success'=>true];            
+            return ['success'=>true,'messeage'=>'予約がキャンセルされました。'];            
         }catch(Exception $e){
             throw $e;
         }
@@ -49,6 +52,9 @@ class ReservationService{
     public function update($request){
         try{
         $old=$this->reservationsModel->getReservationById($request);
+        if(!$old){
+            return ['success'=>false, 'message'=>'予約が存在しません。'];
+        }
         $stock=$this->roomAvailabilityModel->hasStock($request);
         if(!$stock){
             return ['success'=>false,'messeage'=>'空きがありません。'];
@@ -56,16 +62,19 @@ class ReservationService{
         $this->roomAvailabilityModel->increaseBookedRooms($old);
         $this->reservationsModel->updateReservation($request);
         $this->roomAvailabilityModel->decreaseBookedRooms($request);
-        return ['success'=>true];
+        return ['success'=>true,'message'=>'予約が変更されました。'];
     }catch(Exception $e){
         throw $e;
     }
     }
 
-    //既予約情報をビューに返す操作。予約IDと電話番号を元に照合。戻り値として結果の連想配列を受け取る（もしくは$eを受け取る）。
+    //照合して既予約情報を返す操作。予約IDと電話番号を元に照合。戻り値として結果の連想配列を受け取る（もしくは$eを受け取る）。
     public function showReservation($request){
         try{
             $reservation=$this->reservationsModel->getReservationById($request);
+            if(!$reservation){
+                return ['success'=>false, 'message'=>'予約が存在しません。'];
+            }
             if($reservation['user_telphone']==$request['user_telphone']){
                 return ['success'=>true, 'reservation'=>$reservation];
             }else{
