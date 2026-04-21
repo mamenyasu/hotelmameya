@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__.'/../models/ReservationsModel.php';
+require_once __DIR__.'/../models/RoomAvailabilityModel.php';
+
 class MasterService{
     private $reservationsModel;
     private $RoomAvailabilityModel;

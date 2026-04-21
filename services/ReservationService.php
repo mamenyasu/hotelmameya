@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__.'/../models/ReservationsModel.php';
+require_once __DIR__.'/../models/RoomAvailabilityModel.php';
+
 class ReservationService{
     private $reservationsModel;
     private $roomAvailabilityModel;
@@ -11,7 +15,7 @@ class ReservationService{
     //予約操作。戻り値として結果の連想配列を受け取る（もしくは$eを受け取る)。
     public function reserve($request){
         try{
-             //操作直前に本当に空きがあるか再確認。
+            //操作直前に本当に空きがあるか再確認。
             $stock=$this->roomAvailabilityModel->hasStock($request);
             if(!$stock){
                 return ['success'=>false,'messeage'=>'空きがありません。'];
