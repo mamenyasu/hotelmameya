@@ -89,5 +89,17 @@ class ReservationService{
         }
     }
 
+    //指定した種類の部屋の、一か月の在庫状況を返す操作。
+    public function getAvailabilityRoomMonth($room_id,$year,$month){
+        try{
+            $availabilityRoomMonth=$this->roomAvailabilityModel->getAvailabilityMonth($room_id,$year,$month);
+            if(!$availabilityRoomMonth){
+                return ['success'=>false, 'message'=>'指定された部屋の月在庫を取得できませんでした。'];
+            }
+            return ['success'=>true, 'availabilityRoomMonth'=>$availabilityRoomMonth];
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
 
 }

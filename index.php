@@ -5,11 +5,14 @@ $path=trim($path,'/');
 $segments=explode('/',$path);
 $controller=$segments[0] ?? 'home';
 $action=$segments[1] ?? 'index';
+$room_id=$segments[2];
+$year=$segments[3];
+$month=$segments[4];
 
 $dsn='mysql:host=localhost;dbname=hotelmameya;charset=utf8';
 $user='root';
-$db=new PDO($dsn,$user);
-$db->setAttribute(PDO::ATTR_EMULATE_PREPARES,false);
+$pdo=new PDO($dsn,$user);
+$pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES,false);
 
 switch($controller){
     case 'home' :
@@ -26,10 +29,10 @@ switch($controller){
 
     case 'reserve' :
         require_once 'controllers/ReservationController.php';
-        $ctrl=new ReservationController($db);
+        $ctrl=new ReservationController($pdo);
         switch($action){
             case 'index' : $ctrl->index(); break;
-            case 'date_list' : $ctrl->date_list(); break;
+            case 'date_list' : $ctrl->date_list($room_id,$year,$month); break;
             case 'reserve_form' : $ctrl->reserve_form(); break;
             case 'reserve_confirm' : $ctrl->reserve_confirm(); break;
             case 'cancel_form' : $ctrl->reserve_cancel_form(); break;
@@ -42,7 +45,7 @@ switch($controller){
 
     case 'contact' :
         require_once 'controllers/ContactController.php';
-        $ctrl=new ContactController($db);
+        $ctrl=new ContactController($pdo);
         switch($action){
             case 'index' : $ctrl->index(); break;
             case 'contact_form' : $ctrl->contact_form(); break;
@@ -54,7 +57,7 @@ switch($controller){
 
     case 'master' :
         require_once 'controllers/MasterController.php';
-        $ctrl=new MasterController($db);
+        $ctrl=new MasterController($pdo);
         switch($action){
             case 'index' : $ctrl->index(); break;
             case 'login_form' : $ctrl->master_login_form(); break;

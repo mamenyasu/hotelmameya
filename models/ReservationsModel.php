@@ -7,12 +7,12 @@ class ReservationsModel{
         $this->pdo=$pdo;
     }
 
-    //指定した種類の部屋の、一か月の予約状況を取得するメソッド。主に管理者用。
+    //指定した種類の部屋の、一か月の予約状況を、昇順で取得するメソッド。主に管理者用。
     public function getReservationRoomMonthAll($room_id,$year,$month){
         $startdate=sprintf('%04d-%02d-01',$year,$month);
         $enddate=date('Y-m-d',strtotime("$startdate +1 Month"));
         try{
-        $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE room_id=:room_id AND checkin_date >= :startdate AND checkin_date < :enddate');
+        $stmt=$this->pdo->prepare('SELECT * FROM reservations WHERE room_id=:room_id AND checkin_date >= :startdate AND checkin_date < :enddate ORDER BY stay_date ASC');
         $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
         $stmt->bindValue(':startdate',$startdate,PDO::PARAM_STR);
         $stmt->bindValue(':enddate',$enddate,PDO::PARAM_STR);

@@ -8,14 +8,14 @@ class RoomAvailabilityModel{
     }
 
 
-    //指定した種類の部屋の、一か月分の在庫データを配列で返すメソッド。
+    //指定した種類の部屋の、一か月分の在庫データの配列を、昇順で返すメソッド。
     public function getAvailabilityMonth(int $room_id,int $year,int $month){
         //せっかくインデックスを設定しているので、速度改善のためSQLでLIKEは使わない。
     try{
         $startYearMonth=sprintf('%04d-%02d-01',$year,$month);
         $endYearMonth=date('Y-m-d',strtotime("$startYearMonth +1 Month")); //シングルクォートで囲まないように。変数展開されません。
 
-        $stmt=$this->pdo->prepare("SELECT * FROM room_availability WHERE room_id=:room_id AND stay_date >= :startYearMonth AND stay_date <:endYearMonth");
+        $stmt=$this->pdo->prepare("SELECT * FROM room_availability WHERE room_id=:room_id AND stay_date >= :startYearMonth AND stay_date <:endYearMonth ORDER BY stay_date ASC");
         $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
         $stmt->bindValue(':startYearMonth',$startYearMonth,PDO::PARAM_STR);
         $stmt->bindValue(':endYearMonth',$endYearMonth,PDO::PARAM_STR);
@@ -77,7 +77,7 @@ class RoomAvailabilityModel{
                 return false;
             }
         }
-        return $found;
+        return $found; //trueかfalseが返る。
         }catch(Exception $e){
             throw new Exception('データベースエラー：空き室状況の確認に失敗しました');
         }
