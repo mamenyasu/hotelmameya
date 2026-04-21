@@ -8,6 +8,7 @@ $action=$segments[1] ?? 'index';
 $room_id=$segments[2];
 $year=$segments[3];
 $month=$segments[4];
+$day=$segments[5];
 
 $dsn='mysql:host=localhost;dbname=hotelmameya;charset=utf8';
 $user='root';
@@ -32,8 +33,9 @@ switch($controller){
         $ctrl=new ReservationController($pdo);
         switch($action){
             case 'index' : $ctrl->index(); break;
-            case 'date_list' : $ctrl->date_list($room_id,$year,$month); break;
-            case 'reserve_form' : $ctrl->reserve_form(); break;
+            case 'date_list' : $ctrl->reservationCalendar($room_id,$year,$month); break;
+            case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day); break;
+            case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST);
             case 'reserve_confirm' : $ctrl->reserve_confirm(); break;
             case 'cancel_form' : $ctrl->reserve_cancel_form(); break;
             case 'cancel_confirm' : $ctrl->reserve_cancel_confirm(); break;

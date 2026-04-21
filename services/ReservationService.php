@@ -102,4 +102,36 @@ class ReservationService{
         }
     }
 
+    //指定の種類の部屋に、指定の期間で、空きがあるかの情報をコントローラーに渡すメソッド。
+    public function hasStock($request){
+        try{
+        $result=$this->roomAvailabilityModel->hasStock($request);
+            if($result){
+                return ['success'=>true];
+            }else{
+                return ['success'=>false,'message'=>'空きがありません。'];
+            }
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
+
+    //カレンダーで選択した日が、最低でも当日一泊出来るか確認するメソッド。
+    public function hasStockOne($room_id,$year,$month,$day){
+        try{
+            $request['room_id']=$room_id;
+            $request['checkin_date']=sprintf('%04d-%02d-%02d',$year,$month,$day);
+            $request['checkput_date']=date('Y-m-d',strtotime('+1 days',strtotime(sprintf('%04d-%02d-%02d',$year,$month,$day))));
+            $result=$this->roomAvailabilityModel->hasStock($request);
+            if($result){
+                return ['success'=>true];
+            }else{
+                return ['success'=>false,'message'=>'空きがありません。'];
+            }
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
+
+
 }
