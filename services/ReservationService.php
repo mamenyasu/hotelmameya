@@ -79,10 +79,10 @@ class ReservationService{
             if(!$reservation){
                 return ['success'=>false, 'message'=>'予約が存在しません。'];
             }
-            if($reservation['user_telphone']==$request['user_telphone']){
+            if($reservation['email']==$request['email']){
                 return ['success'=>true, 'reservation'=>$reservation];
             }else{
-                return ['success'=>false, 'message'=>'予約IDと電話番号が一致しません'];
+                return ['success'=>false, 'message'=>'予約IDとメールアドレスが一致しません'];
             }
         }catch(Exception $e){
             throw $e;

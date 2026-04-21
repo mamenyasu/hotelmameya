@@ -70,7 +70,7 @@ class ReservationController{
         $room_id=$room_id;
         $user_name="";
         $user_telphone="";
-        $checkin_date=sprintf('%04d-%02d-%02d',$year,$month,$day);
+        $checkin_date=htmlspecialchars(sprintf('%04d-%02d-%02d',$year,$month,$day));
         $checkout_date="";
         $total_price="";
         include __DIR__.'/../views/reserveForm.php';
@@ -91,12 +91,14 @@ class ReservationController{
         $error=$formrequest->formValidate($request);
         if($error){
             $error=$error;
-            $room_id=$request['room_id'];
-            $user_name=$request['user_name'];
-            $user_telphone=$request['user_telphone'];
-            $checkin_date=$request['checkin_date'];
-            $checkout_date=$request['checkout_date'];
-            $total_price=$request['total_price'];
+            $room_id=htmlspecialchars($request['room_id']);
+            $user_name=htmlspecialchars($request['user_name']);
+            $user_telphone=htmlspecialchars($request['user_telphone']);
+            $user_address=htmlspecialchars($request['user_address']);
+            $email=htmlspecialchars($request['email']);
+            $checkin_date=htmlspecialchars($request['checkin_date']);
+            $checkout_date=htmlspecialchars($request['checkout_date']);
+            $total_price=htmlspecialchars($request['total_price']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
         }
@@ -105,17 +107,21 @@ class ReservationController{
             'room_id' => $request['room_id'],
             'user_name' => $request['user_name'],
             'user_telphone' => mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'), //電話番号、全角なら半角へ。
+            'user_address' => $request['user_address'],
+            'email' => $request['email'],
             'checkin_date' => $request['checkin_date'],
             'checkout_date' =>$request['checkout_date'],
             'total_price' =>$request['total_price']
         ];
         //ビュー表示用。
-        $room_id=$request['room_id'];
-        $user_name=$request['user_name'];
-        $user_telphone=mb_convert_kana($request['user_telphone'], 'n', 'UTF-8');
-        $checkin_date=$request['checkin_date'];
-        $checkout_date=$request['checkout_date'];
-        $total_price=$request['total_price'];
+        $room_id=htmlspecialchars($request['room_id']);
+        $user_name=htmlspecialchars($request['user_name']);
+        $user_telphone=htmlspecialchars(mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'));
+        $user_address=htmlspecialchars($request['user_address']);
+        $email=htmlspecialchars($request['email']);
+        $checkin_date=htmlspecialchars($request['checkin_date']);
+        $checkout_date=htmlspecialchars($request['checkout_date']);
+        $total_price=htmlspecialchars($request['total_price']);
         include __DIR__.'/../views/reserveReconfirm.php';
         exit();
     }
