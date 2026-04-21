@@ -3,7 +3,7 @@
 require_once __DIR__.'/../services/FormValidationService.php';
 require_once __DIR__.'/../services/ReservationService.php';
 require_once __DIR__.'/../services/CalendarMarkArrayService.php';
-require_once __DIR__.'/../services/RoomMonthPriceService.php';
+require_once __DIR__.'/../requests/RoomMonthPriceService.php';
 
 class ReservationController{
 
@@ -84,28 +84,63 @@ class ReservationController{
         }
     }
 
-    ////予約内容確認ビュー表示メソッド。
+    ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request){
         //バリデーション。
-        $formvalidation=new FormValidationService();
-        $error=$formvalidation->formValidate($request);
+        $formrequest=new FormRequest();
+        $error=$formrequest->formValidate($request);
         if($error){
             $error=$error;
             $room_id=$request['room_id'];
             $user_name=$request['user_name'];
-            $user_telphone=['user_telphone'];
+            $user_telphone=$request['user_telphone'];
             $checkin_date=$request['checkin_date'];
             $checkout_date=$request['checkout_date'];
             $total_price=$request['total_price'];
             include __DIR__.'/../views/reserveForm.php';
+            exit();
         }
+        //セッション変数を使って、ビューをまたいで保持可能にする。
+        $_SESSION['reserve']=[
+            'room_id' => $request['room_id'],
+            'user_name' => $request['user_name'],
+            'user_telphone' => mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'), //電話番号、全角なら半角へ。
+            'checkin_date' => $request['checkin_date'],
+            'checkout_date' =>$request['checkout_date'],
+            'total_price' =>$request['total_price']
+        ];
+        //ビュー表示用。
         $room_id=$request['room_id'];
         $user_name=$request['user_name'];
-        $uset_telphone=$request['user_telphone'];
+        $user_telphone=mb_convert_kana($request['user_telphone'], 'n', 'UTF-8');
         $checkin_date=$request['checkin_date'];
         $checkout_date=$request['checkout_date'];
         $total_price=$request['total_price'];
         include __DIR__.'/../views/reserveReconfirm.php';
+        exit();
+    }
+
+    ////予約確定メソッド。
+    public function reserve_confirm(){
+        try{
+        $reservationService=new ReservationService($this->pdo);
+        //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。
+        $result=$reservationService->reserve($_SESSION['reserve']);
+        if($result['success']==false){
+            unset($_SESSION['reserve']);
+            $message=$result['message'];
+            include __DIR__.'/../views/false.php';
+            exit();
+        }
+        unset($_SESSION['reserve']);
+        include __DIR__.'/../views/reserveSuccess.php';
+        exit();
+        //例外処理。
+        }catch(Exception $e){
+        unset($_SESSION['reserve']);
+        $message=$e->getMessage();
+        include __DIR__.'/../views/false.php';
+        }
     }
 
 }

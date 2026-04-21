@@ -1,7 +1,6 @@
 <?php
-class FormValidationService{
+class FormRequest{
     //formのバリデーションをするメソッド。error[]配列を返す。
-
     public function formvalidate($request){
         $error=[];
         $user_name=$request['user_name'];
@@ -18,8 +17,6 @@ class FormValidationService{
             $error['user_name_length']='名前は３３文字以内で入力してください。';
         }
 
-        //電話番号について。まずは全角だったら半角に。
-        $user_telphone=mb_convert_kana($user_telphone,'n','UTF-8');
         if($user_telphone==null || $user_telphone==""){
             $error['user_telphone']='電話番号が入力されていません';
         }

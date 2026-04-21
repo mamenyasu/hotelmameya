@@ -1,5 +1,5 @@
 <?php
-class CalendarMarkArray{
+class CalendarMarkArrayService{
 
     public function getCalendarMarkArray($availability){
 
