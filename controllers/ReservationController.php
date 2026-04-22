@@ -26,7 +26,11 @@ class ReservationController{
 //--新規予約--
 
     ////予約カレンダービュー表示メソッド。初期表示ではroom=1(シングル)、当日。
-    public function reservationCalendar($room_id=1, $year=null, $month=null){
+        //ただし、--新規予約--プロセスだけでなく、後述の--予約変更--プロセスでAJAXで呼ばれる場合もある。
+    public function reservationCalendar($room_id=null, $year=null, $month=null){
+        if($room_id===null){
+            $room_id=1;
+        }
         if($year===null){
             $year=date('Y');
         }
@@ -54,7 +58,12 @@ class ReservationController{
         $mark=$calendarMark;
         $year=$year;
         $month=$month;
+        //後述の--予約変更--プロセスの中でAJAXとして呼ぶ場合は、マウスで各日をクリック選択できないカレンダーを表示。
+        if(isset($_SESSION['reserve_update_old'])){
+            include __DIR__.'/../views/reserveUpdateCalendar.php';
+        }else{
         include __DIR__.'/../views/reservationCalendar.php';
+        }
         exit();
 
         //例外処理。
@@ -306,6 +315,7 @@ class ReservationController{
     ////存在すれば、旧予約情報を保持しつつ、変更内容入力フォームを表示。
     ////部屋ごとのカレンダー用のデータもビューに渡す。在庫は、予約済みのものを一時的に戻して計算。
     public function reserve_update_form($request){
+
         //予約IDとメールアドレスをバリデーション。キャンセルバリデーションを再利用。
         $cancelFormRequest=new CancelFormRequest();
         $error=$cancelFormRequest->cancelFormValidate($request);

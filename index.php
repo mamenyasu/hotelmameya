@@ -7,10 +7,10 @@ $path=trim($path,'/');
 $segments=explode('/',$path);
 $controller=$segments[0] ?? 'home';
 $action=$segments[1] ?? 'index';
-$room_id=$segments[2];
-$year=$segments[3];
-$month=$segments[4];
-$day=$segments[5];
+$room_id=$segments[2] ?? null;
+$year=$segments[3] ?? null; 
+$month=$segments[4] ?? null;
+$day=$segments[5] ?? null;
 
 $dsn='mysql:host=localhost;dbname=hotelmameya;charset=utf8';
 $user='root';
