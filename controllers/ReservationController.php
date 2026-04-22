@@ -16,22 +16,24 @@ class ReservationController{
     }
 
 
-    ////初期ページ表示メソッド。
-    //予約カレンダーページへ移動する場合に、初期設定として、room_id=1(シングル)、当日の年、月、日をデータとして与える。
+//--初期ページ表示メソッド--
     public function index(){
-        $room_id=1;
-        $year=date('Y');
-        $month=date('m');
         include __DIR__.'/../views/index.php';
         exit();
     }
 
 
-
 //--新規予約--
 
-    ////予約カレンダービュー表示メソッド。
-    public function reservationCalendar($room_id,$year,$month){
+    ////予約カレンダービュー表示メソッド。初期表示ではroom=1(シングル)、当日。
+    public function reservationCalendar($room_id=1, $year=null, $month=null){
+        if($year===null){
+            $year=date('Y');
+        }
+        if($month===null){
+            $month=date('m');
+        }
+
         try{
         //指定された種類の部屋の、指定月のデータを取得。各日それぞれの値段も、この配列に入っている。
         $reservationService=new ReservationService($this->pdo);
@@ -50,6 +52,8 @@ class ReservationController{
         $roomMonthPriceService=new RoomMonthPriceService();
         $price=$roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
         $mark=$calendarMark;
+        $year=$year;
+        $month=$month;
         include __DIR__.'/../views/reservationCalendar.php';
         exit();
 
@@ -77,6 +81,9 @@ class ReservationController{
         //予約フォームを表示。カレンダーで選択した月日がチェックイン日となる。
         $message="";
         $errors="";
+        $checkin_year=$year;
+        $checkin_month=$month;
+        $checkin_day=$day;
         $room_id=$room_id;
         $user_name="";
         $user_telphone="";
@@ -346,16 +353,22 @@ class ReservationController{
 
             //在庫を一時的に戻す。
             $restockService=new RestockService();
-            $availabilityRoomMonth=$restockService->restock($availabilityRoomMonth);
-            
-
-
+            $restocked_availabilityRoomMonth=$restockService->restock($availabilityRoomMonth);
+            //１～月末日まで、〇△×に変換。在庫戻しと関係あるので、リストック後の配列を使用。
+            $calendarMarkArrayService=new CalendarMarkArrayService();
+            $markArrayMonth=$calendarMarkArrayService->getCalendarMarkArray($restocked_availabilityRoomMonth);
+            //値段データも取得。 １～月末日まで。価格は在庫戻しと関係ないので、修正前の配列を使う。
+            $roomMonthPriceService=new RoomMonthPriceService();
+            $pricesMonth=$roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
             
 
             //ビュー表示用。
-            $calendarData=$availabilityRoomMonth['availabilityRoomMonth'];
+            $markArray=$markArrayMonth;
+            $prices=$pricesMonth;
             $message="";
             $errors="";
+            $old_checkin_year=(int)date('Y',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
+            $old_checkin_month=(int)date('n',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id=htmlspecialchars($oldresult['reservation']['id']);
             $old_room_id=htmlspecialchars($oldresult['reservation']['room_id']);
             $old_checkin_date=htmlspecialchars($oldresult['reservation']['checkin_date']);
@@ -372,8 +385,9 @@ class ReservationController{
 
     
     ////変更内容最終確認ビューを表示。旧予約情報と新予約情報を表示。
-    public function reserve_update_reconfirm(){
+    public function reserve_update_reconfirm($request){
 
+    
     }
 
 }

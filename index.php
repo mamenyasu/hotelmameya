@@ -35,7 +35,7 @@ switch($controller){
         $ctrl=new ReservationController($pdo);
         switch($action){
             case 'index' : $ctrl->index(); break;
-            case 'date_list' : $ctrl->reservationCalendar($room_id,$year,$month); break;
+            case 'reservationCalendar' : $ctrl->reservationCalendar($room_id,$year,$month); break;
             case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day); break;
             case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST); break;
             case 'reserve_confirm' : $ctrl->reserve_confirm(); break;
@@ -44,7 +44,7 @@ switch($controller){
             case 'cancel_confirm' : $ctrl->reserve_cancel_confirm(); break;
             case 'update_verify_form' : $ctrl->reserve_updateVerify_form(); break;
             case 'update_form' : $ctrl->reserve_update_form($_POST); break;
-            case 'update_reconfirm' : $ctrl->reserve_update_reconfirm(); break;
+            case 'update_reconfirm' : $ctrl->reserve_update_reconfirm($_POST); break;
             case 'update_confirm' : $ctrl->reserve_update_confirm(); break;
             default : $ctrl->index(); break;
         }
