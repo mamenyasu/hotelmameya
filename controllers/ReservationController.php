@@ -5,6 +5,7 @@ require_once __DIR__.'/../requests/CancelFormRequest.php';
 require_once __DIR__.'/../services/ReservationService.php';
 require_once __DIR__.'/../services/CalendarMarkArrayService.php';
 require_once __DIR__.'/../services/RoomMonthPriceService.php';
+require_once __DIR__.'/../services/RestockService.php';
 
 
 class ReservationController{
@@ -331,7 +332,7 @@ class ReservationController{
                 'total_price' =>$oldresult['reservation']['total_price']
                 ];
 
-            //初期表示用にカレンダーのデータをつくる。初期設定は既予約のものを使う。
+            //初期表示用に一か月分の在庫データを取得。初期設定は既予約のものを使う。
             $oldroom_id=$_SESSION['reserve_update_old']['room_id'];
             $oldcheckin_date=$_SESSION['reserve_update_old']['checkin_date'];
             $oldyear=date('Y',strtotime($oldcheckin_date));
@@ -343,7 +344,9 @@ class ReservationController{
                 exit();
             }
 
-            //カレンダーの在庫を一時的に戻す。
+            //在庫を一時的に戻す。
+            $restockService=new RestockService();
+            $availabilityRoomMonth=$restockService->restock($availabilityRoomMonth);
             
 
 
