@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 $requestUri=$_SERVER['REQUEST_URI'];
 $path=parse_url($requestUri,PHP_URL_PATH);
 $path=trim($path,'/');
@@ -41,7 +43,7 @@ switch($controller){
             case 'cancel_reconfirm' : $ctrl->reserve_cancel_reconfirm($_POST); break;
             case 'cancel_confirm' : $ctrl->reserve_cancel_confirm(); break;
             case 'update_verify_form' : $ctrl->reserve_updateVerify_form(); break;
-            case 'update_form' : $ctrl->reserve_update_Verifyform(); break;
+            case 'update_form' : $ctrl->reserve_update_form($_POST); break;
             case 'update_reconfirm' : $ctrl->reserve_update_reconfirm(); break;
             case 'update_confirm' : $ctrl->reserve_update_confirm(); break;
             default : $ctrl->index(); break;

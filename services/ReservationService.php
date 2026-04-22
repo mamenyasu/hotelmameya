@@ -12,6 +12,21 @@ class ReservationService{
         $this->roomAvailabilityModel=new RoomAvailabilityModel($pdo);
     }
 
+    //選択した期間、部屋が確保できるか
+    public function hasSTockBetween($request){
+        try{
+            $stockBetween=$this->roomAvailabilityModel->hasStock($request);
+            if(!$stockBetween){
+                return ['success'=>false,'messeage'=>'選択した期間の空きがありません。'];
+            }
+            return ['success'=>true];
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
+
+
+
     //予約操作。戻り値として結果の連想配列を受け取る（もしくは$eを受け取る)。
     public function reserve($request){
         try{
