@@ -72,14 +72,13 @@ class ReservationService{
     }
     }
 
-    //照合して既予約情報を返す操作。予約IDと電話番号を元に照合。戻り値として結果の連想配列を受け取る（もしくは$eを受け取る）。
+    //照合して既予約情報を返す操作。予約IDとメールアドレスを元に照合。戻り値として結果の連想配列を返す（もしくは$eを返す）。
     public function showReservation($request){
         try{
             $reservation=$this->reservationsModel->getReservationById($request);
             if(!$reservation){
                 return ['success'=>false, 'message'=>'予約が存在しません。'];
-            }
-            if($reservation['email']==$request['email']){
+            }elseif($reservation['email']==$request['email']){
                 return ['success'=>true, 'reservation'=>$reservation];
             }else{
                 return ['success'=>false, 'message'=>'予約IDとメールアドレスが一致しません'];

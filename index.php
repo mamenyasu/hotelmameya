@@ -35,9 +35,11 @@ switch($controller){
             case 'index' : $ctrl->index(); break;
             case 'date_list' : $ctrl->reservationCalendar($room_id,$year,$month); break;
             case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day); break;
-            case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST);
+            case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST); break;
             case 'reserve_confirm' : $ctrl->reserve_confirm(); break;
             case 'cancel_form' : $ctrl->reserve_cancel_form(); break;
+            case 'cancel_verify' : $ctrl->reserve_cancel_verify($_POST); break;
+            case 'cancel_reconfirm' : $ctrl->reserve_cancel_reconfirm(); break;
             case 'cancel_confirm' : $ctrl->reserve_cancel_confirm(); break;
             case 'update_form' : $ctrl->reserve_update_form(); break;
             case 'update_confirm' : $ctrl->reserve_update_confirm(); break;
