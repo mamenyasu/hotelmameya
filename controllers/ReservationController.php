@@ -26,6 +26,9 @@ class ReservationController{
     }
 
 
+
+//--新規予約--
+
     ////予約カレンダービュー表示メソッド。
     public function reservationCalendar($room_id,$year,$month){
         try{
@@ -57,7 +60,8 @@ class ReservationController{
         }
     }
 
-    ////予約フォームビュー表示メソッド。
+
+    ////予約フォームビュー表示。
     public function reserve_form($room_id,$year,$month,$day){
         try{
         //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
@@ -69,7 +73,7 @@ class ReservationController{
             exit();
         }
 
-        //予約フォームを表示。
+        //予約フォームを表示。カレンダーで選択した月日がチェックイン日となる。
         $room_id=$room_id;
         $user_name="";
         $user_telphone="";
@@ -86,6 +90,7 @@ class ReservationController{
         exit();
         }
     }
+
 
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request){
@@ -129,6 +134,7 @@ class ReservationController{
         exit();
     }
 
+
     ////予約確定メソッド。
     public function reserve_confirm(){
         try{
@@ -153,13 +159,18 @@ class ReservationController{
         }
     }
 
-    ////キャンセルフォーム表示メソッド。
+
+
+//--予約キャンセル--    
+
+    ////キャンセルフォーム表示。予約IDとメールアドレスを入力してもらう予定。
     public function reserve_cancel_form(){
         include __DIR__.'/../views/reserveCancelForm.php';
     }
 
+
     ////キャンセルリクエスト照会メソッド。成功だとキャンセル最終確認ビューへ。
-    public function reserve_cancel_verify($request){
+    public function reserve_cancel_reconfirm($request){
         //予約IDとメールアドレスをバリデーション。
         $cancelFormRequest=new CancelFormRequest();
         $error=$cancelFormRequest->cancelFormValidate($request);
@@ -175,42 +186,127 @@ class ReservationController{
         $request['id']=mb_convert_kana($request['id'],'n','utf-8');
 
         //既予約が存在するか、また入力内容と一致するか照合。
-        $reservationService=new ReservationService($this->pdo);
-        $result=$reservationService->showReservation($request);
-        if($result['success']==false){
-            $message=$result['message'];
+        try{
+            $reservationService=new ReservationService($this->pdo);
+            $result=$reservationService->showReservation($request);
+            if($result['success']==false){
+                $message=$result['message'];
+                include __DIR__.'/../views/false.php';
+                exit();
+            }
+
+            //セッション変数を使って、ビューをまたいで保持可能にする。
+            $_SESSION['reserve_cancel']=[
+                'id' => $result['reservation']['id'],
+                'room_id' => $result['reservation']['room_id'],
+                'user_name' => $result['reservation']['user_name'],
+                'user_telphone' => $result['reservation']['user_telphone'],
+                'user_address' => $result['reservation']['user_address'],
+                'email' => $result['reservation']['email'],
+                'checkin_date' => $result['reservation']['checkin_date'],
+                'checkout_date' =>$result['reservation']['checkout_date'],
+                'total_price' =>$result['reservation']['total_price']
+                ];
+
+            //ビュー表示用。
+            $id=htmlspecialchars($result['reservation']['id']);
+            $room_id=htmlspecialchars($result['reservation']['room_id']);
+            $user_name=htmlspecialchars($result['reservation']['user_name']);
+            $user_telphone=htmlspecialchars($result['reservation']['user_telphone']);
+            $user_address=htmlspecialchars($result['reservation']['user_address']);
+            $email=htmlspecialchars($result['reservation']['email']);
+            $checkin_date=htmlspecialchars($result['reservation']['checkin_date']);
+            $checkout_date=htmlspecialchars($result['reservation']['checkout_date']);
+            $total_price=htmlspecialchars($result['reservation']['total_price']);
+            include __DIR__.'/../views/reserveCancelReconfirm.php';
+            exit();
+        }catch(Exception $e){
+            $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();
         }
-
-        //セッション変数を使って、ビューをまたいで保持可能にする。
-        $_SESSION['reserve_cancel']=[
-            'id' => $result['reservation']['id'],
-            'room_id' => $result['reservation']['room_id'],
-            'user_name' => $result['reservation']['user_name'],
-            'user_telphone' => $result['reservation']['user_telphone'],
-            'user_address' => $result['reservation']['user_address'],
-            'email' => $result['reservation']['email'],
-            'checkin_date' => $result['reservation']['checkin_date'],
-            'checkout_date' =>$result['reservation']['checkout_date'],
-            'total_price' =>$result['reservation']['total_price']
-            ];
-
-        //ビュー表示用。
-        $id=htmlspecialchars($result['reservation']['id']);
-        $room_id=htmlspecialchars($result['reservation']['room_id']);
-        $user_name=htmlspecialchars($result['reservation']['user_name']);
-        $user_telphone=htmlspecialchars($result['reservation']['user_telphone']);
-        $user_address=htmlspecialchars($result['reservation']['user_address']);
-        $email=htmlspecialchars($result['reservation']['email']);
-        $checkin_date=htmlspecialchars($result['reservation']['checkin_date']);
-        $checkout_date=htmlspecialchars($result['reservation']['checkout_date']);
-        $total_price=htmlspecialchars($result['reservation']['total_price']);
-        include __DIR__.'/../views/reserveCancelReconfirm.php';
-        exit();
     }
 
-    ////キャンセル確定メソッド。
+
+    ////キャンセル確定メソッド。セッション変数[reserve_cancel]を使ってキャンセルする。
+    public function reserve_cancel_confirm(){
+        try{
+            $reservationService=new ReservationService($this->pdo);
+            $result=$reservationService->cancel($_SESSION['reserve_cancel']);
+            $message=$result['message'];
+            include __DIR__.'/../views/reserveCancelSuccess.php';
+            exit();
+        }catch(Exception $e){
+            $message=$e->getMessage();
+            include __DIR__.'/../views/false.php';
+            exit();
+        }
+    }
+
+
+
+//--予約変更--
+
+    ////予約変更フォーム表示。既予約の予約IDとメールアドレスを入力してもらう予定。
+    public function reserve_updateVerify_form(){
+        include __DIR__.'/../views/reserveUpdateVerifyForm.php';
+    }
+
+    ////リクエスト照会し、存在すれば、旧予約情報を保持しつつ変更内容入力フォームを表示。
+    public function reserve_update_form($request){
+        //予約IDとメールアドレスをバリデーション。キャンセルバリデーションを再利用。
+        $cancelFormRequest=new CancelFormRequest();
+        $error=$cancelFormRequest->cancelFormValidate($request);
+        if($error){
+            $errors=$error;
+            $id=htmlspecialchars($request['id']);
+            $email=htmlspecialchars($request['email']);
+            include __DIR__.'/../views/reserveUpdateVerifyForm.php';
+            exit();
+        }
+
+        //入力バリデーション後、予約IDが全角だった場合、照会前に半角へ変換。
+        $request['id']=mb_convert_kana($request['id'],'n','utf-8');
+
+         //既予約が存在するか、また入力内容と一致するか照合。
+        try{
+            $reservationService=new ReservationService($this->pdo);
+            $oldresult=$reservationService->showReservation($request);
+            if($oldresult['success']==false){
+                $message=$oldresult['message'];
+                include __DIR__.'/../views/false.php';
+                exit();
+            }
+
+            //セッション変数を使って、旧予約内容をビューをまたいで保持可能にする。個人情報は不要。
+            $_SESSION['reserve_update_old']=[
+                'id' => $oldresult['reservation']['id'],
+                'room_id' => $oldresult['reservation']['room_id'],
+                'checkin_date' => $oldresult['reservation']['checkin_date'],
+                'checkout_date' =>$oldresult['reservation']['checkout_date'],
+                'total_price' =>$oldresult['reservation']['total_price']
+                ];
+
+            //ビュー表示用。
+            $old_id=htmlspecialchars($oldresult['reservation']['id']);
+            $old_room_id=htmlspecialchars($oldresult['reservation']['room_id']);
+            $old_checkin_date=htmlspecialchars($oldresult['reservation']['checkin_date']);
+            $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date']);
+            $old_total_price=htmlspecialchars($oldresult['reservation']['total_price']);
+            include __DIR__.'/../views/reserveUpdateForm.php';
+            exit();
+        }catch(Exception $e){
+            $message=$e->getMessage();
+            include __DIR__.'/../views/false.php';
+            exit();
+        }
+    }
+
     
+    ////変更内容入力フォーム表示。旧予約情報と、在庫カレンダー(ただしクリックはできない)、新予約用フォームを一気に表示。
+    ////在庫カレンダーは、一時的に旧予約の部屋を戻した条件で表示する。
+    public function reserve_update_reconfirm(){
+
+    }
 
 }

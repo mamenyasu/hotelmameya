@@ -34,15 +34,10 @@ class ReservationService{
     //予約キャンセル操作。戻り値として結果の連想配列を受けとる（もしくは$eを受け取る）。
     public function cancel($request){
         try{
-            //キャンセル予定の予約が実在するか確認する。予約IDから既予約情報(DBの連想配列)が返ってくる。
-            $reservation=$this->reservationsModel->getReservationById($request);
-            if(!$reservation){
-                return ['success'=>false, 'message'=>'予約が存在しません。'];
-            }
             //予約取り消し操作。
-            $this->reservationsModel->deleteReservation($reservation);
+            $this->reservationsModel->deleteReservation($request);
             //在庫を復活させる。
-            $this->roomAvailabilityModel->increaseBookedRooms($reservation);
+            $this->roomAvailabilityModel->increaseBookedRooms($request);
             //結果をコントローラーに返す。
             return ['success'=>true,'messeage'=>'予約がキャンセルされました。'];            
         }catch(Exception $e){
@@ -55,21 +50,21 @@ class ReservationService{
     //DB書き込み直前に空きがあるか再確認しておく。その後、在庫を回復させてから、予約データを上書きし、在庫をあらたに減らす。
     public function update($request){
         try{
-        $old=$this->reservationsModel->getReservationById($request);
-        if(!$old){
-            return ['success'=>false, 'message'=>'予約が存在しません。'];
+            $old=$this->reservationsModel->getReservationById($request);
+            if(!$old){
+                return ['success'=>false, 'message'=>'予約が存在しません。'];
+            }
+            $stock=$this->roomAvailabilityModel->hasStock($request);
+            if(!$stock){
+                return ['success'=>false,'messeage'=>'空きがありません。'];
+            }
+            $this->roomAvailabilityModel->increaseBookedRooms($old);
+            $this->reservationsModel->updateReservation($request);
+            $this->roomAvailabilityModel->decreaseBookedRooms($request);
+                return ['success'=>true,'message'=>'予約が変更されました。'];
+        }catch(Exception $e){
+            throw $e;
         }
-        $stock=$this->roomAvailabilityModel->hasStock($request);
-        if(!$stock){
-            return ['success'=>false,'messeage'=>'空きがありません。'];
-        }
-        $this->roomAvailabilityModel->increaseBookedRooms($old);
-        $this->reservationsModel->updateReservation($request);
-        $this->roomAvailabilityModel->decreaseBookedRooms($request);
-        return ['success'=>true,'message'=>'予約が変更されました。'];
-    }catch(Exception $e){
-        throw $e;
-    }
     }
 
     //照合して既予約情報を返す操作。予約IDとメールアドレスを元に照合。戻り値として結果の連想配列を返す（もしくは$eを返す）。
