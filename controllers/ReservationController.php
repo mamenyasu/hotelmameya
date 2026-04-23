@@ -66,8 +66,6 @@ class ReservationController{
         //月初～月末（例：１～３１）のprice配列とmark配列をビューに与えて表示。
         $price=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
         $mark=$calendarMark;
-        $year=$year;
-        $month=$month;
         //後述の--予約変更--プロセスの中でAJAXとして呼ぶ場合は、マウスで各日をクリック選択できないカレンダーを表示。
         if(isset($_SESSION['reserve_update_old'])){
             include __DIR__.'/../views/reserveUpdateCalendar.php';
@@ -97,19 +95,7 @@ class ReservationController{
         }
 
         //予約フォームを表示。カレンダーで選択した月日がチェックイン日となる。
-        $message="";
-        $errors="";
-        $checkin_year=$year;
-        $checkin_month=$month;
-        $checkin_day=$day;
-        $room_id=$room_id;
-        $user_name="";
-        $user_telphone="";
-        $user_address="";
-        $email="";
         $checkin_date=htmlspecialchars(sprintf('%04d-%02d-%02d',$year,$month,$day));
-        $checkout_date="";
-        $total_price="";
         include __DIR__.'/../views/reserveForm.php';
         exit();
 
@@ -127,8 +113,6 @@ class ReservationController{
         //バリデーション。
         $error=$this->formrequest->formValidate($request);
         if($error){
-            $message="";
-            $errors=$error;
             $room_id=htmlspecialchars($request['room_id']);
             $user_name=htmlspecialchars($request['user_name']);
             $user_telphone=htmlspecialchars($request['user_telphone']);
@@ -146,7 +130,6 @@ class ReservationController{
             $hasStockBetween=$this->reservationService->hasStockBetween($request);
             if($hasStockBetween['success']==false){
                 $message=$hasStockBetween['message'];
-                $errors="";
                 $room_id=htmlspecialchars($request['room_id']);
                 $user_name=htmlspecialchars($request['user_name']);
                 $user_telphone=htmlspecialchars($request['user_telphone']);
@@ -222,9 +205,6 @@ class ReservationController{
 
     ////キャンセルフォーム表示。予約IDとメールアドレスを入力してもらう予定。
     public function reserve_cancel_form(){
-        $errors="";
-        $id="";
-        $email="";
         include __DIR__.'/../views/reserveCancelForm.php';
     }
 
@@ -306,10 +286,6 @@ class ReservationController{
 
     ////予約変更フォーム表示。既予約の予約IDとメールアドレスを入力してもらう予定。
     public function reserve_updateVerify_form(){
-        $message="";
-        $errors="";
-        $id="";
-        $email="";
         include __DIR__.'/../views/reserveUpdateVerifyForm.php';
     }
 
@@ -322,7 +298,6 @@ class ReservationController{
         //予約IDとメールアドレスをバリデーション。キャンセルバリデーションを再利用。
         $error=$this->cancelFormRequest->cancelFormValidate($request);
         if($error){
-            $errors=$error;
             $id=htmlspecialchars($request['id']);
             $email=htmlspecialchars($request['email']);
             include __DIR__.'/../views/reserveUpdateVerifyForm.php';
@@ -373,8 +348,6 @@ class ReservationController{
             //ビュー表示用。
             $markArray=$markArrayMonth;
             $prices=$pricesMonth;
-            $message="";
-            $errors="";
             $old_checkin_year=(int)date('Y',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
             $old_checkin_month=(int)date('n',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id=htmlspecialchars($oldresult['reservation']['id']);
