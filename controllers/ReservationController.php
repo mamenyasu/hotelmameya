@@ -13,6 +13,7 @@ class ReservationController{
     private $pdo;
     private $formrequest;
     private $cancelFormRequest;
+    private $updateFormRequest;
     private $reservationService;
     private $calendarMarkArrayService;
     private $roomMonthPriceService;
@@ -22,6 +23,7 @@ class ReservationController{
         $this->pdo=$pdo;
         $this->formrequest = new FormRequest();
         $this->cancelFormRequest = new CancelFormRequest();
+        $this->updateFormRequest = new UpdateFormRequest();
         $this->reservationService = new ReservationService($pdo);
         $this->calendarMarkArrayService = new CalendarMarkArrayService();
         $this->roomMonthPriceService = new RoomMonthPriceService();
@@ -110,7 +112,7 @@ class ReservationController{
 
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request){
-        //バリデーション。
+        //バリデーション。通らなかったら差し戻し。
         $error=$this->formrequest->formValidate($request);
         if($error){
             $room_id=htmlspecialchars($request['room_id']);
@@ -211,15 +213,15 @@ class ReservationController{
 
     ////キャンセルリクエスト照会メソッド。成功だとキャンセル最終確認ビューへ。
     public function reserve_cancel_reconfirm($request){
-        //予約IDとメールアドレスをバリデーション。
-        $error=$this->cancelFormRequest->cancelFormValidate($request);
-        if($error){
-            $errors=$error;
-            $id=htmlspecialchars($request['id']);
-            $email=htmlspecialchars($request['email']);
-            include __DIR__.'/../views/reserveCancelForm.php';
-            exit();
-        }
+        //予約IDとメールアドレスをバリデーション。通らなかったら差し戻し。
+            $error=$this->cancelFormRequest->cancelFormValidate($request);
+            if($error){
+                $errors=$error;
+                $id=htmlspecialchars($request['id']);
+                $email=htmlspecialchars($request['email']);
+                include __DIR__.'/../views/reserveCancelForm.php';
+                exit();
+            }
 
         //入力バリデーション後、予約IDが全角だった場合、照会前に半角へ変換。
         $request['id']=mb_convert_kana($request['id'],'n','utf-8');
@@ -307,7 +309,7 @@ class ReservationController{
         //入力バリデーション後、予約IDが全角だった場合、照会前に半角へ変換。
         $request['id']=mb_convert_kana($request['id'],'n','utf-8');
 
-         //既予約が存在するか、また入力内容と一致するか照合。一致しなければメッセージを持って差し戻し。
+         //既予約が存在するか、入力内容と一致するか照合。戻り値は結果と該当レコード。一致しなければメッセージを持って差し戻し。
         try{
             $oldresult=$this->reservationService->showReservation($request);
             if($oldresult['success']==false){
@@ -316,7 +318,7 @@ class ReservationController{
                 exit();
             }
 
-            //セッション変数を使って、旧予約内容をビューをまたいで保持可能にする。個人情報は不要。
+            //セッション変数を使って、旧予約内容(該当レコード)をビューをまたいで保持可能にする。個人情報は不要。
             $_SESSION['reserve_update_old']=[
                 'id' => $oldresult['reservation']['id'],
                 'room_id' => $oldresult['reservation']['room_id'],
@@ -367,8 +369,98 @@ class ReservationController{
     
     ////変更内容最終確認ビューを表示。旧予約情報と新予約情報を表示。
     public function reserve_update_reconfirm($request){
+    //バリデーション。通らなかったら差し戻し。
+        $error=$this->updateFormRequest->updateFormValidate($request);
+        if($error){
+            $new_room_id=htmlspecialchars($request['room_id']);
+            $new_checkin_date=htmlspecialchars($request['checkin_date']);
+            $new_checkout_date=htmlspecialchars($request['checkout_date']);
+            $new_total_price=htmlspecialchars($request['total_price']);
+            include __DIR__.'/../views/reserveUpdateForm.php';
+            exit();
+        }
 
-    
+    //変更後の予約の部屋と期間が本当に空いているか再度チェック。空いていなければ差し戻し。
+        try{
+            $result=$this->reservationService->hasStock($request);
+            if(!$result){
+                $message=$result['message'];
+                $new_room_id=htmlspecialchars($request['room_id']);
+                $new_checkin_date=htmlspecialchars($request['checkin_date']);
+                $new_checkout_date=htmlspecialchars($request['checkout_date']);
+                $new_total_price=htmlspecialchars($request['total_price']);
+                include __DIR__.'/../views/reserveUpdateForm.php';
+            }
+
+    //セッション変数を使って、旧予約内容をビューをまたいで保持可能にする。個人情報は不要。
+            $_SESSION['reserve_update_new']=[
+                'room_id' => $request['room_id'],
+                'checkin_date' => $request['checkin_date'],
+                'checkout_date' =>$request['checkout_date'],
+                'total_price' =>$request['total_price']
+                ];
+
+    //ビュー表示用。
+            $id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
+            $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
+            $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
+            $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
+            $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
+            $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
+            $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
+            $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
+            $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
+            include __DIR__.'/../views/reserveUpdateConfirm.php';
+            exit();
+        }catch(Exception $e){
+            $message=$e->getMessage();
+            include __DIR__.'/../views/false.php';
+            exit();
+        }    
     }
+
+
+    ////変更内容のDBへの書き込み。
+    public function reserve_update_confirm(){
+
+        if(!$_SESSION['reserve_update_old'] || $_SESSION['reserve_update_new']){
+            echo "不正なリクエストです。";
+            exit();
+        }
+
+        $updateRequest['id']=$_SESSION['reserve_update_old']['id'];
+        $updateRequest['room_id']=$_SESSION['reserve_update_new']['room_id'];
+        $updateRequest['checkin_date']=$_SESSION['reserve_update_new']['checkin_date'];
+        $updateRequest['checkout_date']=$_SESSION['reserve_update_new']['checkout_date'];
+        $updateRequest['total_price']=$_SESSION['reserve_update_new']['total_price'];
+
+        try{
+                $result=$this->reservationService->update($updateRequest);
+                //最終チェック。通らなければ差し戻し。
+                    if(!$result){
+                    $message=$result['message'];
+                    $id=$_SESSION['reserve_update_old']['id'];
+                    $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
+                    $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
+                    $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
+                    $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
+                    $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
+                    $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
+                    $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
+                    $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
+                    include __DIR__.'/../views/reserveUpdateForm.php';
+                    exit();
+                    } 
+                $message=$result['message'];
+                include __DIR__.'/../views/updateSuccess.php';
+                exit();
+        }catch(Exception $e){
+                $message=$e->getMessage();
+                include __DIR__.'/../views/false.php';
+                exit();    
+        }
+        
+    }
+
 
 }

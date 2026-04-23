@@ -4,25 +4,14 @@ require_once __DIR__.'/../models/ReservationsModel.php';
 require_once __DIR__.'/../models/RoomAvailabilityModel.php';
 
 class ReservationService{
+    private $pdo;
     private $reservationsModel;
     private $roomAvailabilityModel;
 
     public function __construct($pdo){
+        $this->pdo=$pdo;
         $this->reservationsModel=new ReservationsModel($pdo);
         $this->roomAvailabilityModel=new RoomAvailabilityModel($pdo);
-    }
-
-    //選択した期間、部屋が確保できるか
-    public function hasSTockBetween($request){
-        try{
-            $stockBetween=$this->roomAvailabilityModel->hasStock($request);
-            if(!$stockBetween){
-                return ['success'=>false,'messeage'=>'選択した期間の空きがありません。'];
-            }
-            return ['success'=>true];
-        }catch(Exception $e){
-            throw $e;
-        }
     }
 
 
@@ -73,11 +62,15 @@ class ReservationService{
             if(!$stock){
                 return ['success'=>false,'messeage'=>'空きがありません。'];
             }
+            //トランザクション処理開始。
+            $this->pdo->beginTransaction();
             $this->roomAvailabilityModel->increaseBookedRooms($old);
             $this->reservationsModel->updateReservation($request);
             $this->roomAvailabilityModel->decreaseBookedRooms($request);
+            $this->pdo->commit(); //成功時はコミット。
                 return ['success'=>true,'message'=>'予約が変更されました。'];
         }catch(Exception $e){
+            $this->pdo->rollBack(); //失敗時はロールバック。
             throw $e;
         }
     }
@@ -115,15 +108,29 @@ class ReservationService{
     public function hasStock($request){
         try{
         $result=$this->roomAvailabilityModel->hasStock($request);
-            if($result){
-                return ['success'=>true];
-            }else{
+            if(!$result){
                 return ['success'=>false,'message'=>'空きがありません。'];
             }
+                return ['success'=>true];
         }catch(Exception $e){
             throw $e;
         }
     }
+
+
+    //選択した期間、部屋が確保できるか
+    public function hasSTockBetween($request){
+        try{
+            $stockBetween=$this->roomAvailabilityModel->hasStock($request);
+            if(!$stockBetween){
+                return ['success'=>false,'messeage'=>'選択した期間の空きがありません。'];
+            }
+                return ['success'=>true];
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
+
 
     //カレンダーで選択した日が、最低でも当日一泊出来るか確認するメソッド。
     public function hasStockOne($room_id,$year,$month,$day){
