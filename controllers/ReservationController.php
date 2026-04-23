@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../requests/FromRequest.php';
+require_once __DIR__.'/../requests/FormRequest.php';
 require_once __DIR__.'/../requests/CancelFormRequest.php';
 require_once __DIR__.'/../services/ReservationService.php';
 require_once __DIR__.'/../services/CalendarMarkArrayService.php';
@@ -9,10 +9,23 @@ require_once __DIR__.'/../services/RestockService.php';
 
 
 class ReservationController{
-
+//!!--プロパティ--
     private $pdo;
+    private $formrequest;
+    private $cancelFormRequest;
+    private $reservationService;
+    private $calendarMarkArrayService;
+    private $roomMonthPriceService;
+    private $restockService;
+//!!--コンストラクタ--
     public function __construct($pdo){
         $this->pdo=$pdo;
+        $this->formrequest = new FormRequest();
+        $this->cancelFormRequest = new CancelFormRequest();
+        $this->reservationService = new ReservationService($pdo);
+        $this->calendarMarkArrayService = new CalendarMarkArrayService();
+        $this->roomMonthPriceService = new RoomMonthPriceService();
+        $this->restockService = new RestockService();
     }
 
 
@@ -40,8 +53,7 @@ class ReservationController{
 
         try{
         //指定された種類の部屋の、指定月のデータを取得。各日それぞれの値段も、この配列に入っている。
-        $reservationService=new ReservationService($this->pdo);
-        $availabilityRoomMonth=$reservationService->getAvailabilityRoomMonth($room_id,$year,$month);
+        $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($room_id,$year,$month);
             if($availabilityRoomMonth['success']==false){
                 $message=$availabilityRoomMonth['message'];
                 include __DIR__.'/../views/false.php';
@@ -49,12 +61,10 @@ class ReservationController{
             }
 
         //指定された種類の部屋の、指定月の各日の空き具合（〇△×）のデータ。
-        $calendarMarkService=new CalendarMarkArrayService();
-        $calendarMark=$calendarMarkService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+        $calendarMark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
 
         //月初～月末（例：１～３１）のprice配列とmark配列をビューに与えて表示。
-        $roomMonthPriceService=new RoomMonthPriceService();
-        $price=$roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
+        $price=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
         $mark=$calendarMark;
         $year=$year;
         $month=$month;
@@ -79,8 +89,7 @@ class ReservationController{
     public function reserve_form($room_id,$year,$month,$day){
         try{
         //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
-        $reservationService=new ReservationService($this->pdo);
-        $hasStockOne=$reservationService->hasStockOne($room_id,$year,$month,$day);
+        $hasStockOne=$this->reservationService->hasStockOne($room_id,$year,$month,$day);
         if($hasStockOne['success']==false){
             $message=$hasStockOne['message'];
             include __DIR__.'/../views/false.php';
@@ -116,8 +125,7 @@ class ReservationController{
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request){
         //バリデーション。
-        $formrequest=new FormRequest();
-        $error=$formrequest->formValidate($request);
+        $error=$this->formrequest->formValidate($request);
         if($error){
             $message="";
             $errors=$error;
@@ -135,8 +143,7 @@ class ReservationController{
 
         //選択した期間で、部屋が確保できるか確認。確保できなければ、入力内容を持って差し戻し。
         try{
-            $reservationSerivice=new ReservationService($this->pdo);
-            $hasStockBetween=$reservationService->hasStockBetween($request);
+            $hasStockBetween=$this->reservationService->hasStockBetween($request);
             if($hasStockBetween['success']==false){
                 $message=$hasStockBetween['message'];
                 $errors="";
@@ -189,9 +196,8 @@ class ReservationController{
     ////予約確定メソッド。
     public function reserve_confirm(){
         try{
-        $reservationService=new ReservationService($this->pdo);
         //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。
-        $result=$reservationService->reserve($_SESSION['reserve']);
+        $result=$this->reservationService->reserve($_SESSION['reserve']);
         if($result['success']==false){
             unset($_SESSION['reserve']);
             $message=$result['message'];
@@ -226,8 +232,7 @@ class ReservationController{
     ////キャンセルリクエスト照会メソッド。成功だとキャンセル最終確認ビューへ。
     public function reserve_cancel_reconfirm($request){
         //予約IDとメールアドレスをバリデーション。
-        $cancelFormRequest=new CancelFormRequest();
-        $error=$cancelFormRequest->cancelFormValidate($request);
+        $error=$this->cancelFormRequest->cancelFormValidate($request);
         if($error){
             $errors=$error;
             $id=htmlspecialchars($request['id']);
@@ -241,8 +246,7 @@ class ReservationController{
 
         //既予約が存在するか、また入力内容と一致するか照合。
         try{
-            $reservationService=new ReservationService($this->pdo);
-            $result=$reservationService->showReservation($request);
+            $result=$this->reservationService->showReservation($request);
             if($result['success']==false){
                 $message=$result['message'];
                 include __DIR__.'/../views/false.php';
@@ -285,8 +289,7 @@ class ReservationController{
     ////キャンセル確定メソッド。セッション変数[reserve_cancel]を使ってキャンセルする。
     public function reserve_cancel_confirm(){
         try{
-            $reservationService=new ReservationService($this->pdo);
-            $result=$reservationService->cancel($_SESSION['reserve_cancel']);
+            $result=$this->reservationService->cancel($_SESSION['reserve_cancel']);
             $message=$result['message'];
             include __DIR__.'/../views/reserveCancelSuccess.php';
             exit();
@@ -317,8 +320,7 @@ class ReservationController{
     public function reserve_update_form($request){
 
         //予約IDとメールアドレスをバリデーション。キャンセルバリデーションを再利用。
-        $cancelFormRequest=new CancelFormRequest();
-        $error=$cancelFormRequest->cancelFormValidate($request);
+        $error=$this->cancelFormRequest->cancelFormValidate($request);
         if($error){
             $errors=$error;
             $id=htmlspecialchars($request['id']);
@@ -332,8 +334,7 @@ class ReservationController{
 
          //既予約が存在するか、また入力内容と一致するか照合。一致しなければメッセージを持って差し戻し。
         try{
-            $reservationService=new ReservationService($this->pdo);
-            $oldresult=$reservationService->showReservation($request);
+            $oldresult=$this->reservationService->showReservation($request);
             if($oldresult['success']==false){
                 $message=$oldresult['message'];
                 include __DIR__.'/../views/reserveUpdateVerifyForm.php';
@@ -354,7 +355,7 @@ class ReservationController{
             $oldcheckin_date=$_SESSION['reserve_update_old']['checkin_date'];
             $oldyear=date('Y',strtotime($oldcheckin_date));
             $oldmonth=date('m',strtotime($oldcheckin_date));
-            $availabilityRoomMonth=$reservationService->getAvailabilityRoomMonth($oldroom_id,$oldyear,$oldmonth);
+            $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($oldroom_id,$oldyear,$oldmonth);
             if($availabilityRoomMonth['success']==false){
                 $message=$availabilityRoomMonth['message'];
                 include __DIR__.'/../views/false.php';
@@ -362,14 +363,11 @@ class ReservationController{
             }
 
             //在庫を一時的に戻す。
-            $restockService=new RestockService();
-            $restocked_availabilityRoomMonth=$restockService->restock($availabilityRoomMonth);
+            $restocked_availabilityRoomMonth=$this->restockService->restock($availabilityRoomMonth);
             //１～月末日まで、〇△×に変換。在庫戻しと関係あるので、リストック後の配列を使用。
-            $calendarMarkArrayService=new CalendarMarkArrayService();
-            $markArrayMonth=$calendarMarkArrayService->getCalendarMarkArray($restocked_availabilityRoomMonth);
+            $markArrayMonth=$this->calendarMarkArrayService->getCalendarMarkArray($restocked_availabilityRoomMonth);
             //値段データも取得。 １～月末日まで。価格は在庫戻しと関係ないので、修正前の配列を使う。
-            $roomMonthPriceService=new RoomMonthPriceService();
-            $pricesMonth=$roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
+            $pricesMonth=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
             
 
             //ビュー表示用。
