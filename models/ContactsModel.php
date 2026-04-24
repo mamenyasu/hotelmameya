@@ -10,10 +10,6 @@ private $pdo;
 
 ////予約内容をデータベースに登録。
     public function confirm($request){
-        if($request['id']){
-            $request['id']=(int)mb_convert_kana($request['id'],'n','urf-8');
-        }
-
         try{
         $stmt=$this->pdo->prepare('INSERT INTO contacts (reservation_id, user_name, user_telphone, email, comment) VALUES (:reservation_id, :user_name, :user_telphone, :email, :comment');
         $stmt->bindValue(':reservation_id',$request['reservation_id'],PDO::PARAM_INT);

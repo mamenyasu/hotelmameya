@@ -58,23 +58,16 @@ class RoomAvailabilityModel{
         }
     }
     
-    //指定の種類の部屋に、指定の期間で、空きがあるか確認するメソッド。trueかfalseを返す。
-    public function hasStock($request){
+    //指定の種類の部屋に、指定の期間のデータを返すメソッド。
+    public function getRoomBetweenData($request){
         try{
         $stmt=$this->pdo->prepare('SELECT booked_rooms,total_rooms FROM room_availability WHERE room_id=:room_id AND stay_date >=:checkin_date AND stay_date < :checkout_date');
         $stmt->bindValue(':room_id',$request['room_id'],PDO::PARAM_INT);
         $stmt->bindValue(':checkin_date',$request['checkin_date'],PDO::PARAM_STR);
         $stmt->bindValue(':checkout_date',$request['checkout_date'],PDO::PARAM_STR);
         $stmt->execute();
-
-        $found=false; //万が一、該当データが無く(10年先とか変なPOSTされた場合)、whileに入れなかった場合はfalseを返す為の変数。
-        while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-            $found=true;
-            if($row['total_rooms']<=$row['booked_rooms']){
-                return false;
-            }
-        }
-        return $found; //trueかfalseが返る。
+        $rows=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rows;
         }catch(Exception $e){
             throw new Exception('データベースエラー：空き室状況の確認に失敗しました');
         }

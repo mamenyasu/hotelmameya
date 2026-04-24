@@ -34,7 +34,7 @@ switch($controller){
         require_once 'controllers/ReservationController.php';
         $ctrl=new ReservationController($pdo);
         switch($action){
-            case 'index' : $ctrl->index(); break;
+            case 'reserve_index' : $ctrl->reserve_index(); break;
             case 'reservationCalendar' : $ctrl->reservationCalendar($room_id,$year,$month); break;
             case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day); break;
             case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST); break;
@@ -54,7 +54,6 @@ switch($controller){
         require_once 'controllers/ContactController.php';
         $ctrl=new ContactController($pdo);
         switch($action){
-            case 'index' : $ctrl->index(); break;
             case 'contact_form' : $ctrl->contact_form(); break;
             case 'contact_reconform' : $ctrl->contact_reconfirm($_POST); break;
             case 'contact_form_confirm' : $ctrl->contact_confirm(); break;
@@ -67,10 +66,9 @@ switch($controller){
         require_once 'controllers/MasterController.php';
         $ctrl=new MasterController($pdo);
         switch($action){
-            case 'index' : $ctrl->index(); break;
+            case 'master_index' : $ctrl->index(); break;
             case 'login_form' : $ctrl->master_login_form(); break;
             case 'login_confirm' : $ctrl->master_login_confirm(); break;
-            case 'master_home' : $ctrl->master_home(); break;
             case 'master_listSelect' : $ctrl->master_listSelect(); break;
             case 'master_list' : $ctrl->master_list(); break;
             default : $ctrl->index(); break;

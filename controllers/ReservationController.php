@@ -9,7 +9,7 @@ require_once __DIR__.'/../services/RestockService.php';
 
 
 class ReservationController{
-//!!--プロパティ--
+//!!--プロパティ----------
     private $pdo;
     private $formrequest;
     private $cancelFormRequest;
@@ -18,7 +18,7 @@ class ReservationController{
     private $calendarMarkArrayService;
     private $roomMonthPriceService;
     private $restockService;
-//!!--コンストラクタ--
+//!!--コンストラクタ---------
     public function __construct($pdo){
         $this->pdo=$pdo;
         $this->formrequest = new FormRequest();
@@ -30,18 +30,25 @@ class ReservationController{
         $this->restockService = new RestockService();
     }
 
-
-//--初期ページ表示メソッド--
+///ルータースイッチデフォルト用。----------
     public function index(){
         include __DIR__.'/../views/index.php';
+    }
+
+
+//--初期ページ表示メソッド----------------
+    public function reserve_index(){
+        include __DIR__.'/../views/reservtionIndex.php';
         exit();
     }
 
 
-//--新規予約--
 
-    ////予約カレンダービュー表示メソッド。初期表示ではroom=1(シングル)、当日。
-        //ただし、--新規予約--プロセスだけでなく、後述の--予約変更--プロセスでAJAXで呼ばれる場合もある。
+//--新規予約------------------------------------------
+
+    ////予約カレンダービュー表示メソッド。<<汎用>>--------
+     //初期表示ではroom=1(シングル)、当日。
+     //--新規予約--プロセスだけでなく、後述の--予約変更--プロセスでAJAXで呼ばれる場合もある。
     public function reservationCalendar($room_id=null, $year=null, $month=null){
         if($room_id===null){
             $room_id=1;
@@ -225,7 +232,8 @@ class ReservationController{
 
 
 
-//--予約キャンセル--    
+
+//--予約キャンセル-------------------------------------
 
     ////キャンセルフォーム表示。予約IDとメールアドレスを入力してもらう予定。
     public function reserve_cancel_form(){
@@ -318,7 +326,7 @@ class ReservationController{
 
 
 
-//--予約変更--
+//--予約変更-------------------------------------------------
 
     ////予約変更フォーム表示。既予約の予約IDとメールアドレスを入力してもらう予定。
     public function reserve_updateVerify_form(){
