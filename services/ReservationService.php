@@ -73,7 +73,7 @@ class ReservationService{
             }
             foreach($rows as $row){
                 if($row['total_rooms'] <= $row['booked_rooms']){
-                return ['success'=>'false','message'=>'空きがありません。'];
+                return ['success'=>false,'message'=>'空きがありません。'];
                 }
             }
 
@@ -128,7 +128,7 @@ class ReservationService{
         }
         foreach($rows as $row){
             if($row['total_rooms'] <= $row['booked_rooms']){
-                return ['success'=>'false','message'=>'空きがありません。'];
+                return ['success'=>false,'message'=>'空きがありません。'];
             }
         }
         return ['success'=>true];
@@ -151,7 +151,7 @@ class ReservationService{
             }
             foreach($rows as $row){
                 if($row['total_rooms'] <= $row['booked_rooms']){
-                return ['success'=>'false','message'=>'空きがありません。'];
+                return ['success'=>false,'message'=>'空きがありません。'];
                 }
             }
             return ['success'=>true];
