@@ -47,9 +47,8 @@ class ReservationController{
 
 //--新規予約------------------------------------------
 
-    ////予約カレンダービュー表示メソッド。<<汎用>>--------
+    ////予約カレンダービュー表示メソッド。
      //初期表示ではroom=1(シングル)、当日。
-     //--新規予約--プロセスだけでなく、後述の--予約変更--プロセスでAJAXで呼ばれる場合もある。
     public function reservationCalendar($room_id=null, $year=null, $month=null){
         if($room_id===null){
             $room_id=1;
@@ -63,7 +62,7 @@ class ReservationController{
 
         try{
         //指定された種類の部屋の、指定月のデータを取得。各日それぞれの値段も、この配列に入っている。
-        $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($room_id,$year,$month);
+            $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($room_id,$year,$month);
             if($availabilityRoomMonth['success']==false){
                 $message=$availabilityRoomMonth['message'];
                 include __DIR__.'/../views/false.php';
@@ -71,18 +70,13 @@ class ReservationController{
             }
 
         //指定された種類の部屋の、指定月の各日の空き具合（〇△×）のデータ。
-        $calendarMark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+            $calendarMark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
 
         //月初～月末（例：１～３１）のprice配列とmark配列をビューに与えて表示。
-        $price=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
-        $mark=$calendarMark;
-        //後述の--予約変更--プロセスの中でAJAXとして呼ぶ場合は、マウスで各日をクリック選択できないカレンダーを表示。
-        if(isset($_SESSION['reserve_update_old'])){
-            include __DIR__.'/../views/reserveUpdateCalendar.php';
-        }else{
-        include __DIR__.'/../views/reservationCalendar.php';
-        }
-        exit();
+            $price=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
+            $mark=$calendarMark;
+            include __DIR__.'/../views/reservationCalendar.php';
+            exit();
 
         //例外処理。
         }catch(Exception $e){
@@ -507,6 +501,9 @@ class ReservationController{
             if(isset($_SESSION['reserve_update_new'])){
             unset($_SESSION['reserve_update_new']);
             }
+            if(isset($_SESSION['reserve_update_calendar'])){
+            unset($_SESSION['reserve_update_calendar']);
+            }
             $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();
@@ -544,6 +541,7 @@ class ReservationController{
                 //成功時。
                 unset($_SESSION['reserve_update_old']);
                 unset($_SESSION['reserve_update_new']);
+                unset($_SESSION['reserve_update_calendar']);
                 $message=$result['message'];
                 include __DIR__.'/../views/success.php';
                 exit();
@@ -551,6 +549,7 @@ class ReservationController{
         }catch(Exception $e){
             unset($_SESSION['reserve_update_old']);
             unset($_SESSION['reserve_update_new']);
+            unset($_SESSION['reserve_update_calendar']);
             $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();    
