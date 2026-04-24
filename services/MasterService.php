@@ -4,10 +4,12 @@ require_once __DIR__.'/../models/ReservationsModel.php';
 require_once __DIR__.'/../models/RoomAvailabilityModel.php';
 
 class MasterService{
+    private $pdo;
     private $reservationsModel;
     private $RoomAvailabilityModel;
     
     public function __construct($pdo){
+        $this->pdo=$pdo;
         $this->reservationsModel=new ReservationsModel($pdo);
         $this->RoomAvailabilityModel=new RoomAvailabilityModel($pdo);
     }

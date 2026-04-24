@@ -10,7 +10,6 @@ class RoomAvailabilityModel{
 
     //指定した種類の部屋の、一か月分の在庫データの配列を、昇順で返すメソッド。
     public function getAvailabilityMonth($room_id,$year,$month){
-        //せっかくインデックスを設定しているので、速度改善のためSQLでLIKEは使わない。
     try{
         $startYearMonth=sprintf('%04d-%02d-01',$year,$month);
         $endYearMonth=date('Y-m-d',strtotime("$startYearMonth +1 Month")); //シングルクォートで囲まないように。変数展開されません。
