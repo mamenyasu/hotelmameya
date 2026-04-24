@@ -3,7 +3,7 @@ class ContactFormRequest{
     //Contactformのバリデーションをするメソッド。error配列を返す。
     public function contactFormvalidate($request){
         $error=[];
-        $id=$request['id'];
+        $reservation_id=$request['reservation_id'];
         $user_name=$request['user_name'];
         $user_telphone=$request['user_telphone'];
         $email=$request['email'];

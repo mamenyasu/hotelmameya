@@ -37,7 +37,7 @@ class ContactController{
     //バリデーション。通らなかったら差し戻し。
     $error=$this->contactFormRequest->contactFormValidate($request);
         if($error){
-            $id=$request['id'];
+            $reservaiton_id=$request['reservation_id'];
             $user_name=$request['user_name'];
             $user_telphone=$request['user_telphone'];
             $email=$request['email'];
@@ -48,7 +48,7 @@ class ContactController{
 
     //セッション変数に保持。
     $_SESSION['contact']=[
-        'id' => $request['id'],
+        'reservation_id' => $request['reservation_id'],
         'user_name' => $request['user_name'],
         'user_telphone' => $request['user_telphone'],
         'email' => $request['email'],

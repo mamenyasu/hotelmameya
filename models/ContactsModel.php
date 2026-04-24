@@ -15,8 +15,8 @@ private $pdo;
         }
 
         try{
-        $stmt=$this->pdo->prepare('INSERT INTO contacts (id, user_name, user_telphone, email, comment) VALUES (:id, :user_name, :user_telphone, :email, :comment');
-        $stmt->bindValue(':id',$request['id'],PDO::PARAM_INT);
+        $stmt=$this->pdo->prepare('INSERT INTO contacts (reservation_id, user_name, user_telphone, email, comment) VALUES (:reservation_id, :user_name, :user_telphone, :email, :comment');
+        $stmt->bindValue(':reservation_id',$request['reservation_id'],PDO::PARAM_INT);
         $stmt->bindValue('user_name',$request['user_name'],PDO::PARAM_STR);
         $stmt->bindValue(':user_telphone',$request['user_telphone'],PDO::PARAM_STR);
         $stmt->bindValue(':email',$request['email'],PDO::PARAM_STR);
