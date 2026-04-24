@@ -14,7 +14,7 @@ class RoomAvailabilityModel{
         $startYearMonth=sprintf('%04d-%02d-01',$year,$month);
         $endYearMonth=date('Y-m-d',strtotime("$startYearMonth +1 Month")); //シングルクォートで囲まないように。変数展開されません。
 
-        $stmt=$this->pdo->prepare("SELECT * FROM room_availability WHERE room_id=:room_id AND stay_date >= :startYearMonth AND stay_date <:endYearMonth ORDER BY stay_date ASC");
+        $stmt=$this->pdo->prepare("SELECT * FROM room_availability WHERE room_id=:room_id AND stay_date >= :startYearMonth AND stay_date < :endYearMonth ORDER BY stay_date ASC");
         $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
         $stmt->bindValue(':startYearMonth',$startYearMonth,PDO::PARAM_STR);
         $stmt->bindValue(':endYearMonth',$endYearMonth,PDO::PARAM_STR);

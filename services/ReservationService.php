@@ -25,8 +25,8 @@ class ReservationService{
                 return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
             }
             foreach($rows as $row){
-                if($row['total_rooms'] <= $rows['booked_rooms']){
-                return ['success'=>'false','message'=>'空きがありません。'];
+                if($row['total_rooms'] <= $row['booked_rooms']){
+                return ['success'=>false,'message'=>'空きがありません。'];
                 }
             }
 
@@ -49,7 +49,7 @@ class ReservationService{
             //在庫を復活させる。
             $this->roomAvailabilityModel->increaseBookedRooms($request);
             //結果をコントローラーに返す。
-            return ['success'=>true,'messeage'=>'予約がキャンセルされました。'];            
+            return ['success'=>true,'message'=>'予約がキャンセルされました。'];            
         }catch(Exception $e){
             throw $e;
         }
@@ -72,7 +72,7 @@ class ReservationService{
                 return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
             }
             foreach($rows as $row){
-                if($row['total_rooms'] <= $rows['booked_rooms']){
+                if($row['total_rooms'] <= $row['booked_rooms']){
                 return ['success'=>'false','message'=>'空きがありません。'];
                 }
             }
@@ -127,7 +127,7 @@ class ReservationService{
             return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
         }
         foreach($rows as $row){
-            if($row['total_rooms'] <= $rows['booked_rooms']){
+            if($row['total_rooms'] <= $row['booked_rooms']){
                 return ['success'=>'false','message'=>'空きがありません。'];
             }
         }
@@ -150,7 +150,7 @@ class ReservationService{
                 return ['success'=>false,'message'=>'空き状況が確認できませんでした。'];
             }
             foreach($rows as $row){
-                if($row['total_rooms'] <= $rows['booked_rooms']){
+                if($row['total_rooms'] <= $row['booked_rooms']){
                 return ['success'=>'false','message'=>'空きがありません。'];
                 }
             }

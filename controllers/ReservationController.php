@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__.'/../requests/FormRequest.php';
+require_once __DIR__.'/../requests/UpdateFormRequest';
 require_once __DIR__.'/../requests/CancelFormRequest.php';
 require_once __DIR__.'/../services/ReservationService.php';
 require_once __DIR__.'/../services/CalendarMarkArrayService.php';
@@ -38,7 +39,7 @@ class ReservationController{
 
 //--初期ページ表示メソッド----------------
     public function reserve_index(){
-        include __DIR__.'/../views/reservtionIndex.php';
+        include __DIR__.'/../views/reservationIndex.php';
         exit();
     }
 
@@ -211,8 +212,8 @@ class ReservationController{
             $email=htmlspecialchars($_SESSION['reserve']['email']);
             $comment=htmlspecialchars($_SESSION['reserve']['comment']);
             $checkin_date=htmlspecialchars($_SESSION['reserve']['checkin_date']);
-            $checout_date=htmlspecialchars($_SESSION['reserve']['checkout_date']);
-            $total_price=htmlspecialchars($_SESSION['reserve']['checkout_date']);
+            $checkout_date=htmlspecialchars($_SESSION['reserve']['checkout_date']);
+            $total_price=htmlspecialchars($_SESSION['reserve']['total_price']);
             unset($_SESSION['reserve']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
@@ -238,6 +239,7 @@ class ReservationController{
     ////キャンセルフォーム表示。予約IDとメールアドレスを入力してもらう予定。
     public function reserve_cancel_form(){
         include __DIR__.'/../views/reserveCancelForm.php';
+        exit();
     }
 
 
@@ -313,12 +315,12 @@ class ReservationController{
         try{
             $result=$this->reservationService->cancel($_SESSION['reserve_cancel']);
             $message=$result['message'];
-            unset($_SESSION['reserva_cancel']);
+            unset($_SESSION['reserve_cancel']);
             include __DIR__.'/../views/success.php';
             exit();
         }catch(Exception $e){
             $message=$e->getMessage();
-            unset($_SESSION['reserva_cancel']);
+            unset($_SESSION['reserve_cancel']);
             include __DIR__.'/../views/false.php';
             exit();
         }
@@ -364,7 +366,7 @@ class ReservationController{
             $_SESSION['reserve_update_old']=[
                 'id' => $oldresult['reservation']['id'],
                 'room_id' => $oldresult['reservation']['room_id'],
-                'comment' => $oldresult['resrvation']['comment'],
+                'comment' => $oldresult['reservation']['comment'],
                 'checkin_date' => $oldresult['reservation']['checkin_date'],
                 'checkout_date' =>$oldresult['reservation']['checkout_date'],
                 'total_price' =>$oldresult['reservation']['total_price']
@@ -390,6 +392,11 @@ class ReservationController{
             //値段データも取得。 １～月末日まで。価格は在庫戻しと関係ないので、修正前の配列を使う。
             $pricesMonth=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
             
+            //差し戻し用に、リストック状態のカレンダー表示用データをセッション変数で保持。
+            $_SESSION['reserve_update_calendar'] = [
+                'markArray' => $markArrayMonth,
+                'prices'    => $pricesMonth
+                ];
 
             //ビュー表示用。
             $markArray=$markArrayMonth;
@@ -398,7 +405,7 @@ class ReservationController{
             $old_checkin_month=(int)date('n',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id=htmlspecialchars($oldresult['reservation']['id']);
             $old_room_id=htmlspecialchars($oldresult['reservation']['room_id']);
-            $old_comment=htmlspecialchars($oldresult['resrvation']['comment']);
+            $old_comment=htmlspecialchars($oldresult['reservation']['comment']);
             $old_checkin_date=htmlspecialchars($oldresult['reservation']['checkin_date']);
             $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date']);
             $old_total_price=htmlspecialchars($oldresult['reservation']['total_price']);
@@ -425,6 +432,16 @@ class ReservationController{
     //バリデーション。通らなかったら差し戻し。
         $error=$this->updateFormRequest->updateFormValidate($request);
         if($error){
+            $markArray=$_SESSION['reserve_update_calendar']['markArray'];
+            $prices=$_SESSION['reserve_update_calendar']['prices'];
+            $old_checkin_year=(int)date('Y',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
+            $old_checkin_month=(int)date('n',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
+            $old_id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
+            $old_room_id=htmlspecialchars($_SESSION['resere_update_old']['room_id']);
+            $old_comment=htmlspecialchars($_SESSION['resere_update_old']['comment']);
+            $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
+            $old_checkout_date=htmlspecialchars($_SESSION['resere_update_old']['checkout_date']);
+            $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
             $new_room_id=htmlspecialchars($request['room_id']);
             $new_comment=htmlspecialchars($request['comment']);
             $new_checkin_date=htmlspecialchars($request['checkin_date']);
@@ -439,12 +456,23 @@ class ReservationController{
             $result=$this->reservationService->hasStock($request);
             if($result['success']==false){
                 $message=$result['message'];
+                $markArray=$_SESSION['reserve_update_calendar']['markArray'];
+                $prices=$_SESSION['reserve_update_calendar']['prices'];
+                $old_checkin_year=(int)date('Y',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
+                $old_checkin_month=(int)date('n',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
+                $old_id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
+                $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
+                $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
+                $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
+                $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
+                $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
                 $new_room_id=htmlspecialchars($request['room_id']);
                 $new_comment=htmlspecialchars($request['comment']);
                 $new_checkin_date=htmlspecialchars($request['checkin_date']);
                 $new_checkout_date=htmlspecialchars($request['checkout_date']);
                 $new_total_price=htmlspecialchars($request['total_price']);
                 include __DIR__.'/../views/reserveUpdateForm.php';
+                exit();
             }
 
     //セッション変数を使って、新たな予約内容をビューをまたいで保持可能にする。個人情報は不要。
