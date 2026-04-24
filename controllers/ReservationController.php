@@ -7,6 +7,7 @@ require_once __DIR__.'/../services/ReservationService.php';
 require_once __DIR__.'/../services/CalendarMarkArrayService.php';
 require_once __DIR__.'/../services/RoomMonthPriceService.php';
 require_once __DIR__.'/../services/RestockService.php';
+require_once __DIR__.'/../services/YearMonthToDaysService.php';
 
 
 class ReservationController{
@@ -19,6 +20,7 @@ class ReservationController{
     private $calendarMarkArrayService;
     private $roomMonthPriceService;
     private $restockService;
+    private $yearMonthToDaysService;
 //!!--コンストラクタ---------
     public function __construct($pdo){
         $this->pdo=$pdo;
@@ -29,6 +31,7 @@ class ReservationController{
         $this->calendarMarkArrayService = new CalendarMarkArrayService();
         $this->roomMonthPriceService = new RoomMonthPriceService();
         $this->restockService = new RestockService();
+        $this->yearMonthToDaysService= new YearMonthToDaysService();
     }
 
 ///ルータースイッチデフォルト用。----------
@@ -69,12 +72,10 @@ class ReservationController{
                 exit();
             }
 
-        //指定された種類の部屋の、指定月の各日の空き具合（〇△×）のデータ。
-            $calendarMark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
-
-        //月初～月末（例：１～３１）のprice配列とmark配列をビューに与えて表示。
+        //月初～月末（例：１～３１）のdays配列とprice配列とmark配列(指定された種類の部屋の、指定月の各日の空き具合（〇△×）)をビューに与えて表示。
+            $days=$this->yearMonthToDaysService->getDays($year,$month);
             $price=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
-            $mark=$calendarMark;
+            $mark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
             include __DIR__.'/../views/reservationCalendar.php';
             exit();
 
@@ -379,7 +380,7 @@ class ReservationController{
                 exit();
             }
 
-            //在庫を一時的に戻す。
+            //在庫を一時的に戻す。リストック後は'success'判定がなくなり、普通の配列に。
             $restocked_availabilityRoomMonth=$this->restockService->restock($availabilityRoomMonth);
             //１～月末日まで、〇△×に変換。在庫戻しと関係あるので、リストック後の配列を使用。
             $markArrayMonth=$this->calendarMarkArrayService->getCalendarMarkArray($restocked_availabilityRoomMonth);
@@ -393,6 +394,7 @@ class ReservationController{
                 ];
 
             //ビュー表示用。
+            $days=$this->yearMonthToDaysService->getDays($oldyear,$oldmonth);
             $markArray=$markArrayMonth;
             $prices=$pricesMonth;
             $old_checkin_year=(int)date('Y',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。

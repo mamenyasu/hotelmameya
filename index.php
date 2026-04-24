@@ -79,6 +79,15 @@ switch($controller){
         }
     break;
 
+    case 'calendar' :
+        require_once 'controllers/CalendarController.php';
+        $ctrl=new CalendarController($pdo);
+        switch($action){
+            case 'calendar' : $ctrl->getCalendarData($room_id, $year, $month); break;
+            default : $vtrl->index(); break;
+        }
+    break;
+    
     default : 
         echo '404 Not Found';
     break; 

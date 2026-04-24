@@ -7,8 +7,7 @@ class CalendarMarkArrayService{
         $calendarMarkArray=[];
 
         for($i=0; $i<$days; $i++){
-            $row=$availability[$i];
-            $booked=$row['booked_rooms']; //予約済みの部屋の数
+            $booked=$availability[$i]['booked_rooms']; //予約済みの部屋の数
             $remaining=10-$booked; //残り部屋数
 
             if($remaining > 3){
