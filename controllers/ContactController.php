@@ -17,6 +17,14 @@ class ContactController{
     }
 
 
+////初期ページ表示メソッド。
+    public function index(){
+        include __DIR__.'/../views/index.php';
+        exit();
+    }
+
+
+
 ////コンタクトフォーム表示。
     public function contact_form(){
         include __DIR__.'/../views/contactForm.php';
@@ -57,14 +65,6 @@ class ContactController{
 
         try{
             $result=$this->contactService->confirm($_SESSION['contact']);
-            //書き込み失敗時。
-            if($result['success']==false){
-                unset($_SESSION['contact']);
-                $message=$result['message'];
-                include __DIR__.'/../view/false.php';
-                exit();
-            }
-            //成功時。
             unset($_SESSION['contact']);
             $message=$result['message'];
             include __DIR__.'/../view/success.php';

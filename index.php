@@ -56,6 +56,7 @@ switch($controller){
         switch($action){
             case 'index' : $ctrl->index(); break;
             case 'contact_form' : $ctrl->contact_form(); break;
+            case 'contact_reconform' : $ctrl->contact_reconfirm($_POST); break;
             case 'contact_form_confirm' : $ctrl->contact_confirm(); break;
             default : $ctrl->index(); break;
         }
