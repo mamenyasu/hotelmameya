@@ -5,14 +5,12 @@ $requestUri=$_SERVER['REQUEST_URI'];
 $path=parse_url($requestUri,PHP_URL_PATH);
 $path=trim($path,'/');
 if ($path === '') {
-    $segment=[];
-    $controller = 'home';
-    $action = 'index';
+    $segments=[];  //explodeしてしまうとnullではなく空文字が返ってきてしまい、後述の「??」が効かなくなる。
 }else{
-$segments=explode('/',$path);
+    $segments=explode('/',$path);
+}
 $controller=$segments[0] ?? 'home';
 $action=$segments[1] ?? 'index';
-}
 $room_id=$segments[2] ?? null;
 $year=$segments[3] ?? null; 
 $month=$segments[4] ?? null;
