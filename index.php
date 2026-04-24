@@ -4,9 +4,15 @@ session_start();
 $requestUri=$_SERVER['REQUEST_URI'];
 $path=parse_url($requestUri,PHP_URL_PATH);
 $path=trim($path,'/');
+if ($path === '') {
+    $segment=[];
+    $controller = 'home';
+    $action = 'index';
+}else{
 $segments=explode('/',$path);
 $controller=$segments[0] ?? 'home';
 $action=$segments[1] ?? 'index';
+}
 $room_id=$segments[2] ?? null;
 $year=$segments[3] ?? null; 
 $month=$segments[4] ?? null;
@@ -55,7 +61,7 @@ switch($controller){
         $ctrl=new ContactController($pdo);
         switch($action){
             case 'contact_form' : $ctrl->contact_form(); break;
-            case 'contact_reconform' : $ctrl->contact_reconfirm($_POST); break;
+            case 'contact_reconfirm' : $ctrl->contact_reconfirm($_POST); break;
             case 'contact_form_confirm' : $ctrl->contact_confirm(); break;
             default : $ctrl->index(); break;
         }
