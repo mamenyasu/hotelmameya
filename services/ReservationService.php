@@ -20,10 +20,16 @@ class ReservationService{
     public function reserve($request){
         try{
             //操作直前に本当に空きがあるか再確認。
-            $stock=$this->roomAvailabilityModel->hasStock($request);
-            if(!$stock){
-                return ['success'=>false,'messeage'=>'空きがありません。'];
+            $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
+            if(!$rows){
+                return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
             }
+            foreach($rows as $row){
+                if($row['total_rooms'] <= $rows['booked_rooms']){
+                return ['success'=>'false','message'=>'空きがありません。'];
+                }
+            }
+
             //予約テーブルに登録。
             $this->reservationsModel->createReservation($request);
             //部屋（在庫）を減らす。
@@ -54,14 +60,23 @@ class ReservationService{
     //DB書き込み直前に空きがあるか再確認しておく。その後、在庫を回復させてから、予約データを上書きし、在庫をあらたに減らす。
     public function update($request){
         try{
+            //古いデータを取得。有無も確認。
             $old=$this->reservationsModel->getReservationById($request);
             if(!$old){
                 return ['success'=>false, 'message'=>'予約が存在しません。'];
             }
-            $stock=$this->roomAvailabilityModel->hasStock($request);
-            if(!$stock){
-                return ['success'=>false,'messeage'=>'空きがありません。'];
+            
+            //新たに指定された部屋の種類と期間で、空きがあるか確認。
+            $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
+            if(!$rows){
+                return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
             }
+            foreach($rows as $row){
+                if($row['total_rooms'] <= $rows['booked_rooms']){
+                return ['success'=>'false','message'=>'空きがありません。'];
+                }
+            }
+
             //トランザクション処理開始。
             $this->pdo->beginTransaction();
             $this->roomAvailabilityModel->increaseBookedRooms($old);
@@ -104,32 +119,24 @@ class ReservationService{
         }
     }
 
-    //指定の種類の部屋に、指定の期間で、空きがあるかの情報をコントローラーに渡すメソッド。
+    //指定の種類の部屋に、指定の期間で、空きがあるかをコントローラーに渡すメソッド。
     public function hasStock($request){
         try{
-        $result=$this->roomAvailabilityModel->hasStock($request);
-            if(!$result){
-                return ['success'=>false,'message'=>'空きがありません。'];
+        $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
+        if(!$rows){
+            return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
+        }
+        foreach($rows as $row){
+            if($row['total_rooms'] <= $rows['booked_rooms']){
+                return ['success'=>'false','message'=>'空きがありません。'];
             }
-                return ['success'=>true];
+        }
+        return ['success'=>true];
         }catch(Exception $e){
             throw $e;
         }
     }
 
-
-    //選択した期間、部屋が確保できるか
-    public function hasSTockBetween($request){
-        try{
-            $stockBetween=$this->roomAvailabilityModel->hasStock($request);
-            if(!$stockBetween){
-                return ['success'=>false,'messeage'=>'選択した期間の空きがありません。'];
-            }
-                return ['success'=>true];
-        }catch(Exception $e){
-            throw $e;
-        }
-    }
 
 
     //カレンダーで選択した日が、最低でも当日一泊出来るか確認するメソッド。
@@ -137,13 +144,17 @@ class ReservationService{
         try{
             $request['room_id']=$room_id;
             $request['checkin_date']=sprintf('%04d-%02d-%02d',$year,$month,$day);
-            $request['checkput_date']=date('Y-m-d',strtotime('+1 days',strtotime(sprintf('%04d-%02d-%02d',$year,$month,$day))));
-            $result=$this->roomAvailabilityModel->hasStock($request);
-            if($result){
-                return ['success'=>true];
-            }else{
-                return ['success'=>false,'message'=>'空きがありません。'];
+            $request['checkout_date']=date('Y-m-d',strtotime('+1 days',strtotime(sprintf('%04d-%02d-%02d',$year,$month,$day))));
+            $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
+            if(!$rows){
+                return ['success'=>false,'message'=>'空き状況が確認できませんでした。'];
             }
+            foreach($rows as $row){
+                if($row['total_rooms'] <= $rows['booked_rooms']){
+                return ['success'=>'false','message'=>'空きがありません。'];
+                }
+            }
+            return ['success'=>true];
         }catch(Exception $e){
             throw $e;
         }

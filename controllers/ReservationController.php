@@ -130,9 +130,9 @@ class ReservationController{
 
         //選択した期間で、部屋が確保できるか確認。確保できなければ、入力内容を持って差し戻し。
         try{
-            $hasStockBetween=$this->reservationService->hasStockBetween($request);
-            if($hasStockBetween['success']==false){
-                $message=$hasStockBetween['message'];
+            $hasStock=$this->reservationService->hasStock($request);
+            if($hasStock['success']==false){
+                $message=$hasStock['message'];
                 $room_id=htmlspecialchars($request['room_id']);
                 $user_name=htmlspecialchars($request['user_name']);
                 $user_telphone=htmlspecialchars($request['user_telphone']);
@@ -146,7 +146,7 @@ class ReservationController{
                 exit();
             }
 
-            //セッション変数を使って、ビューをまたいで保持可能にする。
+            //セッション変数に保持。
             $_SESSION['reserve']=[
                 'room_id' => $request['room_id'],
                 'user_name' => $request['user_name'],
@@ -174,6 +174,9 @@ class ReservationController{
         
         //例外処理
         }catch(Exception $e){
+            if(isset($_SESSION['reserve'])){
+                unset($_SESSION['reserve']);
+            }
             $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();
@@ -184,22 +187,32 @@ class ReservationController{
 
     ////予約確定メソッド。
     public function reserve_confirm(){
-            if(!$_SESSION['reserve']){
+            if(!isset($_SESSION['reserve'])){
             echo "不正なリクエストです。";
             exit();
         }
 
         try{
-        //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。
+        //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。できなかったら差し戻し。
         $result=$this->reservationService->reserve($_SESSION['reserve']);
         if($result['success']==false){
+            $message=htmlspecialchars($result['message']);
+            $room_id=htmlspecialchars($_SESSION['reserve']['room_id']);
+            $user_name=htmlspecialchars($_SESSION['reserve']['user_name']);
+            $user_telphone=htmlspecialchars($_SESSION['reserve']['user_telphone']);
+            $user_address=htmlspecialchars($_SESSION['reserve']['user_address']);
+            $email=htmlspecialchars($_SESSION['reserve']['email']);
+            $comment=htmlspecialchars($_SESSION['reserve']['comment']);
+            $checkin_date=htmlspecialchars($_SESSION['reserve']['checkin_date']);
+            $checout_date=htmlspecialchars($_SESSION['reserve']['checkout_date']);
+            $total_price=htmlspecialchars($_SESSION['reserve']['checkout_date']);
             unset($_SESSION['reserve']);
-            $message=$result['message'];
-            include __DIR__.'/../views/false.php';
+            include __DIR__.'/../views/reserveForm.php';
             exit();
         }
+        $message=$result['message'];
         unset($_SESSION['reserve']);
-        include __DIR__.'/../views/reserveSuccess.php';
+        include __DIR__.'/../views/success.php';
         exit();
         //例外処理。
         }catch(Exception $e){
@@ -272,6 +285,9 @@ class ReservationController{
             include __DIR__.'/../views/reserveCancelReconfirm.php';
             exit();
         }catch(Exception $e){
+            if(isset($_SESSION['reserve_cancel'])){
+                unset($_SESSION['reserve_cancel']);
+            }
             $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();
@@ -281,7 +297,7 @@ class ReservationController{
 
     ////キャンセル確定メソッド。セッション変数[reserve_cancel]を使ってキャンセルする。
     public function reserve_cancel_confirm(){
-        if(!$_SESSION['reserve_cancel']){
+        if(!isset($_SESSION['reserve_cancel'])){
             echo "不正なリクエストです。";
             exit();
         }
@@ -290,7 +306,7 @@ class ReservationController{
             $result=$this->reservationService->cancel($_SESSION['reserve_cancel']);
             $message=$result['message'];
             unset($_SESSION['reserva_cancel']);
-            include __DIR__.'/../views/reserveCancelSuccess.php';
+            include __DIR__.'/../views/success.php';
             exit();
         }catch(Exception $e){
             $message=$e->getMessage();
@@ -353,6 +369,7 @@ class ReservationController{
             $oldmonth=date('m',strtotime($oldcheckin_date));
             $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($oldroom_id,$oldyear,$oldmonth);
             if($availabilityRoomMonth['success']==false){
+                unset($_SESSION['reserve_update_old']);
                 $message=$availabilityRoomMonth['message'];
                 include __DIR__.'/../views/false.php';
                 exit();
@@ -380,6 +397,9 @@ class ReservationController{
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
         }catch(Exception $e){
+            if(isset($_SESSION['reserve_update_old'])){
+                unset($_SESSION['reserve_update_old']);
+            }
             $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();
@@ -389,6 +409,11 @@ class ReservationController{
     
     ////変更内容最終確認ビューを表示。旧予約情報と新予約情報を表示。
     public function reserve_update_reconfirm($request){
+    if(!isset($_SESSION['reserve_update_old'])){
+        echo '不正なリクエストです。';
+        exit();
+    }
+
     //バリデーション。通らなかったら差し戻し。
         $error=$this->updateFormRequest->updateFormValidate($request);
         if($error){
@@ -404,7 +429,7 @@ class ReservationController{
     //変更後の予約の部屋と期間が本当に空いているか再度チェック。空いていなければ差し戻し。
         try{
             $result=$this->reservationService->hasStock($request);
-            if(!$result){
+            if($result['success']==false){
                 $message=$result['message'];
                 $new_room_id=htmlspecialchars($request['room_id']);
                 $new_comment=htmlspecialchars($request['comment']);
@@ -414,8 +439,9 @@ class ReservationController{
                 include __DIR__.'/../views/reserveUpdateForm.php';
             }
 
-    //セッション変数を使って、旧予約内容をビューをまたいで保持可能にする。個人情報は不要。
+    //セッション変数を使って、新たな予約内容をビューをまたいで保持可能にする。個人情報は不要。
             $_SESSION['reserve_update_new']=[
+                'id' => $_SESSION['reserve_update_old']['id'],
                 'room_id' => $request['room_id'],
                 'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
@@ -437,7 +463,14 @@ class ReservationController{
             $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
             include __DIR__.'/../views/reserveUpdateConfirm.php';
             exit();
+        //例外処理。    
         }catch(Exception $e){
+            if(isset($_SESSION['reserve_update_old'])){
+            unset($_SESSION['reserve_update_old']);
+            }
+            if(isset($_SESSION['reserve_update_new'])){
+            unset($_SESSION['reserve_update_new']);
+            }
             $message=$e->getMessage();
             include __DIR__.'/../views/false.php';
             exit();
@@ -447,22 +480,15 @@ class ReservationController{
 
     ////変更内容のDBへの書き込み。
     public function reserve_update_confirm(){
-        if(!$_SESSION['reserve_update_old'] || $_SESSION['reserve_update_new']){
+        if(!isset($_SESSION['reserve_update_old']) || !isset($_SESSION['reserve_update_new'])){
             echo "不正なリクエストです。";
             exit();
         }
 
-        $updateRequest['id']=$_SESSION['reserve_update_old']['id'];
-        $updateRequest['room_id']=$_SESSION['reserve_update_new']['room_id'];
-        $updateRequest['comment']=$_SESSION['reserve_update_new']['comment'];
-        $updateRequest['checkin_date']=$_SESSION['reserve_update_new']['checkin_date'];
-        $updateRequest['checkout_date']=$_SESSION['reserve_update_new']['checkout_date'];
-        $updateRequest['total_price']=$_SESSION['reserve_update_new']['total_price'];
-
         try{
-                $result=$this->reservationService->update($updateRequest);
+                $result=$this->reservationService->update($_SESSION['reserve_update_new']);
                 //最終チェック。通らなければ差し戻し。
-                    if(!$result){
+                if($result['success']==false){
                     $message=$result['message'];
                     $id=$_SESSION['reserve_update_old']['id'];
                     $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
@@ -475,16 +501,23 @@ class ReservationController{
                     $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
                     $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
                     $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
+                    unset($_SESSION['reserve_update_new']);
                     include __DIR__.'/../views/reserveUpdateForm.php';
                     exit();
-                    } 
+                } 
+                //成功時。
+                unset($_SESSION['reserve_update_old']);
+                unset($_SESSION['reserve_update_new']);
                 $message=$result['message'];
-                include __DIR__.'/../views/updateSuccess.php';
+                include __DIR__.'/../views/success.php';
                 exit();
+        //例外処理。        
         }catch(Exception $e){
-                $message=$e->getMessage();
-                include __DIR__.'/../views/false.php';
-                exit();    
+            unset($_SESSION['reserve_update_old']);
+            unset($_SESSION['reserve_update_new']);
+            $message=$e->getMessage();
+            include __DIR__.'/../views/false.php';
+            exit();    
         }
         
     }
