@@ -2,9 +2,16 @@
 class UpdateFormRequest{
     public function updateFormValidate($request){
         $error=[];
+        $comment=$request['comment'];
         $checkin_date=$request['checkin_date'];
         $checkout_date=$request['checkout_date'];
         $total_price=$request['total_price'];
+
+
+        //コメントについて
+        if(mb_strlen($comment) > 1000){
+            $error['comment_length']='コメントは１０００文字以内で入力してください。';
+        }
 
         //チェックイン、アウトについて
         if($checkin_date==null || $checkin_date==""){

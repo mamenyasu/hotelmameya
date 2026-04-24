@@ -1,12 +1,13 @@
 <?php
 class FormRequest{
-    //formのバリデーションをするメソッド。error[]配列を返す。
+    //formのバリデーションをするメソッド。error配列を返す。
     public function formvalidate($request){
         $error=[];
         $user_name=$request['user_name'];
         $user_telphone=$request['user_telphone'];
         $user_address=$request['user_address'];
         $email=$request['email'];
+        $comment=$request['comment'];
         $checkin_date=$request['checkin_date'];
         $checkout_date=$request['checkout_date'];
         $total_price=$request['total_price'];
@@ -19,7 +20,7 @@ class FormRequest{
         }
 
         //電話番号について
-        if($user_telphone==null || $user_telphone==""){
+        if($user_telphone==null || trim($user_telphone)==""){
             $error['user_telphone']='電話番号が入力されていません';
         }elseif(!preg_match('/^[0-9]+$/',$user_telphone)){
             $error['user_telphone_format']='電話番号は数字のみで入力してください。';
@@ -41,6 +42,11 @@ class FormRequest{
             $error['email_length']='メールアドレスは２５５文字以内で入力してください。';
         }elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
             $error['email_format'] = 'メールアドレスの形式が正しくありません。';
+        }
+
+        //コメントについて
+        if(mb_strlen($comment) > 1000){
+            $error['comment_length']='コメントは１０００文字以内で入力してください。';
         }
 
         //チェックイン、アウトについて

@@ -120,6 +120,7 @@ class ReservationController{
             $user_telphone=htmlspecialchars($request['user_telphone']);
             $user_address=htmlspecialchars($request['user_address']);
             $email=htmlspecialchars($request['email']);
+            $comment=htmlspecialchars($request['comment']);
             $checkin_date=htmlspecialchars($request['checkin_date']);
             $checkout_date=htmlspecialchars($request['checkout_date']);
             $total_price=htmlspecialchars($request['total_price']);
@@ -137,6 +138,7 @@ class ReservationController{
                 $user_telphone=htmlspecialchars($request['user_telphone']);
                 $user_address=htmlspecialchars($request['user_address']);
                 $email=htmlspecialchars($request['email']);
+                $comment=htmlspecialchars($request['comment']);
                 $checkin_date=htmlspecialchars($request['checkin_date']);
                 $checkout_date=htmlspecialchars($request['checkout_date']);
                 $total_price=htmlspecialchars($request['total_price']);
@@ -151,6 +153,7 @@ class ReservationController{
                 'user_telphone' => mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'), //電話番号、全角なら半角へ。
                 'user_address' => $request['user_address'],
                 'email' => $request['email'],
+                'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
                 'checkout_date' =>$request['checkout_date'],
                 'total_price' =>$request['total_price']
@@ -162,6 +165,7 @@ class ReservationController{
             $user_telphone=htmlspecialchars(mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'));
             $user_address=htmlspecialchars($request['user_address']);
             $email=htmlspecialchars($request['email']);
+            $comment=htmlspecialchars($request['comment']);
             $checkin_date=htmlspecialchars($request['checkin_date']);
             $checkout_date=htmlspecialchars($request['checkout_date']);
             $total_price=htmlspecialchars($request['total_price']);
@@ -180,6 +184,11 @@ class ReservationController{
 
     ////予約確定メソッド。
     public function reserve_confirm(){
+            if(!$_SESSION['reserve']){
+            echo "不正なリクエストです。";
+            exit();
+        }
+
         try{
         //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。
         $result=$this->reservationService->reserve($_SESSION['reserve']);
@@ -243,6 +252,7 @@ class ReservationController{
                 'user_telphone' => $result['reservation']['user_telphone'],
                 'user_address' => $result['reservation']['user_address'],
                 'email' => $result['reservation']['email'],
+                'comment' => $result['reservation']['comment'],
                 'checkin_date' => $result['reservation']['checkin_date'],
                 'checkout_date' =>$result['reservation']['checkout_date'],
                 'total_price' =>$result['reservation']['total_price']
@@ -255,6 +265,7 @@ class ReservationController{
             $user_telphone=htmlspecialchars($result['reservation']['user_telphone']);
             $user_address=htmlspecialchars($result['reservation']['user_address']);
             $email=htmlspecialchars($result['reservation']['email']);
+            $comment=htmlspecialchars($result['reservation']['comment']);
             $checkin_date=htmlspecialchars($result['reservation']['checkin_date']);
             $checkout_date=htmlspecialchars($result['reservation']['checkout_date']);
             $total_price=htmlspecialchars($result['reservation']['total_price']);
@@ -270,13 +281,20 @@ class ReservationController{
 
     ////キャンセル確定メソッド。セッション変数[reserve_cancel]を使ってキャンセルする。
     public function reserve_cancel_confirm(){
+        if(!$_SESSION['reserve_cancel']){
+            echo "不正なリクエストです。";
+            exit();
+        }
+
         try{
             $result=$this->reservationService->cancel($_SESSION['reserve_cancel']);
             $message=$result['message'];
+            unset($_SESSION['reserva_cancel']);
             include __DIR__.'/../views/reserveCancelSuccess.php';
             exit();
         }catch(Exception $e){
             $message=$e->getMessage();
+            unset($_SESSION['reserva_cancel']);
             include __DIR__.'/../views/false.php';
             exit();
         }
@@ -322,6 +340,7 @@ class ReservationController{
             $_SESSION['reserve_update_old']=[
                 'id' => $oldresult['reservation']['id'],
                 'room_id' => $oldresult['reservation']['room_id'],
+                'comment' => $oldresult['resrvation']['comment'],
                 'checkin_date' => $oldresult['reservation']['checkin_date'],
                 'checkout_date' =>$oldresult['reservation']['checkout_date'],
                 'total_price' =>$oldresult['reservation']['total_price']
@@ -354,6 +373,7 @@ class ReservationController{
             $old_checkin_month=(int)date('n',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id=htmlspecialchars($oldresult['reservation']['id']);
             $old_room_id=htmlspecialchars($oldresult['reservation']['room_id']);
+            $old_comment=htmlspecialchars($oldresult['resrvation']['comment']);
             $old_checkin_date=htmlspecialchars($oldresult['reservation']['checkin_date']);
             $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date']);
             $old_total_price=htmlspecialchars($oldresult['reservation']['total_price']);
@@ -373,6 +393,7 @@ class ReservationController{
         $error=$this->updateFormRequest->updateFormValidate($request);
         if($error){
             $new_room_id=htmlspecialchars($request['room_id']);
+            $new_comment=htmlspecialchars($request['comment']);
             $new_checkin_date=htmlspecialchars($request['checkin_date']);
             $new_checkout_date=htmlspecialchars($request['checkout_date']);
             $new_total_price=htmlspecialchars($request['total_price']);
@@ -386,6 +407,7 @@ class ReservationController{
             if(!$result){
                 $message=$result['message'];
                 $new_room_id=htmlspecialchars($request['room_id']);
+                $new_comment=htmlspecialchars($request['comment']);
                 $new_checkin_date=htmlspecialchars($request['checkin_date']);
                 $new_checkout_date=htmlspecialchars($request['checkout_date']);
                 $new_total_price=htmlspecialchars($request['total_price']);
@@ -395,6 +417,7 @@ class ReservationController{
     //セッション変数を使って、旧予約内容をビューをまたいで保持可能にする。個人情報は不要。
             $_SESSION['reserve_update_new']=[
                 'room_id' => $request['room_id'],
+                'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
                 'checkout_date' =>$request['checkout_date'],
                 'total_price' =>$request['total_price']
@@ -403,10 +426,12 @@ class ReservationController{
     //ビュー表示用。
             $id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
             $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
+            $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
             $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
             $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
             $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
             $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
+            $bew_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment']);
             $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
             $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
             $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
@@ -422,7 +447,6 @@ class ReservationController{
 
     ////変更内容のDBへの書き込み。
     public function reserve_update_confirm(){
-
         if(!$_SESSION['reserve_update_old'] || $_SESSION['reserve_update_new']){
             echo "不正なリクエストです。";
             exit();
@@ -430,6 +454,7 @@ class ReservationController{
 
         $updateRequest['id']=$_SESSION['reserve_update_old']['id'];
         $updateRequest['room_id']=$_SESSION['reserve_update_new']['room_id'];
+        $updateRequest['comment']=$_SESSION['reserve_update_new']['comment'];
         $updateRequest['checkin_date']=$_SESSION['reserve_update_new']['checkin_date'];
         $updateRequest['checkout_date']=$_SESSION['reserve_update_new']['checkout_date'];
         $updateRequest['total_price']=$_SESSION['reserve_update_new']['total_price'];
@@ -441,10 +466,12 @@ class ReservationController{
                     $message=$result['message'];
                     $id=$_SESSION['reserve_update_old']['id'];
                     $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
+                    $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
                     $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
                     $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
                     $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
                     $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
+                    $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment']);
                     $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
                     $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
                     $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);

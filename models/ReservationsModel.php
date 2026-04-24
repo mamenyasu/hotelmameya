@@ -70,8 +70,9 @@ class ReservationsModel{
     //予約変更（上書き）メソッド。
     public function updateReservation($request){
         try{
-        $stmt=$this->pdo->prepare('UPDATE reservations SET room_id=:room_id, checkin_date=:checkin_date, checkout_date=:checkout_date total_price=:total_price WHERE id=:id');
+        $stmt=$this->pdo->prepare('UPDATE reservations SET room_id=:room_id, comment=:comment, checkin_date=:checkin_date, checkout_date=:checkout_date total_price=:total_price WHERE id=:id');
         $stmt->bindValue(':room_id',$request['room_id'],PDO::PARAM_INT);
+        $stmt->bindValue('comment',$request['comment'],PDO::PARAM_STR);
         $stmt->bindValue(':checkin_date',$request['checkin_date'],PDO::PARAM_STR);
         $stmt->bindValue(':checkout_date',$request['checkout_date'],PDO::PARAM_STR);
         $stmt->bindValue(':total_price',$request['total_price'],PDO::PARAM_STR);
