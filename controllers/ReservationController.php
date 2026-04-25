@@ -9,6 +9,7 @@ require_once __DIR__.'/../services/RoomMonthPriceService.php';
 require_once __DIR__.'/../services/RestockService.php';
 require_once __DIR__.'/../services/YearMonthToDaysService.php';
 require_once __DIR__.'/../services/FinalPriceService.php';
+require_once __DIR__.'/../views/PricesCalendar.php';
 
 
 class ReservationController{
@@ -23,6 +24,7 @@ class ReservationController{
     private $restockService;
     private $yearMonthToDaysService;
     private $finalPriceService;
+    private $pricesCalendarService;
 //!!--コンストラクタ---------
     public function __construct($pdo){
         $this->pdo=$pdo;
@@ -35,6 +37,7 @@ class ReservationController{
         $this->restockService = new RestockService();
         $this->yearMonthToDaysService = new YearMonthToDaysService();
         $this->finalPriceService = new FinalPriceService($pdo);
+        $this->pricesCalendarService = new PricesCalendarService($pdo);
     }
 
 ///ルータースイッチデフォルト用。----------
@@ -67,7 +70,7 @@ class ReservationController{
         }
 
         try{
-        //指定された種類の部屋の、指定月のデータを取得。各日それぞれの値段も、この配列に入っている。
+        //指定された種類の部屋の、指定月のデータを取得。
             $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($room_id,$year,$month);
             if($availabilityRoomMonth['success']==false){
                 $message=$availabilityRoomMonth['message'];
@@ -75,10 +78,12 @@ class ReservationController{
                 exit();
             }
 
-        //月初～月末（例：１～３１）のdays配列とprice配列とmark配列(指定された種類の部屋の、指定月の各日の空き具合（〇△×）)をビューに与えて表示。
-            $days=$this->yearMonthToDaysService->getDays($year,$month);
-            $price=$this->roomMonthPriceService->getRoomMonthPrice($availabilityRoomMonth['availabilityRoomMonth']);
+        //mark配列生成。(指定された種類の部屋の、指定月の各日の空き具合（〇△×）)
             $mark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+        //指定された種類の部屋の、指定月の値段表を取得。$pricesはプランごとの多重配列。
+            $prices=$this->pricesCalendarService->getPricesAllPlan($room_id,$year,$month);
+        //月初～月末（例：１～３１）のdays配列。
+            $days=$this->yearMonthToDaysService->getDays($year,$month);            
             include __DIR__.'/../views/reservationCalendar.php';
             exit();
 
