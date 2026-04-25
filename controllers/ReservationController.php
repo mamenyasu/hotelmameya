@@ -8,6 +8,7 @@ require_once __DIR__.'/../services/CalendarMarkArrayService.php';
 require_once __DIR__.'/../services/RoomMonthPriceService.php';
 require_once __DIR__.'/../services/RestockService.php';
 require_once __DIR__.'/../services/YearMonthToDaysService.php';
+require_once __DIR__.'/../services/FinalPriceService.php';
 
 
 class ReservationController{
@@ -21,6 +22,7 @@ class ReservationController{
     private $roomMonthPriceService;
     private $restockService;
     private $yearMonthToDaysService;
+    private $finalPriceService;
 //!!--コンストラクタ---------
     public function __construct($pdo){
         $this->pdo=$pdo;
@@ -31,7 +33,8 @@ class ReservationController{
         $this->calendarMarkArrayService = new CalendarMarkArrayService();
         $this->roomMonthPriceService = new RoomMonthPriceService();
         $this->restockService = new RestockService();
-        $this->yearMonthToDaysService= new YearMonthToDaysService();
+        $this->yearMonthToDaysService = new YearMonthToDaysService();
+        $this->finalPriceService = new FinalPriceService($pdo);
     }
 
 ///ルータースイッチデフォルト用。----------
@@ -148,6 +151,9 @@ class ReservationController{
                 include __DIR__.'/../views/reserveForm.php';
                 exit();
             }
+            //バックエンドで料金を再計算。
+            $result_finalprice=$this->finalPriceService->getFinalPrice($request);
+            $final_price=$result_finalprice['total_price'];
 
             //セッション変数に保持。
             $_SESSION['reserve']=[
@@ -159,7 +165,7 @@ class ReservationController{
                 'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
                 'checkout_date' =>$request['checkout_date'],
-                'total_price' =>$request['total_price']
+                'total_price' =>$final_price
             ];
 
             //最終確認ビュー表示用。
@@ -171,7 +177,7 @@ class ReservationController{
             $comment=htmlspecialchars($request['comment']);
             $checkin_date=htmlspecialchars($request['checkin_date']);
             $checkout_date=htmlspecialchars($request['checkout_date']);
-            $total_price=htmlspecialchars($request['total_price']);
+            $total_price=htmlspecialchars($final_price);
             include __DIR__.'/../views/reserveReconfirm.php';
             exit();
         
@@ -471,6 +477,10 @@ class ReservationController{
                 exit();
             }
 
+    //バックエンドで料金を再計算。
+                $result_finalprice=$this->finalPriceService->getFinalPrice($request);
+                $final_price=$result_finalprice['total_price'];
+
     //セッション変数を使って、新たな予約内容をビューをまたいで保持可能にする。個人情報は不要。
             $_SESSION['reserve_update_new']=[
                 'id' => $_SESSION['reserve_update_old']['id'],
@@ -478,7 +488,7 @@ class ReservationController{
                 'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
                 'checkout_date' =>$request['checkout_date'],
-                'total_price' =>$request['total_price']
+                'total_price' =>$final_price
                 ];
 
     //ビュー表示用。

@@ -68,7 +68,24 @@ class RoomAvailabilityModel{
         $rows=$stmt->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
         }catch(Exception $e){
-            throw new Exception('データベースエラー：空き室状況の確認に失敗しました');
+            throw new Exception('データベースエラー：データベース確認に失敗しました');
         }
     }
+
+    //指定の種類の部屋について、指定の期間の料金データを返すメソッド。
+    public function getRoomBetweenPriceData($request){
+        try{
+        $stmt=$this->pdo->prepare('SELECT price FROM room_availability WHERE room_id=:room_id AND stay_date >=:checkin_date AND stay_date < :checkout_date');
+        $stmt->bindValue(':room_id',$request['room_id'],PDO::PARAM_INT);
+        $stmt->bindValue(':checkin_date',$request['checkin_date'],PDO::PARAM_STR);
+        $stmt->bindValue(':checkout_date',$request['checkout_date'],PDO::PARAM_STR);
+        $stmt->execute();
+        $rows=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rows;
+        }catch(Exception $e){
+            throw new Exception('データベースエラー：データベース確認に失敗しました');
+        }
+    }
+
+
 }
