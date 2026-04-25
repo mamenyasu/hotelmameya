@@ -15,6 +15,7 @@ $room_id=$segments[2] ?? null;
 $year=$segments[3] ?? null; 
 $month=$segments[4] ?? null;
 $day=$segments[5] ?? null;
+$plan=$segments[6] ?? null;
 
 $dsn='mysql:host=localhost;dbname=hotelmameya;charset=utf8';
 $user='root';
@@ -40,7 +41,7 @@ switch($controller){
         switch($action){
             case 'reserve_index' : $ctrl->reserve_index(); break;
             case 'reservationCalendar' : $ctrl->reservationCalendar($room_id,$year,$month); break;
-            case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day); break;
+            case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day,$plan); break;
             case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST); break;
             case 'reserve_confirm' : $ctrl->reserve_confirm(); break;
             case 'cancel_form' : $ctrl->reserve_cancel_form(); break;

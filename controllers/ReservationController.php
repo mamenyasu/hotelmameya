@@ -97,7 +97,7 @@ class ReservationController{
 
 
     ////予約フォームビュー表示。
-    public function reserve_form($room_id,$year,$month,$day){
+    public function reserve_form($room_id,$year,$month,$day,$plan){
         try{
         //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
         $hasStockOne=$this->reservationService->hasStockOne($room_id,$year,$month,$day);
@@ -109,6 +109,7 @@ class ReservationController{
 
         //予約フォームを表示。カレンダーで選択した月日がチェックイン日となる。
         $checkin_date=htmlspecialchars(sprintf('%04d-%02d-%02d',$year,$month,$day));
+        //$planはhiddenで仕込む。
         include __DIR__.'/../views/reserveForm.php';
         exit();
 
@@ -135,6 +136,7 @@ class ReservationController{
             $checkin_date=htmlspecialchars($request['checkin_date']);
             $checkout_date=htmlspecialchars($request['checkout_date']);
             $total_price=htmlspecialchars($request['total_price']);
+            $plan=htmlspecialchars($request['plan']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
         }
@@ -153,6 +155,7 @@ class ReservationController{
                 $checkin_date=htmlspecialchars($request['checkin_date']);
                 $checkout_date=htmlspecialchars($request['checkout_date']);
                 $total_price=htmlspecialchars($request['total_price']);
+                $plan=htmlspecialchars($request['plan']);
                 include __DIR__.'/../views/reserveForm.php';
                 exit();
             }
@@ -170,7 +173,8 @@ class ReservationController{
                 'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
                 'checkout_date' =>$request['checkout_date'],
-                'total_price' =>$final_price
+                'total_price' =>$final_price,
+                'plan' =>$request['plan']
             ];
 
             //最終確認ビュー表示用。
@@ -183,6 +187,7 @@ class ReservationController{
             $checkin_date=htmlspecialchars($request['checkin_date']);
             $checkout_date=htmlspecialchars($request['checkout_date']);
             $total_price=htmlspecialchars($final_price);
+            $plan=htmlspecialchars($request['plan']);
             include __DIR__.'/../views/reserveReconfirm.php';
             exit();
         
@@ -220,6 +225,7 @@ class ReservationController{
             $checkin_date=htmlspecialchars($_SESSION['reserve']['checkin_date']);
             $checkout_date=htmlspecialchars($_SESSION['reserve']['checkout_date']);
             $total_price=htmlspecialchars($_SESSION['reserve']['total_price']);
+            $plan=htmlspecialchars($_SESSION['reserve']['plan']);
             unset($_SESSION['reserve']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
