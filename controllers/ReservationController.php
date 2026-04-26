@@ -142,6 +142,7 @@ class ReservationController{
             $checkout_date=htmlspecialchars($request['checkout_date']);
             $total_price=htmlspecialchars($request['total_price']);
             $plan=htmlspecialchars($request['plan']);
+            $person=htmlspecialchars($request['person']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
         }
@@ -161,6 +162,7 @@ class ReservationController{
                 $checkout_date=htmlspecialchars($request['checkout_date']);
                 $total_price=htmlspecialchars($request['total_price']);
                 $plan=htmlspecialchars($request['plan']);
+                $person=htmlspecialchars($request['person']);
                 include __DIR__.'/../views/reserveForm.php';
                 exit();
             }
@@ -179,7 +181,8 @@ class ReservationController{
                 'checkin_date' => $request['checkin_date'],
                 'checkout_date' =>$request['checkout_date'],
                 'total_price' =>$final_price,
-                'plan' =>$request['plan']
+                'plan' =>$request['plan'],
+                'person' =>$request['person']
             ];
 
             //最終確認ビュー表示用。
@@ -193,6 +196,7 @@ class ReservationController{
             $checkout_date=htmlspecialchars($request['checkout_date']);
             $total_price=htmlspecialchars($final_price);
             $plan=htmlspecialchars($request['plan']);
+            $person=htmlspecialchars($request['person']);
             include __DIR__.'/../views/reserveReconfirm.php';
             exit();
         
@@ -231,6 +235,7 @@ class ReservationController{
             $checkout_date=htmlspecialchars($_SESSION['reserve']['checkout_date']);
             $total_price=htmlspecialchars($_SESSION['reserve']['total_price']);
             $plan=htmlspecialchars($_SESSION['reserve']['plan']);
+            $person=htmlspecialchars($_SESSION['reserve']['person']);
             unset($_SESSION['reserve']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
@@ -295,7 +300,9 @@ class ReservationController{
                 'comment' => $result['reservation']['comment'],
                 'checkin_date' => $result['reservation']['checkin_date'],
                 'checkout_date' =>$result['reservation']['checkout_date'],
-                'total_price' =>$result['reservation']['total_price']
+                'total_price' =>$result['reservation']['total_price'],
+                'plan' => $result['reservation']['plan'],
+                'person' => $result['reservation']['person']
                 ];
 
             //ビュー表示用。
@@ -310,6 +317,7 @@ class ReservationController{
             $checkout_date=htmlspecialchars($result['reservation']['checkout_date']);
             $total_price=htmlspecialchars($result['reservation']['total_price']);
             $plan=htmlspecialchars($result['reservation']['plan']);
+            $person=htmlspecialchars($result['reservation']['person']);
             include __DIR__.'/../views/reserveCancelReconfirm.php';
             exit();
         }catch(Exception $e){
@@ -386,9 +394,10 @@ class ReservationController{
                 'room_id' => $oldresult['reservation']['room_id'],
                 'comment' => $oldresult['reservation']['comment'],
                 'checkin_date' => $oldresult['reservation']['checkin_date'],
-                'checkout_date' =>$oldresult['reservation']['checkout_date'],
-                'total_price' =>$oldresult['reservation']['total_price'],
-                'plan' =>$oldresult['reservation']['plan']
+                'checkout_date' => $oldresult['reservation']['checkout_date'],
+                'total_price' => $oldresult['reservation']['total_price'],
+                'plan' => $oldresult['reservation']['plan'],
+                'person' => $oldresult['reservation']['person']
                 ];
 
             //初期表示用に一か月分の在庫データを取得。初期設定は既予約のものを使う。
@@ -438,6 +447,7 @@ class ReservationController{
             $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date']);
             $old_total_price=htmlspecialchars($oldresult['reservation']['total_price']);
             $old_plan=htmlspecialchars($oldresult['reservation']['plan']);
+            $pld_person=htmlspecialchars($oldresult['reservation']['person']);
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
         }catch(Exception $e){
@@ -472,12 +482,14 @@ class ReservationController{
             $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
             $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
             $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
+            $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
             $new_room_id=htmlspecialchars($request['room_id']);
             $new_comment=htmlspecialchars($request['comment']);
             $new_checkin_date=htmlspecialchars($request['checkin_date']);
             $new_checkout_date=htmlspecialchars($request['checkout_date']);
             $new_total_price=htmlspecialchars($request['total_price']);
             $new_plan=htmlspecialchars($request['plan']);
+            $new_person=htmlspecialchars($request['person']);
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
         }
@@ -498,12 +510,14 @@ class ReservationController{
                 $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
                 $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
                 $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
+                $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
                 $new_room_id=htmlspecialchars($request['room_id']);
                 $new_comment=htmlspecialchars($request['comment']);
                 $new_checkin_date=htmlspecialchars($request['checkin_date']);
                 $new_checkout_date=htmlspecialchars($request['checkout_date']);
                 $new_total_price=htmlspecialchars($request['total_price']);
                 $new_plan=htmlspecialchars($request['plan']);
+                $new_person=htmlspecialchars($request['person']);
                 include __DIR__.'/../views/reserveUpdateForm.php';
                 exit();
             }
@@ -518,9 +532,10 @@ class ReservationController{
                 'room_id' => $request['room_id'],
                 'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
-                'checkout_date' =>$request['checkout_date'],
-                'total_price' =>$final_price,
-                'plan' =>$request['plan']
+                'checkout_date' => $request['checkout_date'],
+                'total_price' => $final_price,
+                'plan' => $request['plan'],
+                'person' => $request['person']
                 ];
 
     //ビュー表示用。
@@ -531,12 +546,14 @@ class ReservationController{
             $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
             $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
             $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
+            $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
             $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
             $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment']);
             $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
             $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
             $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
             $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan']);
+            $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person']);
             include __DIR__.'/../views/reserveUpdateConfirm.php';
             exit();
         //例外処理。    
@@ -576,12 +593,14 @@ class ReservationController{
                     $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
                     $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
                     $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
+                    $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
                     $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
                     $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment']);
                     $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
                     $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
                     $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
                     $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan']);
+                    $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person']);
                     unset($_SESSION['reserve_update_new']);
                     include __DIR__.'/../views/reserveUpdateForm.php';
                     exit();

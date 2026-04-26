@@ -16,7 +16,7 @@ class FinalPriceService{
             $total_price=0;
             $rows=$this->roomAvailabilityModel->getRoomBetweenPriceData($request);
             foreach($rows as $row){
-            $total_price=$total_price+intval($row['price']);
+            $total_price=$total_price+intval($row['price']) * $request['person'];
             }
             return ['success'=>true, 'total_price'=>$total_price];
   
