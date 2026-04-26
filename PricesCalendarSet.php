@@ -1,9 +1,9 @@
 <?php
 $room_id=1;
-$plans=['bed_only', 'standard'];
-$plansbase=['bed_only'=>0, 'standard'=>2000,];
-$start_price;
-$plan_price;
+$plans=[];      //$plans=['bed_only, standard'] みたいになる。
+$plansbase=[];     //$plansbase=['bed_only'=> 0, 'standard' => 2000]みたいになる。数値はint。
+$start_price=0;
+$plan_price=0;
 $start_date=date('Y-m-d');
 
 echo "room_id=1:シングル、room_id=2:ツイン、room_id=3:ダブル";
@@ -15,8 +15,20 @@ try{
     //dbパスワードは無し。
     $db=new PDO($dsn,$user);
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES,false);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+//プラン配列(plans)とプラン上乗せ(plansbase)配列をデータベースから取得し自動で作成。
+    $stmt=$db->prepare('SELECT * FROM plans');
+    $stmt->execute();
+    while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
+        $plans[]=$row['plan_name'];
+        $plansbase[$row['plan_name']] = (int)$row['plan_base'];
+    }
+
 
     for($i=0; $i<3; $i++){  //部屋種類で回す。
+
+        $room_id = $i + 1;
         
         switch ($i) {  //部屋種類ごとに基準料金を設定。
             case 0: $start_price = 5000; break; // シングル
@@ -26,10 +38,7 @@ try{
             foreach($plans as $plan){
                 $date=$start_date; //日にちを今日にリセット。
 
-                switch($plan){ //プランごとに基準料金に上乗せ。
-                    case 'bed_only' : $plan_price = $start_price + $planbase[$plan]; break;
-                    case 'standard' : $plan_price = $start_price + $planbase[$plan]; break;
-                }
+                $plan_price = $start_price + $plansbase[$plan]; //プランに応じて料金を上乗せ。
 
                 for($j=0; $j<365; $j++){                   
                     $w=date('w',strtotime($date)); //曜日ごとに料金調整。
@@ -50,8 +59,6 @@ try{
                     $date=date('Y-m-d',strtotime("$date +1 day")); //シングルクォートで囲まないように。変数展開されません。
                 }
             }
-
-        $room_id++;
         
     }
 
