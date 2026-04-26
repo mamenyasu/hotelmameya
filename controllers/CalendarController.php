@@ -54,7 +54,7 @@ class CalendarController{
 
             //JSONは連想配列で。
             header('Content-Type: application/json; charset=utf-8');
-            echo json_encode(['days'=>$days, 'markArray'=>$markArray, 'prices'=>$prices]);
+            echo json_encode(['days'=>$days, 'marks'=>$markArray, 'prices'=>$prices]);
             exit();
 
         }catch(Exception $e){

@@ -1,0 +1,57 @@
+<?php
+    class CalendarAjaxService {
+
+    private $getPlansDataService;
+    private $calendarMarkArrayService;
+    private $pricesCalendarService;
+    private $yearMonthToDaysService;
+    private $reservationService;
+    private $restockService;
+
+    public function __construct($pdo){
+        $this->getPlansDataService = new GetPlansDataService($pdo);
+        $this->calendarMarkArrayService = new CalendarMarkArrayService();
+        $this->pricesCalendarService = new PricesCalendarService($pdo);
+        $this->yearMonthToDaysService = new YearMonthToDaysService();
+        $this->reservationService = new ReservationService($pdo);
+        $this->restockService = new RestockService();
+    }
+
+    public function getCalendarData($room_id, $year, $month){
+        // ① プラン一覧
+        $plans = $this->getPlansDataService->getPlansData($room_id);
+
+        // ② 生の在庫データ（多重配列）
+        $availability = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+
+        if(!$availability['success']){
+            return [
+                'success' => false,
+                'message' => '在庫データを取得できませんでした'
+            ];
+        }
+
+        // ③ SESSION の旧予約情報を使って restock
+        $restockedAvailability = $this->restockService->restock($availability);
+
+        // ④ mark（〇△×）
+        $marks = $this->calendarMarkArrayService
+                 ->getCalendarMarkArray($restockedAvailability);
+
+        // ⑤ プラン別の価格カレンダー
+        $prices = $this->pricesCalendarService
+                   ->getPricesAllPlan($room_id, $year, $month);
+
+        // ⑥ days（1〜月末）
+        $days = $this->yearMonthToDaysService->getDays($year, $month);
+
+        return [
+            'success' => true,
+            'plans'   => $plans,
+            'marks'    => $marks,
+            'prices'  => $prices,
+            'days'    => $days
+        ];
+
+    }
+}

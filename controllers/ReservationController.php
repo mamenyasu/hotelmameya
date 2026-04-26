@@ -82,7 +82,7 @@ class ReservationController{
             }
 
         //mark配列生成。(指定された種類の部屋の、指定月の各日の空き具合（〇△×）)
-            $mark=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+            $marks=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
         //指定された種類の部屋の、指定月の値段表を取得。$pricesはプランごとの多重配列。
             $prices=$this->pricesCalendarService->getPricesAllPlan($room_id,$year,$month);
         //月初～月末（例：１～３１）のdays配列。
@@ -420,13 +420,13 @@ class ReservationController{
             
             //差し戻し用に、リストック状態のカレンダー表示用データをセッション変数で保持。
             $_SESSION['reserve_update_calendar'] = [
-                'markArray' => $markArrayMonth,
+                'marks' => $markArrayMonth,
                 'prices'    => $pricesMonth
                 ];
 
             //ビュー表示用。
             $days=$this->yearMonthToDaysService->getDays($oldyear,$oldmonth);
-            $markArray=$markArrayMonth;
+            $marks=$markArrayMonth;
             $prices=$pricesMonth;
             $plansdata=$roomPlansData;
             $old_checkin_year=(int)date('Y',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
@@ -461,7 +461,7 @@ class ReservationController{
     //バリデーション。通らなかったら差し戻し。
         $error=$this->updateFormRequest->updateFormValidate($request);
         if($error){
-            $markArray=$_SESSION['reserve_update_calendar']['markArray'];
+            $marks=$_SESSION['reserve_update_calendar']['marks'];
             $prices=$_SESSION['reserve_update_calendar']['prices'];
             $old_checkin_year=(int)date('Y',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
             $old_checkin_month=(int)date('n',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
@@ -487,7 +487,7 @@ class ReservationController{
             $result=$this->reservationService->hasStock($request);
             if($result['success']==false){
                 $message=$result['message'];
-                $markArray=$_SESSION['reserve_update_calendar']['markArray'];
+                $marks=$_SESSION['reserve_update_calendar']['marks'];
                 $prices=$_SESSION['reserve_update_calendar']['prices'];
                 $old_checkin_year=(int)date('Y',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
                 $old_checkin_month=(int)date('n',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
