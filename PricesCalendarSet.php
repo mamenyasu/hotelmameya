@@ -17,7 +17,7 @@ try{
     $db->setAttribute(PDO::ATTR_EMULATE_PREPARES,false);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-//プラン配列(plans)とプラン上乗せ(plansbase)配列をデータベースから取得し自動で作成。
+//プラン配列(plans)とプラン上乗せ(plansbase)配列をデータベースのplansテーブルから取得し自動で作成。
     $stmt=$db->prepare('SELECT * FROM plans');
     $stmt->execute();
     while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
