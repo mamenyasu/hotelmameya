@@ -8,14 +8,14 @@
     }
 
     //プランを取得するメソッド。
-    public function getPlan(){
+    public function getPlanName(){
         try{
-        $stmt=$this->pdo->prepare('SELECT plan FROM plans');
+        $stmt=$this->pdo->prepare('SELECT plan_name FROM plans');
         $stmt->execute();
-        $plans=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        $plans=$stmt->fetchAll(PDO::FETCH_COLUMN);
         return $plans;
         }catch(Exception $e){
-            throw new Exception('データベースエラー：値段情報を取得できませんでした');
+            throw new Exception('データベースエラー：情報を取得できませんでした');
         }
     }
 

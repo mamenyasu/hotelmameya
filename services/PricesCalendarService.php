@@ -21,8 +21,8 @@ class PricesCalendarService{
         try{
             $prices=[];
 
-            //プランを配列で取得。
-            $plans=$this->planModel->getPlan();
+            //プラン名を配列で取得。
+            $plans=$this->planModel->getPlanName();
 
             foreach($plans as $plan){
             $pricesRecord=$this->pricesCalendarModel->getPricesRecord($room_id,$plan,$year,$month);
