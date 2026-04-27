@@ -51,7 +51,7 @@ switch($controller){
             case 'update_form' : $ctrl->reserve_update_form($_POST); break;
             case 'update_reconfirm' : $ctrl->reserve_update_reconfirm($_POST); break;
             case 'update_confirm' : $ctrl->reserve_update_confirm(); break;
-            default : $ctrl->index(); break;
+            default : echo "404 Not Found"; break;
         }
     break;
 
@@ -62,7 +62,7 @@ switch($controller){
             case 'contact_form' : $ctrl->contact_form(); break;
             case 'contact_reconfirm' : $ctrl->contact_reconfirm($_POST); break;
             case 'contact_form_confirm' : $ctrl->contact_confirm(); break;
-            default : $ctrl->index(); break;
+            default : echo "404 Not Found"; break;
         }
     break;
 
@@ -76,19 +76,22 @@ switch($controller){
             case 'login_confirm' : $ctrl->master_login_confirm(); break;
             case 'master_listSelect' : $ctrl->master_listSelect(); break;
             case 'master_list' : $ctrl->master_list(); break;
-            default : $ctrl->index(); break;
+            default : echo "404 Not Found"; break;
         }
     break;
 
-    case 'calendar' :
-        require_once 'controllers/CalendarController.php';
-        $ctrl=new CalendarController($pdo);
-        switch($action){
-            case 'calendar' : $ctrl->getCalendarData($room_id, $year, $month); break;
-            default : $vtrl->index(); break;
-        }
-    break;
     
+    case 'ajax':
+        require_once 'controllers/AjaxController.php';
+        $ctrl = new AjaxController($pdo);
+
+        switch($action){
+        case 'calendar' : $ctrl->calendar($room_id, $year, $month); break;
+        case 'maxguest' : $ctrl->maxguest($room_id); break;
+        default : echo "404 Not Found"; break;
+        }
+
+
     default : 
         echo '404 Not Found';
     break; 

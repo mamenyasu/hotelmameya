@@ -11,6 +11,7 @@ require_once __DIR__.'/../services/YearMonthToDaysService.php';
 require_once __DIR__.'/../services/FinalPriceService.php';
 require_once __DIR__.'/../services/PricesCalendarService.php';
 require_once __DIR__.'/../services/GetPlansDataService.php';
+require_once __DIR__.'/../services/MaxGuest_OfRoomService.php';
 
 
 class ReservationController{
@@ -27,6 +28,7 @@ class ReservationController{
     private $finalPriceService;
     private $pricesCalendarService;
     private $getPlansDataService;
+    private $maxGuest_OfRoomService;
 //!!--コンストラクタ---------
     public function __construct($pdo){
         $this->pdo=$pdo;
@@ -41,11 +43,7 @@ class ReservationController{
         $this->finalPriceService = new FinalPriceService($pdo);
         $this->pricesCalendarService = new PricesCalendarService($pdo);
         $this->getPlansDataService = new GetPlansDataService($pdo);
-    }
-
-///ルータースイッチデフォルト用。----------
-    public function index(){
-        include __DIR__.'/../views/index.php';
+        $this->maxGuest_OfRoomService = new MaxGuest_OfRoomService($pdo);
     }
 
 
@@ -115,6 +113,8 @@ class ReservationController{
         //予約フォームを表示。カレンダーで選択した月日がチェックイン日となる。
         $checkin_date=htmlspecialchars(sprintf('%04d-%02d-%02d',$year,$month,$day));
         //$planはhiddenで仕込む。
+        //部屋タイプにより制限人数。
+        $number_OfRoom=$this->maxGuest_OfRoomService->getMaxguest_OfRoom($room_id);
         include __DIR__.'/../views/reserveForm.php';
         exit();
 
@@ -132,6 +132,7 @@ class ReservationController{
         //バリデーション。通らなかったら差し戻し。
         $error=$this->formrequest->formValidate($request);
         if($error){
+            $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
             $room_id=htmlspecialchars($request['room_id']);
             $user_name=htmlspecialchars($request['user_name']);
             $user_telphone=htmlspecialchars($request['user_telphone']);
@@ -152,6 +153,7 @@ class ReservationController{
             $hasStock=$this->reservationService->hasStock($request);
             if($hasStock['success']==false){
                 $message=$hasStock['message'];
+                $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
                 $room_id=htmlspecialchars($request['room_id']);
                 $user_name=htmlspecialchars($request['user_name']);
                 $user_telphone=htmlspecialchars($request['user_telphone']);
@@ -179,10 +181,10 @@ class ReservationController{
                 'email' => $request['email'],
                 'comment' => $request['comment'],
                 'checkin_date' => $request['checkin_date'],
-                'checkout_date' =>$request['checkout_date'],
-                'total_price' =>$final_price,
-                'plan' =>$request['plan'],
-                'person' =>$request['person']
+                'checkout_date' => $request['checkout_date'],
+                'total_price' => $final_price,
+                'plan' => $request['plan'],
+                'person' => $request['person']
             ];
 
             //最終確認ビュー表示用。
@@ -225,6 +227,7 @@ class ReservationController{
         $result=$this->reservationService->reserve($_SESSION['reserve']);
         if($result['success']==false){
             $message=htmlspecialchars($result['message']);
+            $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve']['room_id']);
             $room_id=htmlspecialchars($_SESSION['reserve']['room_id']);
             $user_name=htmlspecialchars($_SESSION['reserve']['user_name']);
             $user_telphone=htmlspecialchars($_SESSION['reserve']['user_telphone']);
@@ -425,7 +428,7 @@ class ReservationController{
             $pricesMonth=$pricesAllPlan[$oldresult['reservation']['plan']];
 
             //旧予約の部屋種類をもとに、プラン一覧データを取得。
-            $roomPlansdata=$getPlansDataService->getPlansDataService($oldresult['reservation']['room_id']);
+            $roomPlansdata=$this->getPlansDataService->getPlansData($oldresult['reservation']['room_id']);
             
             //差し戻し用に、リストック状態のカレンダー表示用データをセッション変数で保持。
             $_SESSION['reserve_update_calendar'] = [
@@ -434,6 +437,7 @@ class ReservationController{
                 ];
 
             //ビュー表示用。
+            $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($oldresult['reservation']['room_id']);
             $days=$this->yearMonthToDaysService->getDays($oldyear,$oldmonth);
             $marks=$markArrayMonth;
             $prices=$pricesMonth;
@@ -490,6 +494,7 @@ class ReservationController{
             $new_total_price=htmlspecialchars($request['total_price']);
             $new_plan=htmlspecialchars($request['plan']);
             $new_person=htmlspecialchars($request['person']);
+            $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
         }
@@ -518,6 +523,7 @@ class ReservationController{
                 $new_total_price=htmlspecialchars($request['total_price']);
                 $new_plan=htmlspecialchars($request['plan']);
                 $new_person=htmlspecialchars($request['person']);
+                $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
                 include __DIR__.'/../views/reserveUpdateForm.php';
                 exit();
             }
@@ -601,6 +607,7 @@ class ReservationController{
                     $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
                     $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan']);
                     $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person']);
+                    $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
                     unset($_SESSION['reserve_update_new']);
                     include __DIR__.'/../views/reserveUpdateForm.php';
                     exit();

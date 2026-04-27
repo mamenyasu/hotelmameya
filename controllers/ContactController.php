@@ -16,10 +16,6 @@ class ContactController{
         $this->contactService= new ContactService($pdo);
     }
 
-///ルータースイッチデフォルト用。
-    public function index(){
-        include __DIR__.'/../views/index.php';
-    }
 
 ////コンタクトフォーム表示。
     public function contact_form(){
