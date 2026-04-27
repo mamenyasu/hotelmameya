@@ -409,7 +409,7 @@ class ReservationController{
             $oldyear=date('Y',strtotime($oldcheckin_date));
             $oldmonth=date('m',strtotime($oldcheckin_date));
             $availabilityRoomMonth=$this->reservationService->getAvailabilityRoomMonth($oldroom_id,$oldyear,$oldmonth);
-            if($availabilityRoomMonth['success']==false){
+            if($availabilityRoomMonth['success']==false){       //空配列が返ってきた場合。
                 unset($_SESSION['reserve_update_old']);
                 $message=$availabilityRoomMonth['message'];
                 include __DIR__.'/../views/false.php';

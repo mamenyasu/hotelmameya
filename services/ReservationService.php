@@ -111,7 +111,7 @@ class ReservationService{
         try{
             $availabilityRoomMonth=$this->roomAvailabilityModel->getAvailabilityMonth($room_id,$year,$month);
             if(!$availabilityRoomMonth){
-                return ['success'=>false, 'message'=>'指定された部屋の月在庫を取得できませんでした。'];
+                return ['success'=>false, 'message'=>'指定された部屋の月在庫を取得できませんでした。']; //SUCCESS判定は、空配列が返ってきた場合の処理用。
             }
             return ['success'=>true, 'availabilityRoomMonth'=>$availabilityRoomMonth];
         }catch(Exception $e){
