@@ -86,7 +86,9 @@ class ReservationController{
         //月初～月末（例：１～３１）のdays配列。
             $days=$this->yearMonthToDaysService->getDays($year,$month);     
         //指定された部屋のプランデータを取得。見出しや内容など。
-            $plansData=$this->getPlansDataService->getPlansData($room_id);  
+            $plansData=$this->getPlansDataService->getPlansData($room_id);
+        //指定された部屋の人数制限。
+            $maxGuest_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
             include __DIR__.'/../views/reservationCalendar.php';
             exit();
 

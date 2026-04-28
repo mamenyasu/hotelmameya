@@ -1,0 +1,12 @@
+# mod_rewrite を有効化
+RewriteEngine On
+
+# ベースパス（サブディレクトリに設置する場合は修正）
+RewriteBase /
+
+# index.php や既存ファイル・ディレクトリは除外
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# すべて index.php に転送
+RewriteRule ^ index.php [L]
