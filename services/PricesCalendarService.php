@@ -36,4 +36,24 @@ class PricesCalendarService{
             throw $e;
         }
     }
+
+    //最終料金計算
+    public function getFinalPrice($request){
+        try{
+            $checkin_date=$request['checkin_date'];
+            $checkout_date=$request['checkout_date'];
+            $plan=$request['plan'];
+            $person=intval($request['person']);
+            $room_id=$request['room_id'];
+            $prices=$this->pricesCalendarModel->getPricesBetween($room_id,$plan,$checkin_date,$checkout_date);
+            $totalPrice=0;
+            foreach($prices as $price){
+                $totalPrice += $price*$person;
+            }
+            return $totalPrice;
+        }catch(Exception $e){
+            throw $e;
+        }
+
+    }
 }

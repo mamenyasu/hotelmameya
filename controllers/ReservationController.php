@@ -40,7 +40,6 @@ class ReservationController{
         $this->roomMonthPriceService = new RoomMonthPriceService();
         $this->restockService = new RestockService();
         $this->yearMonthToDaysService = new YearMonthToDaysService();
-        $this->finalPriceService = new FinalPriceService($pdo);
         $this->pricesCalendarService = new PricesCalendarService($pdo);
         $this->getPlansDataService = new GetPlansDataService($pdo);
         $this->maxGuest_OfRoomService = new MaxGuest_OfRoomService($pdo);
@@ -171,8 +170,7 @@ class ReservationController{
                 exit();
             }
             //バックエンドで料金を再計算。
-            $result_finalprice=$this->finalPriceService->getFinalPrice($request);
-            $final_price=$result_finalprice['total_price'];
+                $final_price=$this->pricesCalendarService->getFinalPrice($request);
 
             //セッション変数に保持。
             $_SESSION['reserve']=[
@@ -453,7 +451,7 @@ class ReservationController{
             $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date']);
             $old_total_price=htmlspecialchars($oldresult['reservation']['total_price']);
             $old_plan=htmlspecialchars($oldresult['reservation']['plan']);
-            $pld_person=htmlspecialchars($oldresult['reservation']['person']);
+            $old_person=htmlspecialchars($oldresult['reservation']['person']);
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
         }catch(Exception $e){
@@ -531,8 +529,7 @@ class ReservationController{
             }
 
     //バックエンドで料金を再計算。
-                $result_finalprice=$this->finalPriceService->getFinalPrice($request);
-                $final_price=$result_finalprice['total_price'];
+                $final_price=$this->pricesCalendarService->getFinalPrice($request);
 
     //セッション変数を使って、新たな予約内容をビューをまたいで保持可能にする。個人情報は不要。
             $_SESSION['reserve_update_new']=[
