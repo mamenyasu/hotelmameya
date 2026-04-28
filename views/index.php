@@ -21,25 +21,29 @@
                 <img src="/hotelmameya/assets/img/hotelmameya_hero.png" alt="トップ画像">
             </div>
         </section>
-        <section class="index_room">
-            <img src="/hotelmameya/assets/img/hotelmameya_index_room.png" alt="トップ部屋画像">
-            <article>
-                <h2>～和風モダンの室内～</h2>
-                <p>木の香りに包まれた和モダンの空間で、心をほどくひとときを。
-                    高速Wi-Fiと動画配信サービスで、静かな夜も豊かな時間に。
-                    枕の種類も豊富に取り揃え、快眠をお手伝いします。</p>
-            </article>
-        </section>
-        <section class="index_restaurant">
-            <img src="/hotelmameya/assets/img/hotelmameya_index_restaurant.png" alt="トップレストラン画像">
-            <article class=index_room>
-                <h2>～</h2>
-                <p>木の香りと柔らかな灯りに包まれた、和モダンのレストラン。
-                    季節の食材を活かした豊富なメニューと、厳選されたドリンクを取り揃えています。
-                    食後には、あんみつや和菓子など、心をほぐす甘味もご用意。
-                    ゆったりとした時間の中で、和の味わいとおもてなしをお楽しみください。</p>
-            </article>
-        </section>
+        <div class="index_ex">
+            <section class="index_room">
+                <img src="/hotelmameya/assets/img/hotelmameya_index_room.png" alt="トップ部屋画像">
+                <article>
+                    <h2>～和風モダンの室内～</h2>
+                    <br>
+                    <p>木の香りに包まれた和モダンの空間で、心をほどくひとときを。<br>
+                        高速Wi-Fiと動画配信サービスで、静かな夜も豊かな時間に。<br>
+                        枕の種類も豊富に取り揃え、快眠をお手伝いします。</p>
+                </article>
+            </section>
+            <section class="index_restaurant">
+                <article>
+                    <h2>～色とりどりの味覚を堪能～</h2>
+                    <br>
+                    <p>木の香りと柔らかな灯りに包まれた、和モダンのレストラン。<br>
+                        季節の食材を活かした豊富なメニューと、厳選されたドリンクを取り揃えています。<br>
+                        食後には、あんみつや和菓子など、心をほぐす甘味もご用意。<br>
+                        ゆったりとした時間の中で、和の味わいとおもてなしをお楽しみください。</p>
+                </article>
+                <img src="/hotelmameya/assets/img/hotelmameya_index_restaurant.png" alt="トップレストラン画像">
+            </section>
+        </div>
         <footer>
 
         </footer>
