@@ -3,6 +3,8 @@ session_start();
 
 $requestUri=$_SERVER['REQUEST_URI'];
 $path=parse_url($requestUri,PHP_URL_PATH);
+//サブディレクトリ名を削除。
+$path = str_replace('/hotelmameya/', '', $path);
 $path=trim($path,'/');
 if ($path === '') {
     $segments=[];  //explodeしてしまうとnullではなく空文字が返ってきてしまい、後述の「??」が効かなくなる。

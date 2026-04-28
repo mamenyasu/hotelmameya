@@ -1,0 +1,19 @@
+<svg width="260" height="70" viewBox="0 0 260 70" xmlns="http://www.w3.org/2000/svg">
+  <!-- 和モダンの落ち着いた金茶色の丸紋 -->
+  <circle cx="40" cy="35" r="22" fill="#b48a3c"/>
+  <circle cx="40" cy="35" r="16" fill="#f7f4ef"/>
+  <!-- シンプルな“豆”を抽象化した形（ホテル名に合わせた遊び心） -->
+  <ellipse cx="40" cy="35" rx="8" ry="12" fill="#b48a3c" transform="rotate(20 40 35)"/>
+
+  <!-- 上段：控えめな英字（ビジネスホテル感） -->
+  <text x="80" y="30" font-family="Segoe UI, sans-serif"
+        font-size="13" fill="#6b5a3c" letter-spacing="3">
+    MODERN HOTEL
+  </text>
+
+  <!-- 下段：和モダンな太めの明朝体 -->
+  <text x="80" y="55" font-family="Yu Mincho, 'Hiragino Mincho ProN', serif"
+        font-size="26" fill="#2b2b2b" letter-spacing="4">
+    ホテルまめや
+  </text>
+</svg>
