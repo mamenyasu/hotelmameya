@@ -29,9 +29,9 @@ private function clearReservationSessions(){
         exit();
     }
 
-    public function amenity(){
+    public function facility(){
         $this->clearReservationSessions();
-        include __DIR__.'/../views/amenity.php';
+        include __DIR__.'/../views/facility.php';
         exit();
     }
 }

@@ -3,8 +3,8 @@
     <ul>
         <li><a href="../home/room">部屋</a></li>
         <li><a href="../home/food">お食事</a></li>
-        <li><a href="../home/amenity">アメニティ</a></li>
-        <li class="has-sub"><a href="../reserve/reserve_calendar">ご予約</a>
+        <li><a href="../home/amenity">館内施設</a></li>
+        <li class="has-sub"><a href="#">ご予約</a>
             <ul class="sub-menu">
                 <li><a href="../reserve_calendar/1">シングル</a></li>
                 <li><a href="../reserve_calendar/2">ツイン</a></li>

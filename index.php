@@ -32,7 +32,7 @@ switch($controller){
             case 'index' : $ctrl->index(); break;
             case 'rooms' : $ctrl->rooms(); break;
             case 'foods' : $ctrl->foods(); break;
-            case 'amenity' : $ctrl->amenity(); break;
+            case 'facility' : $ctrl->facility(); break;
             default : $ctrl->index(); break;
         }
     break;

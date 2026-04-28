@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 10px 10px;
 }
 
 .nav-menu a {
@@ -12,17 +12,17 @@
 
 .nav-menu a:hover {
     border-bottom: 2px solid #b48a3c; /* 和モダンな金茶ライン */
-    padding-bottom: 2px;
 }
 
-.nav-menu ul{
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
-}
 
 .nav-menu > ul {
     display: flex;
     gap: 40px;
     list-style: none;
+    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-size:20px;
+    margin-right:20px;
+    margin-top:20px;
 }
 
 .has-sub {
@@ -30,21 +30,26 @@
 }
 
 .sub-menu {
+    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
     display: none;
     position: absolute;
-    background: white;
     list-style: none;
-    padding:0;
+    font-size:25px;
+    padding:30px 0px 20px 0px;
     margin:0;
+    background-color: rgba(255, 255, 255, 0.8); 
+    backdrop-filter: blur(4px);
+    left:-42px;
 }
 
 .sub-menu li {
-    margin-bottom: 5px;
     white-space: nowrap;
     padding-top:10px;
     padding-bottom:10px;
     margin:0;
-    height:40px;
+    height:60px;
+    width:150px;
+    text-align: center;
 }
 
 .has-sub:hover .sub-menu {
@@ -58,5 +63,16 @@
 
 .hero img {
     width: 100%;
+    height: auto;
+    object-fit: cover;        /* 画像をトリミングしつつ埋める */
+    object-position: center 10%; /* ← ここで上をカット */
+}
+
+.index_room{
+    display:flex;
+}
+
+.index_room img{
+    width: 50%;
     height: auto;
 }
