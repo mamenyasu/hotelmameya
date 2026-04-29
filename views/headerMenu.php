@@ -1,16 +1,16 @@
 <nav class="nav-menu">
-    <h3><a href="../home/index"><img src="/hotelmameya/assets/img/logo-mameya.svg" alt="ホテルまめや"></a></h3>
+    <h3><a href="/hotelmameya/home/index"><img src="/hotelmameya/assets/img/logo-mameya.svg" alt="ホテルまめや"></a></h3>
     <ul>
-        <li><a href="../home/room">部屋</a></li>
-        <li><a href="../home/food">お食事</a></li>
-        <li><a href="../home/amenity">館内施設</a></li>
+        <li><a href="/hotelmameya/home/rooms">部屋</a></li>
+        <li><a href="/hotelmameya/home/foods">お食事</a></li>
+        <li><a href="/hotelmameya/home/falicity">館内施設</a></li>
         <li class="has-sub"><a href="#">ご予約</a>
             <ul class="sub-menu">
-                <li><a href="../reserve_calendar/1">シングル</a></li>
-                <li><a href="../reserve_calendar/2">ツイン</a></li>
-                <li><a href="../reserve_calendar/3">ダブル</a></li>
+                <li><a href="/hotelmameya/reserve_calendar/1">シングル</a></li>
+                <li><a href="/hotelmameya/reserve_calendar/2">ツイン</a></li>
+                <li><a href="/hotelmameya/reserve_calendar/3">ダブル</a></li>
             </ul>
         </li>
-        <li><a href="./contact/contact_form.php">お問い合わせ</a></li>
+        <li><a href="/hotelmameya/contact/contact_form.php">お問い合わせ</a></li>
     </ul>
 </nav>

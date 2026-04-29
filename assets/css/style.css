@@ -101,3 +101,71 @@
 .index_ex article{
     text-align: center;
 }
+
+.box{
+    color:white;
+    background-color: green;
+    width:70px;
+    height: auto;
+    text-align: center;
+    margin:0 auto;
+}
+
+.green_line {
+    border: none;
+    height: 2px;
+    background-color: green;
+    width: 50%;
+    margin: 20px auto;
+}
+
+.rooms_facility{
+    height: 50px;
+    width: 50%;
+    margin: 20px auto;
+}
+
+.rooms_half{
+    display:flex;
+    margin:0 0 5vw 0;
+}
+
+.rooms_half img{
+    width: 50vw;
+    height: auto;
+}
+
+.rooms_container{
+    display:block;
+    justify-content: center;
+    width:50vw;
+}
+
+.foods_Meals{
+    width:50%;
+    margin:20px auto;
+    text-align: center;
+}
+
+
+.foods_container img{
+    display:block;
+    width:50%;
+    height: auto;
+    margin:0 auto;
+}
+
+
+.foods_title{
+    font-size: 30px;
+    width:50%;
+    margin:20px auto;
+    text-align: center;
+}
+
+.foods_subTitle{
+    font-size: 20px;
+    width:50%;
+    margin:20px auto;
+    text-align: center;
+}
