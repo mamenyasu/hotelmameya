@@ -18,23 +18,33 @@
     <main>
         <section class="foods_container">
             <hr class="green_line">
-            <h2 class="foods_Meals">Meals</h2>
-            <hr class="green_line">
-            <p class="foods_title">夕食</p>
-            <p class="foods_subTitle">dinner</p>
-            <img src="/hotelmameya/assets/img/hotelmameya_foods_dinner.png">
-            <br>
-            <hr class="green_line">
-            <p class="foods_title">朝食</p>
-            <p class="foods_subTitle">breakfast</p>
-            <img src="/hotelmameya/assets/img/hotelmameya_foods_breakFast.png">
-            <br>
-            <hr class="green_line">
-            <p class="foods_title">飲み物</p>
-            <p class="foods_subTitle">drinks</p>
-            <img src="/hotelmameya/assets/img/hotelmameya_foods_drinks.png">
-            <br>
+            <h2 class="foods_Meals">食事</h2>
             <hr class="green_line">
         </section>
+        <div class="foods_ex">
+            <section class="foods_hero">
+                <img src="/hotelmameya/assets/img/hotelmameya_inDining.png" alt="シェフが料理を作る様子">
+            </section>
+            <section class="foods_container">
+                <hr class="green_line">
+                <p class="foods_title">夕食</p>
+                <p class="foods_subTitle">-dinner-</p>
+                <hr class="green_line">
+                <img src="/hotelmameya/assets/img/hotelmameya_foods_dinner.png">
+                <br>
+                <hr class="green_line">
+                <p class="foods_title">朝食</p>
+                <p class="foods_subTitle">-breakfast-</p>
+                <hr class="green_line">
+                <img src="/hotelmameya/assets/img/hotelmameya_foods_breakFast.png">
+                <br>
+                <hr class="green_line">
+                <p class="foods_title">飲み物</p>
+                <p class="foods_subTitle">-drinks-</p>
+                <hr class="green_line">
+                <img src="/hotelmameya/assets/img/hotelmameya_foods_drinks.png">
+                <br>
+            </section>
+        </div>
     </main>
 </body>

@@ -7,6 +7,7 @@ private function clearReservationSessions(){
         unset($_SESSION['reserve_update_old']);
         unset($_SESSION['reserve_update_new']);
         unset($_SESSION['reserve_update_calendar']);
+        unset($_SESSION['contact']);
         }
 
 

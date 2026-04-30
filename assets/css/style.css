@@ -1,3 +1,9 @@
+.error{
+    color:red;
+    font-size: 16px;
+}
+
+
 .nav-menu {
     display: flex;
     align-items: center;
@@ -167,15 +173,28 @@
 .foods_title {
     font-size: 30px;
     width: 50%;
-    margin: 20px auto;
+    margin: 10px auto;
     text-align: center;
 }
 
 .foods_subTitle {
     font-size: 20px;
     width: 50%;
-    margin: 20px auto;
+    margin: 10px auto;
     text-align: center;
+}
+
+.foods_hero img{
+    display: block;
+    width: 80%;
+    height: auto;
+    margin: 0 auto 40px;
+}
+
+.foods_ex{
+    background-image: url("/hotelmameya/assets/img/hotelmameya_index_background.webp");
+    background-repeat: repeat;
+    background-size: 400px 400px;
 }
 
 
@@ -218,3 +237,84 @@
     font-size: 26px;
 }
 
+
+.contact_ex{
+    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+}
+
+.contact_title{
+    text-align: center;
+    font-size: 20px;
+    color: #4a3b2a; 
+    font-weight: 600;
+}
+
+.contact_container {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.contact_container h5{
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 6px;
+    color: #4a3b2a; 
+    font-weight: 600;
+}
+
+.contact_container h6{
+    text-align: center;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color:black; 
+    font-weight: 600;
+}
+
+.contact_container form {
+    width: 80%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.contact_container 
+form input[type="text"],
+form input[type="email"] ,
+textarea{
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border: 1px solid #c8b8a6; /* 和紙っぽい淡い茶色 */
+    border-radius: 4px;
+    background-color: #faf7f3; /* ほんのり和紙風の白 */
+    box-sizing: border-box;
+    margin-bottom: 18px;
+    transition: 0.2s;
+}
+
+/* フォーカス時の和モダン感 */
+form input:focus,
+form textarea:focus {
+    border-color: #8c5e3c; /* ボタンと同系色 */
+    outline: none;
+    background-color: #fff;
+}
+
+
+.submit_btn {
+    background-color: #8c5e3c;
+    color: #fff;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    display: block;
+    margin: 20px auto 0;
+    transition: 0.2s;
+}
+
+.submit_btn:hover {
+    background-color: #6f482f
+}

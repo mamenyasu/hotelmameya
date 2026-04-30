@@ -134,17 +134,17 @@ class ReservationController{
         $error=$this->formrequest->formValidate($request);
         if($error){
             $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
-            $room_id=htmlspecialchars($request['room_id']);
-            $user_name=htmlspecialchars($request['user_name']);
-            $user_telphone=htmlspecialchars($request['user_telphone']);
-            $user_address=htmlspecialchars($request['user_address']);
-            $email=htmlspecialchars($request['email']);
-            $comment=htmlspecialchars($request['comment']);
-            $checkin_date=htmlspecialchars($request['checkin_date']);
-            $checkout_date=htmlspecialchars($request['checkout_date']);
-            $total_price=htmlspecialchars($request['total_price']);
-            $plan=htmlspecialchars($request['plan']);
-            $person=htmlspecialchars($request['person']);
+            $room_id=htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
+            $user_name=htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
+            $user_telphone=htmlspecialchars($request['user_telphone'], ENT_QUOTES, 'UTF-8');
+            $user_address=htmlspecialchars($request['user_address'], ENT_QUOTES, 'UTF-8');
+            $email=htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
+            $comment=htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
+            $checkin_date=htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $checkout_date=htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $total_price=htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
+            $plan=htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
+            $person=htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__.'/../views/reserveForm.php';
             exit();
         }
@@ -155,17 +155,17 @@ class ReservationController{
             if($hasStock['success']==false){
                 $message=$hasStock['message'];
                 $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
-                $room_id=htmlspecialchars($request['room_id']);
-                $user_name=htmlspecialchars($request['user_name']);
-                $user_telphone=htmlspecialchars($request['user_telphone']);
-                $user_address=htmlspecialchars($request['user_address']);
-                $email=htmlspecialchars($request['email']);
-                $comment=htmlspecialchars($request['comment']);
-                $checkin_date=htmlspecialchars($request['checkin_date']);
-                $checkout_date=htmlspecialchars($request['checkout_date']);
-                $total_price=htmlspecialchars($request['total_price']);
-                $plan=htmlspecialchars($request['plan']);
-                $person=htmlspecialchars($request['person']);
+                $room_id=htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
+                $user_name=htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
+                $user_telphone=htmlspecialchars($request['user_telphone'], ENT_QUOTES, 'UTF-8');
+                $user_address=htmlspecialchars($request['user_address'], ENT_QUOTES, 'UTF-8');
+                $email=htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
+                $comment=htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
+                $checkin_date=htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
+                $checkout_date=htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
+                $total_price=htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
+                $plan=htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
+                $person=htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
                 include __DIR__.'/../views/reserveForm.php';
                 exit();
             }
@@ -188,17 +188,17 @@ class ReservationController{
             ];
 
             //最終確認ビュー表示用。
-            $room_id=htmlspecialchars($request['room_id']);
-            $user_name=htmlspecialchars($request['user_name']);
-            $user_telphone=htmlspecialchars(mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'));
-            $user_address=htmlspecialchars($request['user_address']);
-            $email=htmlspecialchars($request['email']);
-            $comment=htmlspecialchars($request['comment']);
-            $checkin_date=htmlspecialchars($request['checkin_date']);
-            $checkout_date=htmlspecialchars($request['checkout_date']);
-            $total_price=htmlspecialchars($final_price);
-            $plan=htmlspecialchars($request['plan']);
-            $person=htmlspecialchars($request['person']);
+            $room_id=htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
+            $user_name=htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
+            $user_telphone=htmlspecialchars(mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'), ENT_QUOTES, 'UTF-8');
+            $user_address=htmlspecialchars($request['user_address'], ENT_QUOTES, 'UTF-8');
+            $email=htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
+            $comment=htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
+            $checkin_date=htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $checkout_date=htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $total_price=htmlspecialchars($final_price, ENT_QUOTES, 'UTF-8');
+            $plan=htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
+            $person=htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__.'/../views/reserveReconfirm.php';
             exit();
         
@@ -226,19 +226,19 @@ class ReservationController{
         //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。できなかったら差し戻し。
         $result=$this->reservationService->reserve($_SESSION['reserve']);
         if($result['success']==false){
-            $message=htmlspecialchars($result['message']);
+            $message=htmlspecialchars($result['message'], ENT_QUOTES, 'UTF-8');
             $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve']['room_id']);
-            $room_id=htmlspecialchars($_SESSION['reserve']['room_id']);
-            $user_name=htmlspecialchars($_SESSION['reserve']['user_name']);
-            $user_telphone=htmlspecialchars($_SESSION['reserve']['user_telphone']);
-            $user_address=htmlspecialchars($_SESSION['reserve']['user_address']);
-            $email=htmlspecialchars($_SESSION['reserve']['email']);
-            $comment=htmlspecialchars($_SESSION['reserve']['comment']);
-            $checkin_date=htmlspecialchars($_SESSION['reserve']['checkin_date']);
-            $checkout_date=htmlspecialchars($_SESSION['reserve']['checkout_date']);
-            $total_price=htmlspecialchars($_SESSION['reserve']['total_price']);
-            $plan=htmlspecialchars($_SESSION['reserve']['plan']);
-            $person=htmlspecialchars($_SESSION['reserve']['person']);
+            $room_id=htmlspecialchars($_SESSION['reserve']['room_id'], ENT_QUOTES, 'UTF-8');
+            $user_name=htmlspecialchars($_SESSION['reserve']['user_name'], ENT_QUOTES, 'UTF-8');
+            $user_telphone=htmlspecialchars($_SESSION['reserve']['user_telphone'], ENT_QUOTES, 'UTF-8');
+            $user_address=htmlspecialchars($_SESSION['reserve']['user_address'], ENT_QUOTES, 'UTF-8');
+            $email=htmlspecialchars($_SESSION['reserve']['email'], ENT_QUOTES, 'UTF-8');
+            $comment=htmlspecialchars($_SESSION['reserve']['comment'], ENT_QUOTES, 'UTF-8');
+            $checkin_date=htmlspecialchars($_SESSION['reserve']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $checkout_date=htmlspecialchars($_SESSION['reserve']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $total_price=htmlspecialchars($_SESSION['reserve']['total_price'], ENT_QUOTES, 'UTF-8');
+            $plan=htmlspecialchars($_SESSION['reserve']['plan'], ENT_QUOTES, 'UTF-8');
+            $person=htmlspecialchars($_SESSION['reserve']['person'], ENT_QUOTES, 'UTF-8');
             unset($_SESSION['reserve']);
             include __DIR__.'/../views/reserveForm.php';
             exit();
@@ -274,8 +274,8 @@ class ReservationController{
             $error=$this->cancelFormRequest->cancelFormValidate($request);
             if($error){
                 $errors=$error;
-                $id=htmlspecialchars($request['id']);
-                $email=htmlspecialchars($request['email']);
+                $id=htmlspecialchars($request['id'], ENT_QUOTES, 'UTF-8');
+                $email=htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
                 include __DIR__.'/../views/reserveCancelForm.php';
                 exit();
             }
@@ -309,18 +309,18 @@ class ReservationController{
                 ];
 
             //ビュー表示用。
-            $id=htmlspecialchars($result['reservation']['id']);
-            $room_id=htmlspecialchars($result['reservation']['room_id']);
-            $user_name=htmlspecialchars($result['reservation']['user_name']);
-            $user_telphone=htmlspecialchars($result['reservation']['user_telphone']);
-            $user_address=htmlspecialchars($result['reservation']['user_address']);
-            $email=htmlspecialchars($result['reservation']['email']);
-            $comment=htmlspecialchars($result['reservation']['comment']);
-            $checkin_date=htmlspecialchars($result['reservation']['checkin_date']);
-            $checkout_date=htmlspecialchars($result['reservation']['checkout_date']);
-            $total_price=htmlspecialchars($result['reservation']['total_price']);
-            $plan=htmlspecialchars($result['reservation']['plan']);
-            $person=htmlspecialchars($result['reservation']['person']);
+            $id=htmlspecialchars($result['reservation']['id'], ENT_QUOTES, 'UTF-8');
+            $room_id=htmlspecialchars($result['reservation']['room_id'], ENT_QUOTES, 'UTF-8');
+            $user_name=htmlspecialchars($result['reservation']['user_name'], ENT_QUOTES, 'UTF-8');
+            $user_telphone=htmlspecialchars($result['reservation']['user_telphone'], ENT_QUOTES, 'UTF-8');
+            $user_address=htmlspecialchars($result['reservation']['user_address'], ENT_QUOTES, 'UTF-8');
+            $email=htmlspecialchars($result['reservation']['email'], ENT_QUOTES, 'UTF-8');
+            $comment=htmlspecialchars($result['reservation']['comment'], ENT_QUOTES, 'UTF-8');
+            $checkin_date=htmlspecialchars($result['reservation']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $checkout_date=htmlspecialchars($result['reservation']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $total_price=htmlspecialchars($result['reservation']['total_price'], ENT_QUOTES, 'UTF-8');
+            $plan=htmlspecialchars($result['reservation']['plan'], ENT_QUOTES, 'UTF-8');
+            $person=htmlspecialchars($result['reservation']['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__.'/../views/reserveCancelReconfirm.php';
             exit();
         }catch(Exception $e){
@@ -373,8 +373,8 @@ class ReservationController{
         //予約IDとメールアドレスをバリデーション。キャンセルバリデーションを再利用。
         $error=$this->cancelFormRequest->cancelFormValidate($request);
         if($error){
-            $id=htmlspecialchars($request['id']);
-            $email=htmlspecialchars($request['email']);
+            $id=htmlspecialchars($request['id'], ENT_QUOTES, 'UTF-8');
+            $email=htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
             include __DIR__.'/../views/reserveUpdateVerifyForm.php';
             exit();
         }
@@ -444,14 +444,14 @@ class ReservationController{
             $plansdata=$roomPlansData;
             $old_checkin_year=(int)date('Y',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
             $old_checkin_month=(int)date('n',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
-            $old_id=htmlspecialchars($oldresult['reservation']['id']);
-            $old_room_id=htmlspecialchars($oldresult['reservation']['room_id']);
-            $old_comment=htmlspecialchars($oldresult['reservation']['comment']);
-            $old_checkin_date=htmlspecialchars($oldresult['reservation']['checkin_date']);
-            $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date']);
-            $old_total_price=htmlspecialchars($oldresult['reservation']['total_price']);
-            $old_plan=htmlspecialchars($oldresult['reservation']['plan']);
-            $old_person=htmlspecialchars($oldresult['reservation']['person']);
+            $old_id=htmlspecialchars($oldresult['reservation']['id'], ENT_QUOTES, 'UTF-8');
+            $old_room_id=htmlspecialchars($oldresult['reservation']['room_id'], ENT_QUOTES, 'UTF-8');
+            $old_comment=htmlspecialchars($oldresult['reservation']['comment'], ENT_QUOTES, 'UTF-8');
+            $old_checkin_date=htmlspecialchars($oldresult['reservation']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $old_checkout_date=htmlspecialchars($oldresult['reservation']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $old_total_price=htmlspecialchars($oldresult['reservation']['total_price'], ENT_QUOTES, 'UTF-8');
+            $old_plan=htmlspecialchars($oldresult['reservation']['plan'], ENT_QUOTES, 'UTF-8');
+            $old_person=htmlspecialchars($oldresult['reservation']['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
         }catch(Exception $e){
@@ -479,21 +479,21 @@ class ReservationController{
             $prices=$_SESSION['reserve_update_calendar']['prices'];
             $old_checkin_year=(int)date('Y',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
             $old_checkin_month=(int)date('n',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
-            $old_id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
-            $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
-            $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
-            $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
-            $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
-            $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
-            $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
-            $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
-            $new_room_id=htmlspecialchars($request['room_id']);
-            $new_comment=htmlspecialchars($request['comment']);
-            $new_checkin_date=htmlspecialchars($request['checkin_date']);
-            $new_checkout_date=htmlspecialchars($request['checkout_date']);
-            $new_total_price=htmlspecialchars($request['total_price']);
-            $new_plan=htmlspecialchars($request['plan']);
-            $new_person=htmlspecialchars($request['person']);
+            $old_id=htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
+            $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
+            $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment'], ENT_QUOTES, 'UTF-8');
+            $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
+            $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
+            $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
+            $new_room_id=htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
+            $new_comment=htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
+            $new_checkin_date=htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $new_checkout_date=htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $new_total_price=htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
+            $new_plan=htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
+            $new_person=htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
             include __DIR__.'/../views/reserveUpdateForm.php';
             exit();
@@ -508,21 +508,21 @@ class ReservationController{
                 $prices=$_SESSION['reserve_update_calendar']['prices'];
                 $old_checkin_year=(int)date('Y',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
                 $old_checkin_month=(int)date('n',strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
-                $old_id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
-                $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
-                $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
-                $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
-                $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
-                $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
-                $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
-                $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
-                $new_room_id=htmlspecialchars($request['room_id']);
-                $new_comment=htmlspecialchars($request['comment']);
-                $new_checkin_date=htmlspecialchars($request['checkin_date']);
-                $new_checkout_date=htmlspecialchars($request['checkout_date']);
-                $new_total_price=htmlspecialchars($request['total_price']);
-                $new_plan=htmlspecialchars($request['plan']);
-                $new_person=htmlspecialchars($request['person']);
+                $old_id=htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
+                $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
+                $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment'], ENT_QUOTES, 'UTF-8');
+                $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date'], ENT_QUOTES, 'UTF-8');
+                $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date'], ENT_QUOTES, 'UTF-8');
+                $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
+                $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
+                $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
+                $new_room_id=htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
+                $new_comment=htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
+                $new_checkin_date=htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
+                $new_checkout_date=htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
+                $new_total_price=htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
+                $new_plan=htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
+                $new_person=htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
                 include __DIR__.'/../views/reserveUpdateForm.php';
                 exit();
@@ -544,21 +544,21 @@ class ReservationController{
                 ];
 
     //ビュー表示用。
-            $id=htmlspecialchars($_SESSION['reserve_update_old']['id']);
-            $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
-            $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
-            $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
-            $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
-            $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
-            $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
-            $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
-            $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
-            $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment']);
-            $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
-            $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
-            $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
-            $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan']);
-            $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person']);
+            $id=htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
+            $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
+            $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment'], ENT_QUOTES, 'UTF-8');
+            $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
+            $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
+            $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
+            $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id'], ENT_QUOTES, 'UTF-8');
+            $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment'], ENT_QUOTES, 'UTF-8');
+            $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price'], ENT_QUOTES, 'UTF-8');
+            $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan'], ENT_QUOTES, 'UTF-8');
+            $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__.'/../views/reserveUpdateConfirm.php';
             exit();
         //例外処理。    
@@ -592,20 +592,20 @@ class ReservationController{
                 if($result['success']==false){
                     $message=$result['message'];
                     $id=$_SESSION['reserve_update_old']['id'];
-                    $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id']);
-                    $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment']);
-                    $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date']);
-                    $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date']);
-                    $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price']);
-                    $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan']);
-                    $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person']);
-                    $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id']);
-                    $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment']);
-                    $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date']);
-                    $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date']);
-                    $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price']);
-                    $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan']);
-                    $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person']);
+                    $old_room_id=htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
+                    $old_comment=htmlspecialchars($_SESSION['reserve_update_old']['comment'], ENT_QUOTES, 'UTF-8');
+                    $old_checkin_date=htmlspecialchars($_SESSION['reserve_update_old']['checkin_date'], ENT_QUOTES, 'UTF-8');
+                    $old_checkout_date=htmlspecialchars($_SESSION['reserve_update_old']['checkout_date'], ENT_QUOTES, 'UTF-8');
+                    $old_total_price=htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
+                    $old_plan=htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
+                    $old_person=htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
+                    $new_room_id=htmlspecialchars($_SESSION['reserve_update_new']['room_id'], ENT_QUOTES, 'UTF-8');
+                    $new_comment=htmlspecialchars($_SESSION['reserve_update_new']['comment'], ENT_QUOTES, 'UTF-8');
+                    $new_checkin_date=htmlspecialchars($_SESSION['reserve_update_new']['checkin_date'], ENT_QUOTES, 'UTF-8');
+                    $new_checkout_date=htmlspecialchars($_SESSION['reserve_update_new']['checkout_date'], ENT_QUOTES, 'UTF-8');
+                    $new_total_price=htmlspecialchars($_SESSION['reserve_update_new']['total_price'], ENT_QUOTES, 'UTF-8');
+                    $new_plan=htmlspecialchars($_SESSION['reserve_update_new']['plan'], ENT_QUOTES, 'UTF-8');
+                    $new_person=htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
                     $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
                     unset($_SESSION['reserve_update_new']);
                     include __DIR__.'/../views/reserveUpdateForm.php';

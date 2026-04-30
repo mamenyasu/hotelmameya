@@ -19,7 +19,7 @@ class ContactFormRequest{
 
         //電話番号について。問い合わせは空欄でも構わないので、NULLチェックはない。
         if(!preg_match('/^[0-9]+$/',$user_telphone)){
-            $error['user_telphone_format']='電話番号は数字のみで入力してください。';
+            $error['user_telphone_format']='電話番号は半角数字で入力してください。';
         }elseif(mb_strlen($user_telphone) > 100){
             $error['user_telphone_length']='電話番号は１００文字以内で入力してください。';
         }

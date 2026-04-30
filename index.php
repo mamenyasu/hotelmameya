@@ -63,7 +63,7 @@ switch($controller){
         switch($action){
             case 'contact_form' : $ctrl->contact_form(); break;
             case 'contact_reconfirm' : $ctrl->contact_reconfirm($_POST); break;
-            case 'contact_form_confirm' : $ctrl->contact_confirm(); break;
+            case 'contact_confirm' : $ctrl->contact_confirm(); break;
             default : echo "404 Not Found"; break;
         }
     break;
