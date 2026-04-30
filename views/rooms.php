@@ -24,7 +24,9 @@
             <section class="rooms_half">
                 <img src="/hotelmameya/assets/img/hotelmameya_rooms_single.png" alt="部屋シングル画像">
                 <article>
+                    <hr class="green_line">
                     <h2>シングルルーム</h2>
+                    <hr class="green_line">
                     <br>
                     <div class=rooms_container>
                             <p class="box">広さ</p><br>
@@ -39,7 +41,9 @@
             <section class="rooms_half">
                 <img src="/hotelmameya/assets/img/hotelmameya_rooms_twin.png" alt="部屋ツイン画像">
                 <article>
+                    <hr class="green_line">
                     <h2>ツインルーム</h2>
+                    <hr class="green_line">
                     <br>
                     <div class=rooms_container>
                             <p class="box">広さ</p><br>
@@ -54,7 +58,9 @@
             <section class="rooms_half">
                 <img src="/hotelmameya/assets/img/hotelmameya_rooms_double.png" alt="部屋ダブル画像">
                 <article>
+                    <hr class="green_line">
                     <h2>ダブルルーム</h2>
+                    <hr class="green_line">
                     <br>
                     <div class=rooms_container>
                             <p class="box">広さ</p><br>

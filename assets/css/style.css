@@ -6,23 +6,25 @@
 }
 
 .nav-menu a {
-    color: inherit; /*親要素の色*/
+    color: inherit;
+    /*親要素の色*/
     text-decoration: none;
 }
 
 .nav-menu a:hover {
-    border-bottom: 2px solid #b48a3c; /* 和モダンな金茶ライン */
+    border-bottom: 2px solid #b48a3c;
+    /* 和モダンな金茶ライン */
 }
 
 
-.nav-menu > ul {
+.nav-menu>ul {
     display: flex;
     gap: 40px;
     list-style: none;
     font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
-    font-size:20px;
-    margin-right:20px;
-    margin-top:20px;
+    font-size: 20px;
+    margin-right: 20px;
+    margin-top: 20px;
 }
 
 .has-sub {
@@ -34,21 +36,21 @@
     display: none;
     position: absolute;
     list-style: none;
-    font-size:25px;
-    padding:30px 0px 20px 0px;
-    margin:0;
-    background-color: rgba(255, 255, 255, 0.8); 
+    font-size: 25px;
+    padding: 30px 0px 20px 0px;
+    margin: 0;
+    background-color: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(4px);
-    left:-42px;
+    left: -42px;
 }
 
 .sub-menu li {
     white-space: nowrap;
-    padding-top:10px;
-    padding-bottom:10px;
-    margin:0;
-    height:60px;
-    width:150px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0;
+    height: 60px;
+    width: 150px;
     text-align: center;
 }
 
@@ -57,32 +59,36 @@
 }
 
 .hero {
-    height: 700px; /* 好きな高さに調整 */
-    overflow: hidden; /* はみ出した部分を隠す */
+    height: 700px;
+    /* 好きな高さに調整 */
+    overflow: hidden;
+    /* はみ出した部分を隠す */
 }
 
 .hero img {
     width: 100%;
     height: auto;
-    object-fit: cover;        /* 画像をトリミングしつつ埋める */
-    object-position: center 10%; /* ← ここで上をカット */
+    object-fit: cover;
+    /* 画像をトリミングしつつ埋める */
+    object-position: center 10%;
+    /* ← ここで上をカット */
 }
 
-.index_room{
-    display:flex;
+.index_room {
+    display: flex;
 }
 
-.index_room img{
+.index_room img {
     width: 50%;
     height: auto;
 }
 
-.index_restaurant{
-    display:flex;
-    margin-left:50px;
+.index_restaurant {
+    display: flex;
+    margin-left: 50px;
 }
 
-.index_restaurant img{
+.index_restaurant img {
     width: 55%;
     height: auto;
 }
@@ -94,21 +100,21 @@
     font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
 }
 
-.index_ex section{
+.index_ex section {
     align-items: center;
 }
 
-.index_ex article{
+.index_ex article {
     text-align: center;
 }
 
-.box{
-    color:white;
+.box {
+    color: white;
     background-color: green;
-    width:70px;
+    width: 70px;
     height: auto;
     text-align: center;
-    margin:0 auto;
+    margin: 0 auto;
 }
 
 .green_line {
@@ -119,53 +125,96 @@
     margin: 20px auto;
 }
 
-.rooms_facility{
+.rooms_facility {
     height: 50px;
     width: 50%;
     margin: 20px auto;
 }
 
-.rooms_half{
-    display:flex;
-    margin:0 0 5vw 0;
+.rooms_half {
+    display: flex;
+    margin: 0 0 5vw 0;
 }
 
-.rooms_half img{
+.rooms_half img {
     width: 50vw;
     height: auto;
 }
 
-.rooms_container{
-    display:block;
+.rooms_container {
+    display: block;
     justify-content: center;
-    width:50vw;
+    width: 50vw;
 }
 
-.foods_Meals{
-    width:50%;
-    margin:20px auto;
+.foods_Meals {
+    width: 50%;
+    margin: 20px auto;
     text-align: center;
 }
 
+.foods_container {
+    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+}
 
-.foods_container img{
-    display:block;
-    width:50%;
+.foods_container img {
+    display: block;
+    width: 50%;
     height: auto;
-    margin:0 auto;
+    margin: 0 auto;
 }
 
-
-.foods_title{
+.foods_title {
     font-size: 30px;
-    width:50%;
-    margin:20px auto;
+    width: 50%;
+    margin: 20px auto;
     text-align: center;
 }
 
-.foods_subTitle{
+.foods_subTitle {
     font-size: 20px;
-    width:50%;
-    margin:20px auto;
+    width: 50%;
+    margin: 20px auto;
     text-align: center;
 }
+
+
+.facility_ex {
+    background-image: url("/hotelmameya/assets/img/hotelmameya_index_background.webp");
+    background-repeat: repeat;
+    background-size: 400px 400px;
+    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+}
+
+.facility_ex section {
+    align-items: center;
+}
+
+.facility_half {
+    display: flex;
+    margin: 0 0 5vw 0;
+}
+
+.facility_half img {
+    width: 50vw;
+    height: auto;
+}
+
+.facility_half article {
+    text-align: center;
+}
+
+.facility_container {
+    display: block;
+    justify-content: center;
+    width: 50vw;
+}
+
+.facility_title {
+    text-align: center;
+}
+
+.facility_half h3 {
+    font-size: 26px;
+}
+

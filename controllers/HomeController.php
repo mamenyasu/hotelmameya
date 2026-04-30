@@ -34,4 +34,5 @@ private function clearReservationSessions(){
         include __DIR__.'/../views/facility.php';
         exit();
     }
+
 }
