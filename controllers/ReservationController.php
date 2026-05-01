@@ -14,6 +14,7 @@ require_once __DIR__.'/../services/GetPlansDataService.php';
 require_once __DIR__.'/../services/MaxGuest_OfRoomService.php';
 require_once __DIR__.'/../services/GetRoomInformationService.php';
 require_once __DIR__.'/../services/WeekDayService.php';
+require_once __DIR__.'/../services/MaxCheckoutService.php';
 
 
 class ReservationController{
@@ -33,6 +34,7 @@ class ReservationController{
     private $maxGuest_OfRoomService;
     private $getRoomInformationService;
     private $weekDayService;
+    private $maxCheckoutService;
 
 //!!--コンストラクタ---------
     public function __construct($pdo){
@@ -50,6 +52,7 @@ class ReservationController{
         $this->maxGuest_OfRoomService = new MaxGuest_OfRoomService($pdo);
         $this->getRoomInformationService = new GetRoomInformationService($pdo);
         $this->weekDayService = new WeekDayService();
+        $this->maxCheckoutService = new MaxCheckoutService($pdo);
     }
 
 
@@ -100,6 +103,10 @@ class ReservationController{
             $maxGuest_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
         //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
             $start_weekDay=$this->weekDayService->getStartWeekDay_From_Ym($year,$month);
+        //カレンダー生成用、在庫カレンダー最後尾の日付
+            $maxDate=$this->maxCheckoutService->getMaxCheckout();
+            $maxYear=$maxDate['maxYear'];
+            $maxMonth=$maxDate['maxMonth'];
             include __DIR__.'/../views/reservationCalendar.php';
             exit();
 
@@ -131,6 +138,10 @@ class ReservationController{
         //$planはhiddenで仕込む。
         //部屋タイプにより制限人数。
         $number_OfRoom=$this->maxGuest_OfRoomService->getMaxguest_OfRoom($room_id);
+        //在庫カレンダー最後尾の日付
+            $maxDate=$this->maxCheckoutService->getMaxCheckout();
+            $maxYear=$maxDate['maxYear'];
+            $maxMonth=$maxDate['maxMonth'];
         include __DIR__.'/../views/reserveForm.php';
         exit();
 
@@ -462,6 +473,11 @@ class ReservationController{
 
             //旧予約の部屋種類をもとに、プラン一覧データを取得。
             $roomPlansdata=$this->getPlansDataService->getPlansData($oldresult['reservation']['room_id']);
+
+            //カレンダー生成用、在庫カレンダー最後尾の日付
+            $maxDate=$this->maxCheckoutService->getMaxCheckout();
+            $maxYear=$maxDate['maxYear'];
+            $maxMonth=$maxDate['maxMonth'];
 
             
             //差し戻し用に、リストック状態のカレンダー表示用データ&カレンダー１日の曜日をセッション変数で保持。
