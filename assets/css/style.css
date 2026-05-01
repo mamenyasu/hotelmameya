@@ -318,3 +318,58 @@ form textarea:focus {
 .submit_btn:hover {
     background-color: #6f482f
 }
+
+
+/* 予約カレンダー*/
+.calendar-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.nav-btn {
+    padding: 5px 10px;
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar-table th,
+.calendar-table td {
+    border: 1px solid #ccc;
+    width: 14.2%;
+    height: 80px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.day-cell {
+    cursor: pointer;
+}
+
+.day-cell.full {
+    background-color: #eee;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.empty {
+    background-color: #f9f9f9;
+}
+
+.sun {
+    color: red;
+}
+
+.sat {
+    color: blue;
+}

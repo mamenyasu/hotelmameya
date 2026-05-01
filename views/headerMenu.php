@@ -6,9 +6,9 @@
         <li><a href="/hotelmameya/home/facility">館内施設</a></li>
         <li class="has-sub"><a href="#">ご予約</a>
             <ul class="sub-menu">
-                <li><a href="/hotelmameya/reserve_calendar/1">シングル</a></li>
-                <li><a href="/hotelmameya/reserve_calendar/2">ツイン</a></li>
-                <li><a href="/hotelmameya/reserve_calendar/3">ダブル</a></li>
+                <li><a href="/hotelmameya/reserve/reserve_calendar/1">シングル</a></li>
+                <li><a href="/hotelmameya/reserve/reserve_calendar/2">ツイン</a></li>
+                <li><a href="/hotelmameya/reserve/reserve_calendar/3">ダブル</a></li>
             </ul>
         </li>
         <li><a href="/hotelmameya/contact/contact_form">お問い合わせ</a></li>

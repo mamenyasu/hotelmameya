@@ -37,6 +37,18 @@ class PricesCalendarService{
         }
     }
 
+    //指定された部屋、指定された月、指定されたプランという条件で、料金表を返す。結果($prices)は配列。
+        public function getPricesPlan($room_id,$plan,$year,$month){
+        try{
+            $pricesRecord=$this->pricesCalendarModel->getPricesRecord($room_id,$plan,$year,$month);
+            $pricesArray=$this->roomMonthPriceService->getRoomMonthPrice($pricesRecord);  // [1=>3000,2=>3500 ...]みたいな感じに変換されて返ってくる。
+            return $pricesArray;
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
+
+
     //最終料金計算
     public function getFinalPrice($request){
         try{

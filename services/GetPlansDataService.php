@@ -10,15 +10,18 @@ class GetPlansDataService{
         $this->planModel=new PlanModel($pdo);
     }
 
-////プランデータを連想配列で取得する操作。
-    public function getPlansData($room_id){
+////プランデータを配列で取得する操作。
+// [
+    //  0 => [ ['plan_name']=>..., ['plan_title']=>... ,]
+    //  1 => [ ['plan_name']=>..., ['plan_title']=>... ,]
+    // ]みたいな感じ。
+    public function getPlansData(){
         try{
-            $plansData=$this->planModel->getPlansData($room_id);
+            $plansData=$this->planModel->getPlansData();
             return $plansData;
         }catch(Exception $e){
             throw $e;
         }
     }
-
 
 }

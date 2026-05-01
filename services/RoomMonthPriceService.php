@@ -4,7 +4,7 @@ class RoomMonthPriceService{
         $prices=[];
             foreach($availabilityRoomMonth as $data){
             $day=(int)date('j',strtotime($data['stay_date']));   //ASC、DESC、両対応。
-            $price[$day]=$data['price'];
+            $prices[$day]=$data['price'];
             }
         return $prices;
     }

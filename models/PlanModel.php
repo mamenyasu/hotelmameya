@@ -19,15 +19,14 @@
         }
     }
 
-    //指定された部屋の、プランデータを連想配列で取得するメソッド。
+    //プランデータを配列で取得するメソッド。
     // [
-    //  [['room_id']=>..., ['plan_name']=>..., ['plan_title']=>... ,]
-    //  [['room_id']=>..., ['plan_name']=>..., ['plan_title']=>... ,]
+    //  0 => [ ['plan_name']=>..., ['plan_title']=>... ,]
+    //  1 => [ ['plan_name']=>..., ['plan_title']=>... ,]
     // ]みたいな感じ。
-    public function getPlansData($room_id){
+    public function getPlansData(){
         try{
-        $stmt=$this->pdo->prepare('SELECT * FROM plans WHERE room_id=:room_id');
-        $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
+        $stmt=$this->pdo->prepare('SELECT * FROM plans');
         $stmt->execute();
         $plansData=$stmt->fetchAll(PDO::FETCH_ASSOC);
         return $plansData;

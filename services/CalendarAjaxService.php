@@ -19,9 +19,9 @@
         $this->weekDayService = new WeekDayService();
     }
 
-    public function getCalendarData($room_id, $year, $month){
-        // ① プラン一覧
-        $plans = $this->getPlansDataService->getPlansData($room_id);
+    public function getCalendarData($room_id, $plan, $year, $month){
+        // ① プラン一覧 ＜修正；不要
+        //$plans = $this->getPlansDataService->getPlansData();
 
         // ② 生の在庫データ（多重配列）
         $availability = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
@@ -40,9 +40,9 @@
         $marks = $this->calendarMarkArrayService
                  ->getCalendarMarkArray($restockedAvailability);
 
-        // ⑤ プラン別の価格カレンダー
+        // ⑤ 指定されたプランの価格カレンダー
         $prices = $this->pricesCalendarService
-                   ->getPricesAllPlan($room_id, $year, $month);
+                   ->getPricesPlan($room_id, $plan, $year, $month);
 
         // ⑥ days（1〜月末）
         $days = $this->yearMonthToDaysService->getDays($year, $month);
@@ -52,7 +52,6 @@
 
         return [
             'success' => true,
-            'plans'   => $plans,
             'marks'    => $marks,
             'prices'  => $prices,
             'days'    => $days,

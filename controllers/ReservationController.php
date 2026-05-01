@@ -1,14 +1,13 @@
 <?php
 
 require_once __DIR__.'/../requests/FormRequest.php';
-require_once __DIR__.'/../requests/UpdateFormRequest';
+require_once __DIR__.'/../requests/UpdateFormRequest.php';
 require_once __DIR__.'/../requests/CancelFormRequest.php';
 require_once __DIR__.'/../services/ReservationService.php';
 require_once __DIR__.'/../services/CalendarMarkArrayService.php';
 require_once __DIR__.'/../services/RoomMonthPriceService.php';
 require_once __DIR__.'/../services/RestockService.php';
 require_once __DIR__.'/../services/YearMonthToDaysService.php';
-require_once __DIR__.'/../services/FinalPriceService.php';
 require_once __DIR__.'/../services/PricesCalendarService.php';
 require_once __DIR__.'/../services/GetPlansDataService.php';
 require_once __DIR__.'/../services/MaxGuest_OfRoomService.php';
@@ -28,7 +27,6 @@ class ReservationController{
     private $roomMonthPriceService;
     private $restockService;
     private $yearMonthToDaysService;
-    private $finalPriceService;
     private $pricesCalendarService;
     private $getPlansDataService;
     private $maxGuest_OfRoomService;
@@ -93,12 +91,16 @@ class ReservationController{
         $room_name=$room_information['room_name'];
         //mark配列生成。(指定された種類の部屋の、指定月の各日の空き具合（〇△×）)
             $marks=$this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
-        //指定された種類の部屋の、指定月の値段表を取得。$pricesはプランごとの多重配列。
-            $prices=$this->pricesCalendarService->getPricesAllPlan($room_id,$year,$month);
+        //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
+            $pricesAllPlan=$this->pricesCalendarService->getPricesAllPlan($room_id,$year,$month);
         //月初～月末（例：１～３１）のdays配列。
             $days=$this->yearMonthToDaysService->getDays($year,$month);     
         //指定された部屋のプランデータを取得。見出しや内容など。
-            $plansData=$this->getPlansDataService->getPlansData($room_id);
+            $plansData=$this->getPlansDataService->getPlansData();
+        //初期表示用の、最初のプラン（1=スタンダード）
+            $selectedPlan = $plansData[1]['plan_name'];
+        // 初期表示用の価格配列
+            $prices = $pricesAllPlan[$selectedPlan];
         //指定された部屋の人数制限。
             $maxGuest_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
         //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
@@ -444,6 +446,12 @@ class ReservationController{
                 'person' => $oldresult['reservation']['person']
                 ];
 
+            //旧予約の部屋のプランデータを取得。見出しや内容など。
+            $plansData=$this->getPlansDataService->getPlansData();
+            //初期表示用の、最初のプラン（1=スタンダード）
+            $selectedPlan = $plansData[1]['plan_name'];
+
+
             //初期表示用に一か月分の在庫データを取得。初期設定は既予約のものを使う。
             $oldroom_id=$_SESSION['reserve_update_old']['room_id'];
             $oldcheckin_date=$_SESSION['reserve_update_old']['checkin_date'];
@@ -472,26 +480,28 @@ class ReservationController{
             $pricesMonth=$pricesAllPlan[$oldresult['reservation']['plan']];
 
             //旧予約の部屋種類をもとに、プラン一覧データを取得。
-            $roomPlansdata=$this->getPlansDataService->getPlansData($oldresult['reservation']['room_id']);
+            $roomplansData=$this->getPlansDataService->getPlansData();
 
             //カレンダー生成用、在庫カレンダー最後尾の日付
             $maxDate=$this->maxCheckoutService->getMaxCheckout();
             $maxYear=$maxDate['maxYear'];
             $maxMonth=$maxDate['maxMonth'];
 
+
             
             //差し戻し用に、リストック状態のカレンダー表示用データ&カレンダー１日の曜日をセッション変数で保持。
             $_SESSION['reserve_update_calendar'] = [
                 'marks' => $markArrayMonth,
                 'prices'    => $pricesMonth,
-                'start_weekDay' => $start_weekDay
+                'start_weekDay' => $start_weekDay,
+                'selectedPlan' => $selectedPlan
                 ];
             //ビュー表示用。
             $number_OfRoom=$this->maxGuest_OfRoomService->getMaxGuest_OfRoom($oldresult['reservation']['room_id']);
             $days=$this->yearMonthToDaysService->getDays($oldyear,$oldmonth);
             $marks=$markArrayMonth;
             $prices=$pricesMonth;
-            $plansdata=$roomPlansData;
+            $plansData=$roomPlansData;
             $old_checkin_year=(int)date('Y',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
             $old_checkin_month=(int)date('n',strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id=htmlspecialchars($oldresult['reservation']['id'], ENT_QUOTES, 'UTF-8');

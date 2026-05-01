@@ -11,7 +11,7 @@
         $this->maxCheckoutService = new MaxCheckoutService($pdo);
     }
 
-    public function calendar($room_id, $year, $month){
+    public function calendar($room_id, $plan, $year, $month){
         //在庫カレンダー最後尾の日付
         $maxDate=$this->maxCheckoutService->getMaxCheckout();
         $maxYear=$maxDate['maxYear'];
@@ -21,7 +21,7 @@
         exit;
         }
 
-        $result = $this->calendarAjaxService->getCalendarData($room_id, $year, $month);
+        $result = $this->calendarAjaxService->getCalendarData($room_id, $plan, $year, $month);
         echo json_encode($result);
         exit();
     }
