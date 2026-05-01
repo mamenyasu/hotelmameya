@@ -96,7 +96,7 @@ class ReservationController{
             $days=$this->yearMonthToDaysService->getDays($year,$month);     
         //指定された部屋のプランデータを取得。見出しや内容など。
             $plansData=$this->getPlansDataService->getPlansData();
-        //初期表示用の、最初のプラン（0=スタンダード）
+        //初期表示用の、最初のプラン（0=１泊２食付きプラン）
             $selectedPlan = $plansData[0]['plan_name'];
         // 初期表示用の価格配列
             $prices = $pricesAllPlan[$selectedPlan];

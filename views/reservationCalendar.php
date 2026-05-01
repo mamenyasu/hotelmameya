@@ -100,14 +100,18 @@ document.getElementById('plan').addEventListener('change', function() {
     const year = <?= $year ?>;
     const month = <?= $month ?>;
 
-    fetch(`./calendar?room_id=${roomId}&plan=${selectedPlan}&year=${year}&month=${month}`)
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) return;
-
-            updateCalendar(data.marks, data.prices, data.days);
-        });
+    fetch(`/hotelmameya/ajax/calendar/${roomId}/${year}/${month}/null/${selectedPlan}`)
+       .then(response => response.text())
+        .then(t => {
+            console.log("RAW RESPONSE:", t);
+            console.log("HEAD 50:", JSON.stringify(t.substring(0, 50)));
+        })
+        .catch(e => console.log("ERROR:", e));
 });
+
+
+
+       
 
 // カレンダーの価格とマークを書き換える関数
 function updateCalendar(marks, prices, days) {
@@ -115,8 +119,8 @@ function updateCalendar(marks, prices, days) {
         const cell = document.querySelector(`#day-${day}`);
         if (!cell) return;
 
-        cell.querySelector('.mark').textContent = marks[day];
-        cell.querySelector('.price').textContent = prices[day] + '円';
+        cell.querySelector('.day-mark').textContent = marks[day];
+        cell.querySelector('.day-price').textContent = prices[day] + '円';
     });
 }
 </script>

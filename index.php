@@ -88,10 +88,11 @@ switch($controller){
         $ctrl = new AjaxController($pdo);
 
         switch($action){
-        case 'calendar' : $ctrl->calendar($room_id, $year, $month); break;
+        case 'calendar' : $ctrl->calendar($room_id, $plan,$year, $month); break;
         case 'maxguest' : $ctrl->maxguest($room_id); break;
         default : echo "404 Not Found"; break;
         }
+    break;
 
 
     default : 

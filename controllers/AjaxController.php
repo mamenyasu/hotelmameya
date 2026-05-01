@@ -1,4 +1,10 @@
 <?php
+
+require_once __DIR__ . '/../services/CalendarAjaxService.php';
+require_once __DIR__ . '/../services/MaxGuest_OfRoomService.php';
+require_once __DIR__ . '/../services/MaxCheckoutService.php';
+
+
     class AjaxController {
 
     private $calendarAjaxService;
