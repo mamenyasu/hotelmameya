@@ -7,6 +7,7 @@
     private $yearMonthToDaysService;
     private $reservationService;
     private $restockService;
+    private $weekDayService;
 
     public function __construct($pdo){
         $this->getPlansDataService = new GetPlansDataService($pdo);
@@ -15,6 +16,7 @@
         $this->yearMonthToDaysService = new YearMonthToDaysService();
         $this->reservationService = new ReservationService($pdo);
         $this->restockService = new RestockService();
+        $this->weekDayService = new WeekDayService();
     }
 
     public function getCalendarData($room_id, $year, $month){
@@ -45,12 +47,16 @@
         // ⑥ days（1〜月末）
         $days = $this->yearMonthToDaysService->getDays($year, $month);
 
+        //⑦　start_weekDay(0が日曜日～6が土曜日)
+        $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year,$month);
+
         return [
             'success' => true,
             'plans'   => $plans,
             'marks'    => $marks,
             'prices'  => $prices,
-            'days'    => $days
+            'days'    => $days,
+            'start_weekDay' => $start_weekDay
         ];
 
     }
