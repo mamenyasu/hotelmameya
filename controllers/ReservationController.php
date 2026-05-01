@@ -85,7 +85,6 @@ class ReservationController{
                 include __DIR__.'/../views/false.php';
                 exit();
             }
-
         //room_idを部屋の名前（日本語）に変換する。
         $room_information=$this->getRoomInformationService->getRoomInformation($room_id);
         $room_name=$room_information['room_name'];
@@ -97,8 +96,8 @@ class ReservationController{
             $days=$this->yearMonthToDaysService->getDays($year,$month);     
         //指定された部屋のプランデータを取得。見出しや内容など。
             $plansData=$this->getPlansDataService->getPlansData();
-        //初期表示用の、最初のプラン（1=スタンダード）
-            $selectedPlan = $plansData[1]['plan_name'];
+        //初期表示用の、最初のプラン（0=スタンダード）
+            $selectedPlan = $plansData[0]['plan_name'];
         // 初期表示用の価格配列
             $prices = $pricesAllPlan[$selectedPlan];
         //指定された部屋の人数制限。
