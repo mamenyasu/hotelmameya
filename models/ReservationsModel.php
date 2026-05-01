@@ -87,15 +87,5 @@ class ReservationsModel{
         }
     }
 
-    //最後尾のチェックアウト日を返すメソッド。
-    public function getMaxCheckout(){
-        try{
-        $stmt=$this->pdo->prepare('SELECT MAX(checkout_date) FROM reservations;');
-        $stmt->execute();
-        $maxCheckoutDate=$stmt->fetch(PDO::FETCH_COLUMN);
-        return $maxCheckoutDate;
-        }catch(Exception $e){
-            throw new Exception('データベースエラー：部屋在庫カレンダーのデータ取得に失敗しました');
-        }
-    }
+    
 }

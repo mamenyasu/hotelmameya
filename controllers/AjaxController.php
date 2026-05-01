@@ -22,7 +22,9 @@ require_once __DIR__ . '/../services/MaxCheckoutService.php';
         $maxDate=$this->maxCheckoutService->getMaxCheckout();
         $maxYear=$maxDate['maxYear'];
         $maxMonth=$maxDate['maxMonth'];
-        if ($year > $maxYear || ($year == $maxYear && $month > $maxMonth)) {
+        $current = strtotime("$year-$month-01");
+        $max     = strtotime($maxYear . '-' . $maxMonth . '-01');
+        if ($current > $max) {
         echo json_encode(['error' => 'out_of_range']);
         exit;
         }

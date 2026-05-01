@@ -1,4 +1,13 @@
 <?php
+
+    require_once __DIR__.'/../services/GetPlansDataService.php';
+    require_once __DIR__.'/../services/CalendarMarkArrayService.php';
+    require_once __DIR__.'/../services/PricesCalendarService.php';
+    require_once __DIR__.'/../services/YearMonthToDaysService.php';
+    require_once __DIR__.'/../services/ReservationService.php';
+    require_once __DIR__.'/../services/RestockService.php';
+    require_once __DIR__.'/../services/WeekDayService.php';
+
     class CalendarAjaxService {
 
     private $getPlansDataService;

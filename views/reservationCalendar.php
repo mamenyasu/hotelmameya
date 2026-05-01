@@ -101,10 +101,13 @@ document.getElementById('plan').addEventListener('change', function() {
     const month = <?= $month ?>;
 
     fetch(`/hotelmameya/ajax/calendar/${roomId}/${year}/${month}/null/${selectedPlan}`)
-       .then(response => response.text())
-        .then(t => {
-            console.log("RAW RESPONSE:", t);
-            console.log("HEAD 50:", JSON.stringify(t.substring(0, 50)));
+        .then(response => response.json())
+        .then(data => {
+            console.log("AJAX DATA:", data);
+
+            if (!data.success) return;
+
+            updateCalendar(data.marks, data.prices, data.days);
         })
         .catch(e => console.log("ERROR:", e));
 });
