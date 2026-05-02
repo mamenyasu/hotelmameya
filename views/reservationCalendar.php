@@ -119,11 +119,11 @@
         fetch(`/hotelmameya/ajax/calendar/${roomId}/${year}/${month}/null/${selectedPlan}`)
             .then(response => response.json())
             .then(data => {
-                console.log("AJAX DATA:", data);
-
                 if (!data.success) return;
 
-                updateCalendar(data.marks, data.prices, data.days);
+                rebuildCalendar(data); 
+                updateCalendarTitle(year, month);
+                updateNavButtons();
             })
             .catch(e => console.log("ERROR:", e));
     });
