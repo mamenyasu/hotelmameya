@@ -42,7 +42,7 @@
             ];
         }
 
-        // ③ SESSION の旧予約情報を使って restock
+        // ③ SESSION の旧予約情報を使って restock 旧予約情報がない場合（新規予約で呼ばれた時など）はSUCCESS判定だけ取り除いた配列に変換。
         $restockedAvailability = $this->restockService->restock($availability);
 
         // ④ mark（〇△×）
