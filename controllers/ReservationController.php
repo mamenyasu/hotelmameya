@@ -101,7 +101,7 @@ class ReservationController
             //指定された部屋のプランデータを取得。見出しや内容など。
             $plansData = $this->getPlansDataService->getPlansData();
             //初期表示用の、最初のプラン（0=１泊２食付きプラン）
-            $selectedPlan = $plansData[0]['plan_name'];
+            $selectedPlan = $_SESSION['reserve_form_selectedPlan'] ?? $plansData[0]['plan_name'];
             // 初期表示用の価格配列
             $prices = $pricesAllPlan[$selectedPlan];
             //指定された部屋の人数制限。
@@ -128,6 +128,9 @@ class ReservationController
     public function reserve_form($room_id, $year, $month, $day, $plan)
     {
         try {
+            //ブラウザの戻るボタン対策。
+            $_SESSION['reserve_form_selectedPlan']=$plan;
+
             //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
             $hasStockOne = $this->reservationService->hasStockOne($room_id, $year, $month, $day);
             if ($hasStockOne['success'] == false) {

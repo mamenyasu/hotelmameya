@@ -48,6 +48,8 @@
                 font-weight: bold;
             }
         </style>
+        <? header("Cache-Control: no-store, no-cache, must-revalidate");
+        header("Pragma: no-cache"); ?>
 </head>
 
 <body>
@@ -197,18 +199,17 @@
                         document.getElementById('total_price_display').innerText = data.estimate.toLocaleString() + " 円";
                     }
                 });
-            }
+        }
 
 
-            function calcPrice() {
-                const person = Number(document.getElementById('person').value);
-                const nights = Number(document.getElementById('stay_nights').value);
-                //チェックアウト日を再計算
-                calcCheckoutDate();
-                // サーバー側の estimate を使うのでfetchEstimate() を呼ぶ
-                fetchEstimate();
-            }
-
+        function calcPrice() {
+            const person = Number(document.getElementById('person').value);
+            const nights = Number(document.getElementById('stay_nights').value);
+            //チェックアウト日を再計算
+            calcCheckoutDate();
+            // サーバー側の estimate を使うのでfetchEstimate() を呼ぶ
+            fetchEstimate();
+        }
     </script>
 
 </body>
