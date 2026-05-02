@@ -74,20 +74,30 @@
                                 $isFull = ($mark === '×');
                                 ?>
 
+
                                 <td id="day-<?= $day ?>"
                                     class="day-cell <?= $isFull ? 'full' : '' ?>"
                                     data-day="<?= $day ?>"
                                     data-price="<?= $price ?>"
                                     data-mark="<?= $mark ?>">
 
-                                    <div class="day-number"><?= $day ?></div>
-                                    <div class="day-mark"><?= $mark ?></div>
-                                    <div class="day-price"><?= number_format($price) ?>円</div>
-                                </td>
-                                <?php if (($day + $start_weekDay) % 7 == 0): ?>
+                                    <?php $link = "/hotelmameya/reserve/reserve_form/{$room_id}/{$year}/{$month}/{$day}/{$selectedPlan}"; ?>
+                                    <?php if ($isFull): ?>
+                                        <div class="day-number"><?= $day ?></div>
+                                        <div class="day-mark"><?= $mark ?></div>
+                                        <div class="day-price"><?= number_format($price) ?>円</div>
+                                    <?php else: ?>
+                                        <a href="<?= $link ?>" class="day-link">
+                                            <div class="day-number"><?= $day ?></div>
+                                            <div class="day-mark"><?= $mark ?></div>
+                                            <div class="day-price"><?= number_format($price) ?>円</div>
+                                        </a>
+                                    <?php endif; ?>
+
+                                    <?php if (($day + $start_weekDay) % 7 == 0): ?>
                         </tr>
                         <tr>
-                                <?php endif; ?>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                         </tr>
                     </tbody>
@@ -99,8 +109,9 @@
 
 
 <script>
+    //プラン変更
     document.getElementById('plan').addEventListener('change', function() {
-        const selectedPlan = this.value;
+        const selectedPlan = this.value; //初期表示用のselectedplanとは別物です。
         const roomId = <?= $room_id ?>;
         const year = parseInt(document.getElementById('currentYear').textContent);
         const month = parseInt(document.getElementById('currentMonth').textContent);
@@ -236,31 +247,39 @@
 
 
     function rebuildCalendar(data) {
-    const tbody = document.querySelector('.calendar-table tbody');
-    tbody.innerHTML = '';
+        const tbody = document.querySelector('.calendar-table tbody');
+        tbody.innerHTML = '';
 
-    const start = Number(data.start_weekDay);
-    const days = data.days.map(Number);
-    const marks = data.marks;
-    const prices = data.prices;
+        const start = Number(data.start_weekDay);
+        const days = data.days.map(Number);
+        const marks = data.marks;
+        const prices = data.prices;
 
-    // ① PHP と同じく、最初に <tr> を出す
-    let html = '<tr>';
+        const roomId = <?= $room_id ?>;
+        const plan = document.getElementById('plan').value;
+        const year = Number(document.getElementById('currentYear').textContent);
+        const month = Number(document.getElementById('currentMonth').textContent);
 
-    // ② 月初の空白セル
-    for (let i = 0; i < start; i++) {
-        html += `<td class="empty"></td>`;
-    }
+        // ① PHP と同じく、最初に <tr> を出す
+        let html = '<tr>';
 
-    // ③ 日付セル
-    days.forEach(day => {
-        const mark = marks[day];
-        const price = prices[day];
-        const isFull = mark === '×';
+        // ② 月初の空白セル
+        for (let i = 0; i < start; i++) {
+            html += `<td class="empty"></td>`;
+        }
 
-        html += `
-            <td id="day-${day}"
-                class="day-cell ${isFull ? 'full' : ''}"
+        // ③ 日付セル
+        days.forEach(day => {
+            const mark = marks[day];
+            const price = prices[day];
+            const isFull = mark === '×';
+
+            const link = `/hotelmameya/reserve/reserve_form/${roomId}/${year}/${month}/${day}/${plan}`;
+            if (isFull) {
+                // 満室 → リンクなし
+                html += `
+                <td id="day-${day}"
+                class="day-cell full"
                 data-day="${day}"
                 data-price="${price}"
                 data-mark="${mark}">
@@ -269,19 +288,33 @@
                 <div class="day-price">${price}円</div>
             </td>
         `;
+            } else {
+                // 空室 → リンクあり
+                html += `
+            <td id="day-${day}"
+                class="day-cell ${isFull ? 'full' : ''}"
+                data-day="${day}"
+                data-price="${price}"
+                data-mark="${mark}">
+                <a href="${link}" class="day-link">
+                <div class="day-number">${day}</div>
+                <div class="day-mark">${mark}</div>
+                <div class="day-price">${price}円</div>
+                </a>
+            </td>
+        `;
+            }
 
-        // ④ PHP と完全一致の折り返し
-        if ((day + start) % 7 === 0) {
-            html += '</tr><tr>';
-        }
-    });
+            // ④ PHP と完全一致の折り返し
+            if ((day + start) % 7 === 0) {
+                html += '</tr><tr>';
+            }
+        });
 
-    // ⑤ 最後の行を閉じる
-    html += '</tr>';
+        // ⑤ 最後の行を閉じる
+        html += '</tr>';
 
-    // ⑥ tbody に反映
-    tbody.innerHTML = html;
-}
-
-
+        // ⑥ tbody に反映
+        tbody.innerHTML = html;
+    }
 </script>

@@ -373,3 +373,15 @@ form textarea:focus {
 .sat {
     color: blue;
 }
+
+
+/* 新規予約カレンダー用*/
+
+.day-link{
+    color: black ;
+    text-decoration: none;
+}
+
+.day-link:hover {
+    opacity: 0.8;  /* 和モダンっぽい控えめなホバー */
+}
