@@ -68,4 +68,23 @@ class PricesCalendarService{
         }
 
     }
+
+//見積り料金計算
+    public function getEstimate($room_id,$plan,$person,$checkin_date,$checkout_date){
+        try{
+            $prices=$this->pricesCalendarModel->getPricesBetween($room_id,$plan,$checkin_date,$checkout_date);
+            $totalPrice=0;
+            foreach($prices as $price){
+                $totalPrice += $price*$person;
+            }
+            return $totalPrice;
+        }catch(Exception $e){
+            throw $e;
+        }
+
+    }
+
+
+
+
 }

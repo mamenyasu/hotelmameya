@@ -24,4 +24,14 @@ class GetPlansDataService{
         }
     }
 
+//プラン名からプランタイトルを取得する操作。
+public function getPlanTitle($plan_name){
+    try{
+            $plansTitle=$this->planModel->getPlanTitle($plan_name);
+            return $plansTitle;
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
 }
+

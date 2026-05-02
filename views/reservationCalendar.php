@@ -105,7 +105,7 @@
             </div>
         </section>
     </main>
-</body>
+
 
 
 <script>
@@ -317,4 +317,8 @@
         // ⑥ tbody に反映
         tbody.innerHTML = html;
     }
+
 </script>
+
+</body>
+</html>

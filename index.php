@@ -90,6 +90,7 @@ switch($controller){
         switch($action){
         case 'calendar' : $ctrl->calendar($room_id, $plan,$year, $month); break;
         case 'maxguest' : $ctrl->maxguest($room_id); break;
+        case 'estimate' : $ctrl->estimate(); break;
         default : echo "404 Not Found"; break;
         }
     break;

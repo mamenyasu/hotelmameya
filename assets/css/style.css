@@ -1,5 +1,5 @@
-.error{
-    color:red;
+.error {
+    color: red;
     font-size: 16px;
 }
 
@@ -184,14 +184,14 @@
     text-align: center;
 }
 
-.foods_hero img{
+.foods_hero img {
     display: block;
     width: 80%;
     height: auto;
     margin: 0 auto 40px;
 }
 
-.foods_ex{
+.foods_ex {
     background-image: url("/hotelmameya/assets/img/hotelmameya_index_background.webp");
     background-repeat: repeat;
     background-size: 400px 400px;
@@ -238,14 +238,14 @@
 }
 
 
-.contact_ex{
+.contact_ex {
     font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
 }
 
-.contact_title{
+.contact_title {
     text-align: center;
     font-size: 20px;
-    color: #4a3b2a; 
+    color: #4a3b2a;
     font-weight: 600;
 }
 
@@ -254,19 +254,19 @@
     margin: 20px auto;
 }
 
-.contact_container h5{
+.contact_container h5 {
     text-align: center;
     font-size: 20px;
     margin-bottom: 6px;
-    color: #4a3b2a; 
+    color: #4a3b2a;
     font-weight: 600;
 }
 
-.contact_container h6{
+.contact_container h6 {
     text-align: center;
     font-size: 16px;
     margin-bottom: 6px;
-    color:black; 
+    color: black;
     font-weight: 600;
 }
 
@@ -276,16 +276,17 @@
     margin: 0 auto;
 }
 
-.contact_container 
-form input[type="text"],
-form input[type="email"] ,
-textarea{
+.contact_container form input[type="text"],
+form input[type="email"],
+textarea {
     width: 100%;
     padding: 10px 12px;
     font-size: 16px;
-    border: 1px solid #c8b8a6; /* 和紙っぽい淡い茶色 */
+    border: 1px solid #c8b8a6;
+    /* 和紙っぽい淡い茶色 */
     border-radius: 4px;
-    background-color: #faf7f3; /* ほんのり和紙風の白 */
+    background-color: #faf7f3;
+    /* ほんのり和紙風の白 */
     box-sizing: border-box;
     margin-bottom: 18px;
     transition: 0.2s;
@@ -294,7 +295,8 @@ textarea{
 /* フォーカス時の和モダン感 */
 form input:focus,
 form textarea:focus {
-    border-color: #8c5e3c; /* ボタンと同系色 */
+    border-color: #8c5e3c;
+    /* ボタンと同系色 */
     outline: none;
     background-color: #fff;
 }
@@ -377,11 +379,51 @@ form textarea:focus {
 
 /* 新規予約カレンダー用*/
 
-.day-link{
-    color: black ;
+.day-link {
+    color: black;
     text-decoration: none;
 }
 
 .day-link:hover {
-    opacity: 0.8;  /* 和モダンっぽい控えめなホバー */
+    opacity: 0.8;
+    /* 和モダンっぽい控えめなホバー */
+}
+
+
+/*新規予約入力フォーム用*/
+.error-box {
+    background: #ffe0e0;
+    border: 1px solid #ff8080;
+    padding: 10px;
+    margin-bottom: 15px;
+    color: #b00000;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+textarea,
+select {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.price-box {
+    background: #faf6e8;
+    padding: 10px;
+    border: 1px solid #e0d8b0;
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
 }

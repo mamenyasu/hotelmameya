@@ -35,5 +35,21 @@
         }
     }
 
+//プラン名からプランタイトルを取得するメソッド。
+    public function getPlanTitle($plan_name){
+        try{
+        $stmt=$this->pdo->prepare('SELECT plan_title FROM plans WHERE plan_name=:plan_name');
+        $stmt->bindValue(':plan_name',$plan_name,PDO::PARAM_STR);
+        $stmt->execute();
+        $planTitle=$stmt->fetch(PDO::FETCH_COLUMN);
+        return $planTitle;
+        }catch(Exception $e){
+            throw new Exception('データベースエラー：情報を取得できませんでした');
+        }
+    }
+
+
+
+
 }
 
