@@ -12,6 +12,11 @@
 </head>
 
 <body>
+    <span id="currentYear" style="display:none;"><?= $year ?></span>
+    <span id="currentMonth" style="display:none;"><?= $month ?></span>
+    <span id="maxYear" style="display:none;"><?= $maxYear ?></span>
+    <span id="maxMonth" style="display:none;"><?= $maxMonth ?></span>
+
     <headar>
         <?php include(__DIR__ . '/headerMenu.php'); ?>
     </headar>
@@ -20,8 +25,8 @@
             <div class="calendar-container">
 
                 <div class="calendar-header">
-                    <button id="prevMonth" class="nav-btn">←</button>
-                    <span class="calendar-title">
+                    <button id="prevMonth" class="nav-btn" disabled>←</button>
+                    <span id="calendarTitle" class="calendar-title">
                         <?= $year ?>年 <?= $month ?>月（<?= $room_name ?>）
                     </span>
 
@@ -82,7 +87,7 @@
                                 <?php if (($day + $start_weekDay) % 7 == 0): ?>
                         </tr>
                         <tr>
-                        <?php endif; ?>
+                                <?php endif; ?>
                     <?php endforeach; ?>
                         </tr>
                     </tbody>
@@ -94,36 +99,189 @@
 
 
 <script>
-document.getElementById('plan').addEventListener('change', function() {
-    const selectedPlan = this.value;
-    const roomId = <?= $room_id ?>;
-    const year = <?= $year ?>;
-    const month = <?= $month ?>;
+    document.getElementById('plan').addEventListener('change', function() {
+        const selectedPlan = this.value;
+        const roomId = <?= $room_id ?>;
+        const year = parseInt(document.getElementById('currentYear').textContent);
+        const month = parseInt(document.getElementById('currentMonth').textContent);
 
-    fetch(`/hotelmameya/ajax/calendar/${roomId}/${year}/${month}/null/${selectedPlan}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log("AJAX DATA:", data);
+        fetch(`/hotelmameya/ajax/calendar/${roomId}/${year}/${month}/null/${selectedPlan}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log("AJAX DATA:", data);
 
-            if (!data.success) return;
+                if (!data.success) return;
 
-            updateCalendar(data.marks, data.prices, data.days);
-        })
-        .catch(e => console.log("ERROR:", e));
-});
-
-
-
-       
-
-// カレンダーの価格とマークを書き換える関数
-function updateCalendar(marks, prices, days) {
-    days.forEach(day => {
-        const cell = document.querySelector(`#day-${day}`);
-        if (!cell) return;
-
-        cell.querySelector('.day-mark').textContent = marks[day];
-        cell.querySelector('.day-price').textContent = prices[day] + '円';
+                updateCalendar(data.marks, data.prices, data.days);
+            })
+            .catch(e => console.log("ERROR:", e));
     });
+
+
+    //月送り
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        let {
+            year,
+            month
+        } = getCurrentYearMonth();
+
+        month++;
+        if (month > 12) {
+            month = 1;
+            year++;
+        }
+
+        setCurrentYearMonth(year, month);
+        updateCalendarTitle(year, month);
+        fetchCalendar(year, month);
+        updateNavButtons();
+    });
+
+    //月戻し
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        let year = parseInt(document.getElementById('currentYear').textContent);
+        let month = parseInt(document.getElementById('currentMonth').textContent);
+
+        month--;
+        if (month < 1) {
+            month = 12;
+            year--;
+        }
+
+        document.getElementById('currentYear').textContent = year;
+        document.getElementById('currentMonth').textContent = month;
+
+        fetchCalendar(year, month);
+        updateCalendarTitle(year, month);
+        updateNavButtons();
+    });
+
+    //ボタンの無効化
+    function updateNavButtons() {
+        const year = parseInt(document.getElementById('currentYear').textContent);
+        const month = parseInt(document.getElementById('currentMonth').textContent);
+
+        const maxYear = parseInt(document.getElementById('maxYear').textContent);
+        const maxMonth = parseInt(document.getElementById('maxMonth').textContent);
+        // 今日の日付を最小値とする
+        const today = new Date();
+        const minYear = today.getFullYear();
+        const minMonth = today.getMonth() + 1;
+
+        const prevBtn = document.getElementById('prevMonth');
+        const nextBtn = document.getElementById('nextMonth');
+
+        // ← の制御（今日より前には戻れない）
+        prevBtn.disabled = (year === minYear && month === minMonth);
+        if (year === minYear && month === minMonth) {
+            prevBtn.disabled = true;
+        } else {
+            prevBtn.disabled = false;
+        }
+
+        // → の制御
+        if (year === maxYear && month === maxMonth) {
+            nextBtn.disabled = true;
+        } else {
+            nextBtn.disabled = false;
+        }
+    }
+
+
+
+    // カレンダーの価格とマークを書き換える関数
+    function updateCalendar(marks, prices, days) {
+        days.forEach(day => {
+            const cell = document.querySelector(`#day-${day}`);
+            if (!cell) return;
+
+            cell.querySelector('.day-mark').textContent = marks[day];
+            cell.querySelector('.day-price').textContent = prices[day] + '円';
+        });
+    }
+
+
+    function getCurrentYearMonth() {
+        return {
+            year: parseInt(document.getElementById('currentYear').textContent),
+            month: parseInt(document.getElementById('currentMonth').textContent)
+        };
+    }
+
+    function setCurrentYearMonth(year, month) {
+        document.getElementById('currentYear').textContent = year;
+        document.getElementById('currentMonth').textContent = month;
+    }
+
+    function updateCalendarTitle(year, month) {
+        const title = document.getElementById('calendarTitle');
+        title.textContent = `${year}年 ${month}月（<?= $room_name ?>）`;
+    }
+
+    function fetchCalendar(year, month) {
+        const roomId = <?= $room_id ?>;
+        const selectedPlan = document.getElementById('plan').value;
+
+        fetch(`/hotelmameya/ajax/calendar/${roomId}/${year}/${month}/null/${selectedPlan}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) return;
+
+                rebuildCalendar(data); // ← HTML を再構築
+                updateCalendarTitle(year, month);
+                updateNavButtons();
+            })
+            .catch(e => console.log("ERROR:", e));
+    }
+
+
+    function rebuildCalendar(data) {
+    const tbody = document.querySelector('.calendar-table tbody');
+    tbody.innerHTML = '';
+
+    const start = Number(data.start_weekDay);
+    const days = data.days.map(Number);
+    const marks = data.marks;
+    const prices = data.prices;
+
+    // ① PHP と同じく、最初に <tr> を出す
+    let html = '<tr>';
+
+    // ② 月初の空白セル
+    for (let i = 0; i < start; i++) {
+        html += `<td class="empty"></td>`;
+    }
+
+    // ③ 日付セル
+    days.forEach(day => {
+        const mark = marks[day];
+        const price = prices[day];
+        const isFull = mark === '×';
+
+        html += `
+            <td id="day-${day}"
+                class="day-cell ${isFull ? 'full' : ''}"
+                data-day="${day}"
+                data-price="${price}"
+                data-mark="${mark}">
+                <div class="day-number">${day}</div>
+                <div class="day-mark">${mark}</div>
+                <div class="day-price">${price}円</div>
+            </td>
+        `;
+
+        // ④ PHP と完全一致の折り返し
+        if ((day + start) % 7 === 0) {
+            html += '</tr><tr>';
+        }
+    });
+
+    // ⑤ 最後の行を閉じる
+    html += '</tr>';
+
+    // ⑥ tbody に反映
+    tbody.innerHTML = html;
 }
+
+
 </script>
