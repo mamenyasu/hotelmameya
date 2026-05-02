@@ -187,15 +187,6 @@
             const person = document.getElementById('person').value;
             const checkin_date = document.getElementById('checkin_date').value;
             const checkout_date = document.getElementById('checkout_date').value;
-
-console.log("room_id:", room_id);
-    console.log("plan:", plan);
-    console.log("person:", person);
-    console.log("checkin_date:", checkin_date);
-    console.log("checkout_date:", checkout_date);
-
-
-
             const url = `/hotelmameya/ajax/estimate?room_id=${room_id}&plan=${plan}&person=${person}&checkin_date=${checkin_date}&checkout_date=${checkout_date}`;
 
             fetch(url)
