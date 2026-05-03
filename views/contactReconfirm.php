@@ -12,9 +12,9 @@
 </head>
 
 <body>
-    <headar>
+    <header>
         <?php include(__DIR__ . '/headerMenu.php'); ?>
-    </headar>
+    </header>
     <main>
         <section>
             <hr class="green_line">

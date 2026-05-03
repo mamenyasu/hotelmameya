@@ -12,9 +12,9 @@
 </head>
 
 <body>
-    <headar>
+    <header>
         <?php include(__DIR__ . '/headerMenu.php'); ?>
-    </headar>
+    </header>
     <main>
         <hr class="green_line">
         <h1 class="facility_title">館内施設</h1>

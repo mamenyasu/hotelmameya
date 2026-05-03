@@ -10,157 +10,125 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="/hotelmameya/assets/css/style.css">
 
-        <style>
-            .error-box {
-                background: #ffe0e0;
-                border: 1px solid #ff8080;
-                padding: 10px;
-                margin-bottom: 15px;
-                color: #b00000;
-            }
-
-            .form-group {
-                margin-bottom: 12px;
-            }
-
-            label {
-                display: block;
-                margin-bottom: 4px;
-                font-weight: bold;
-            }
-
-            input[type="text"],
-            input[type="email"],
-            input[type="date"],
-            textarea,
-            select {
-                width: 100%;
-                padding: 6px;
-                box-sizing: border-box;
-            }
-
-            .price-box {
-                background: #faf6e8;
-                padding: 10px;
-                border: 1px solid #e0d8b0;
-                margin-top: 10px;
-                font-size: 18px;
-                font-weight: bold;
-            }
-        </style>
         <? header("Cache-Control: no-store, no-cache, must-revalidate");
         header("Pragma: no-cache"); ?>
 </head>
 
 <body>
+    <header>
+        <?php include(__DIR__ . '/headerMenu.php'); ?>
+    </header>
 
-    <h2>新規予約フォーム</h2>
+    <div class="reserveForm_container">
+        <h2 class="reserveForm_title">新規予約フォーム</h2>
 
-    <!-- ▼ エラー表示（バリデーション or 在庫エラー） -->
-    <?php if (!empty($error)): ?>
-        <div class="error-box">
-            <?php foreach ($error as $e): ?>
-                <p><?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+        <!-- ▼ エラー表示（バリデーション or 在庫エラー） -->
+        <?php if (!empty($error)): ?>
+            <div class="reserveForm_error-box">
+                <?php foreach ($error as $e): ?>
+                    <p><?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
 
-    <?php if (!empty($message)): ?>
-        <div class="error-box">
-            <p><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
-        </div>
-    <?php endif; ?>
-    <!-- ▲ エラー表示 -->
+        <?php if (!empty($message)): ?>
+            <div class="reserveForm_error-box">
+                <p><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
+            </div>
+        <?php endif; ?>
+        <!-- ▲ エラー表示 -->
 
-    <form action="/reserve/reconfirm" method="POST">
+        <form action="/reserve/reconfirm" method="POST">
 
-        <!-- 必須 hidden（カレンダーから渡された値） -->
-        <input type="hidden" name="room_id" id="room_id" value="<?= $room_id ?>">
-        <input type="hidden" name="plan" id="plan" value="<?= $plan ?>">
-        <input type="hidden" name="checkin_date" id="checkin_date" value="<?= $checkin_date ?>">
-        <input type="hidden" name="checkout_date" id="checkout_date" value="<?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?>">
+            <!-- 必須 hidden（カレンダーから渡された値） -->
+            <input type="hidden" name="room_id" id="room_id" value="<?= $room_id ?>">
+            <input type="hidden" name="plan" id="plan" value="<?= $plan ?>">
+            <input type="hidden" name="checkin_date" id="checkin_date" value="<?= $checkin_date ?>">
+            <input type="hidden" name="checkout_date" id="checkout_date" value="<?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?>">
 
-        <!-- JS 計算用の単価（プラン別価格を入れる） -->
-        <input type="hidden" id="base_price" value="<?= $base_price ?? 0 ?>">
+            <!-- JS 計算用の単価（プラン別価格を入れる） -->
+            <input type="hidden" id="base_price" value="<?= $base_price ?? 0 ?>">
 
-        <div class="form-group">
-            <label>部屋</label>
-            <p><?= htmlspecialchars($room_name, ENT_QUOTES, 'UTF-8') ?></p>
-        </div>
+            <div class="rserveForm_form-group">
+                <label>部屋</label>
+                <p><?= htmlspecialchars($room_name, ENT_QUOTES, 'UTF-8') ?></p>
+            </div>
 
-        <div class="form-group">
-            <label>プラン</label>
-            <p><?= htmlspecialchars($plan_title, ENT_QUOTES, 'UTF-8') ?></p>
-        </div>
+            <div class="reserveForm_form-group">
+                <label>プラン</label>
+                <p><?= htmlspecialchars($plan_title, ENT_QUOTES, 'UTF-8') ?></p>
+            </div>
 
-        <div class="form-group">
-            <label>チェックイン日</label>
-            <p><?= htmlspecialchars($checkin_date, ENT_QUOTES, 'UTF-8') ?></p>
-        </div>
+            <div class="reserveForm_form-group">
+                <label>チェックイン日</label>
+                <p><?= htmlspecialchars($checkin_date, ENT_QUOTES, 'UTF-8') ?></p>
+            </div>
 
-        <div class="form-group">
-            <label for="stay_nights">宿泊日数</label>
-            <select name="stay_nights" id="stay_nights" onchange="calcPrice();">
-                <?php for ($i = 1; $i <= 14; $i++): ?>
-                    <option value="<?= $i ?>" <?= ($stay_nights ?? 1) == $i ? 'selected' : '' ?>>
-                        <?= $i ?> 泊
-                    </option>
-                <?php endfor; ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>チェックアウト日</label>
-            <p id="checkout_display"><?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?></p>
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="stay_nights">宿泊日数</label>
+                <select name="stay_nights" id="stay_nights" onchange="calcPrice();">
+                    <?php for ($i = 1; $i <= 14; $i++): ?>
+                        <option value="<?= $i ?>" <?= ($stay_nights ?? 1) == $i ? 'selected' : '' ?>>
+                            <?= $i ?> 泊
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="reserveForm_form-group">
+                <label>チェックアウト日</label>
+                <p id="checkout_display"><?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?></p>
+            </div>
 
 
-        <div class="form-group">
-            <label for="person">人数（最大 <?= $number_OfRoom ?> 名）</label>
-            <select name="person" id="person" onchange="calcPrice()">
-                <?php for ($i = 1; $i <= $number_OfRoom; $i++): ?>
-                    <option value="<?= $i ?>" <?= ($person ?? 1) == $i ? 'selected' : '' ?>>
-                        <?= $i ?> 名
-                    </option>
-                <?php endfor; ?>
-            </select>
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="person">人数（最大 <?= $number_OfRoom ?> 名）</label>
+                <select name="person" id="person" onchange="calcPrice()">
+                    <?php for ($i = 1; $i <= $number_OfRoom; $i++): ?>
+                        <option value="<?= $i ?>" <?= ($person ?? 1) == $i ? 'selected' : '' ?>>
+                            <?= $i ?> 名
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="user_name">お名前</label>
-            <input type="text" name="user_name" id="user_name" value="<?= $user_name ?? '' ?>">
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="user_name">お名前</label>
+                <input type="text" name="user_name" id="user_name" value="<?= $user_name ?? '' ?>">
+            </div>
 
-        <div class="form-group">
-            <label for="user_telphone">電話番号</label>
-            <input type="text" name="user_telphone" id="user_telphone" value="<?= $user_telphone ?? '' ?>">
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="user_telphone">電話番号</label>
+                <input type="text" name="user_telphone" id="user_telphone" value="<?= $user_telphone ?? '' ?>">
+            </div>
 
-        <div class="form-group">
-            <label for="user_address">住所</label>
-            <input type="text" name="user_address" id="user_address" value="<?= $user_address ?? '' ?>">
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="user_address">住所</label>
+                <input type="text" name="user_address" id="user_address" value="<?= $user_address ?? '' ?>">
+            </div>
 
-        <div class="form-group">
-            <label for="email">メールアドレス</label>
-            <input type="email" name="email" id="email" value="<?= $email ?? '' ?>">
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="email">メールアドレス</label>
+                <input type="email" name="email" id="email" value="<?= $email ?? '' ?>">
+            </div>
 
-        <div class="form-group">
-            <label for="comment">備考</label>
-            <textarea name="comment" id="comment" rows="3"><?= $comment ?? '' ?></textarea>
-        </div>
+            <div class="reserveForm_form-group">
+                <label for="comment">備考</label>
+                <textarea name="comment" id="comment" rows="3"><?= $comment ?? '' ?></textarea>
+            </div>
 
-        <div class="price-box">
-            合計料金：<span id="total_price_display"><?= number_format($total_price ?? $estimate) ?> 円</span>
-        </div>
+            <div class="reserveForm_price-box">
+                合計料金：<span id="total_price_display"><?= number_format($total_price ?? $estimate) ?> 円</span>
+            </div>
 
-        <input type="hidden" name="total_price" id="total_price" value="<?= $total_price ?? $estimate ?>">
+            <input type="hidden" name="total_price" id="total_price" value="<?= $total_price ?? $estimate ?>">
 
-        <div style="margin-top:20px;">
-            <button type="submit">予約内容を確認する</button>
-        </div>
+            <div style="margin-top:20px;">
+                <button type="submit">予約内容を確認する</button>
+            </div>
 
-    </form>
+        </form>
+        <a href="/hotelmameya/reseve/reserve_calendar" class="btn_back">戻る</a>
+    </div>
 
     <script>
         function calcCheckoutDate() {

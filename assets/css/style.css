@@ -3,6 +3,17 @@
     font-size: 16px;
 }
 
+.btn_back{
+    display: block;
+    width: 150px;
+    margin: 40px auto;
+    padding: 10px 20px;
+    background-color: #8c5e3c;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+}
 
 .nav-menu {
     display: flex;
@@ -277,8 +288,8 @@
 }
 
 .contact_container form input[type="text"],
-form input[type="email"],
-textarea {
+.contact_container form input[type="email"],
+.contact_container textarea {
     width: 100%;
     padding: 10px 12px;
     font-size: 16px;
@@ -293,8 +304,8 @@ textarea {
 }
 
 /* フォーカス時の和モダン感 */
-form input:focus,
-form textarea:focus {
+.contact_container form input:focus,
+.contact_container form textarea:focus {
     border-color: #8c5e3c;
     /* ボタンと同系色 */
     outline: none;
@@ -389,41 +400,77 @@ form textarea:focus {
     /* 和モダンっぽい控えめなホバー */
 }
 
-
-/*新規予約入力フォーム用*/
-.error-box {
-    background: #ffe0e0;
-    border: 1px solid #ff8080;
-    padding: 10px;
-    margin-bottom: 15px;
-    color: #b00000;
+/*新規予約入力フォーム*/
+/* 予約フォーム全体 */
+.reserveForm_container {
+    display:block;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    margin: 0 auto; /* ← これで中央寄せ */
+    padding: 20px 0;
 }
 
-.form-group {
-    margin-bottom: 12px;
+.reserveForm_form-group {
+    margin-bottom: 16px;
 }
 
-label {
+/* ラベル */
+.reserveForm_form-group label {
     display: block;
-    margin-bottom: 4px;
-    font-weight: bold;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #4a3b2a;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="date"],
-textarea,
-select {
+/* テキスト系入力 */
+.reserveForm_form-group input[type="text"],
+.reserveForm_form-group input[type="email"],
+.reserveForm_form-group input[type="date"],
+.reserveForm_form-group textarea,
+.reserveForm_form-group select {
     width: 100%;
-    padding: 6px;
+    max-width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    font-size: 16px;
     box-sizing: border-box;
+    margin: 0 auto;
+    display: block;
 }
 
-.price-box {
+/* 備考欄 */
+.reserveForm_form-group textarea {
+    resize: vertical;
+}
+
+/* 合計料金ボックス */
+.reserveForm_price-box {
     background: #faf6e8;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #e0d8b0;
-    margin-top: 10px;
+    margin-top: 20px;
     font-size: 18px;
     font-weight: bold;
+    text-align: center;
+}
+
+/* 予約フォーム：フォーカス時の和モダン感 */
+.reserveForm_form-group input:focus,
+.reserveForm_form-group textarea:focus,
+.reserveForm_form-group select:focus {
+    border-color: #8c5e3c;
+    outline: none;
+    background-color: #fff;
+    transition: 0.2s;
+}
+
+.reserveForm_title {
+    background-color: #8c5e3c;
+    width: 250px;
+    height: auto;
+    text-align: center;
+    margin: 0 auto;
 }
