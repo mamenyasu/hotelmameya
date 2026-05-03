@@ -507,27 +507,30 @@ class ReservationController
                 'person' => $oldresult['reservation']['person']
             ];
 
-            //旧予約の部屋のプランデータを取得。見出しや内容など。
+            //プランデータを取得。plan_name(英字)やplan_title(日本語)や内容など。
             $plansData = $this->getPlansDataService->getPlansData();
-            //初期表示用の、最初のプラン（1=スタンダード）
-            $selectedPlan = $plansData[1]['plan_name'];
+            //初期表示用の、最初のプラン。戻るボタンで戻ってきらセッション変数を優先し、なければ旧予約情報のもので。
+            $selectedPlanName = $_SESSION['reserve_update_new']['plan_name'] ?? $oldresult['reservation']['plan_name'];
+            //初期表示用のプラン名をプランタイトルに変換する。
+            $selected_plan_title = $this->getPlansDataService->getPlanTitle($selectedPlanName);
 
 
-            //初期表示用に一か月分の在庫データを取得。初期設定は既予約のものを使う。
-            $oldroom_id = $_SESSION['reserve_update_old']['room_id'];
-            $oldcheckin_date = $_SESSION['reserve_update_old']['checkin_date'];
-            $oldyear = date('Y', strtotime($oldcheckin_date));
-            $oldmonth = date('m', strtotime($oldcheckin_date));
-            $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($oldroom_id, $oldyear, $oldmonth);
+            //初期表示用に一か月分の在庫データを取得。初期設定は、戻るボタンで戻ってきた場合はセッション変数を優先し、なければ既予約のものを使う。
+            $room_id = $_SESSION['reserve_update_new']['room_id'] ?? $_SESSION['reserve_update_old']['room_id'];
+            $checkin_date = $_SESSION['reserve_update_new']['checkin_date'] ?? $_SESSION['reserve_update_old']['checkin_date'];
+            $year = date('Y', strtotime($checkin_date));
+            $month = date('m', strtotime($checkin_date));
+            $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
             if ($availabilityRoomMonth['success'] == false) {       //空配列が返ってきた場合。
                 unset($_SESSION['reserve_update_old']);
+                unset($_SESSION['reserve_update_new']);
                 $message = $availabilityRoomMonth['message'];
                 include __DIR__ . '/../views/false.php';
                 exit();
             }
 
-            //初期表示用に、既予約情報のチェックイン月の１日が何曜日かを返す（カレンダー生成用）。
-            $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($oldresult['reservation']['checkin_date']);
+            //初期表示用に、戻るボタンで戻ってきた時はセッション変数をもとに、そうでなければ既予約情報をもとに、チェックイン月の１日が何曜日かを返す（カレンダー生成用）。
+            $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date']);
 
             //在庫を一時的に戻す。リストック後は'success'判定がなくなり、普通の配列に。
             $restocked_availabilityRoomMonth = $this->restockService->restock($availabilityRoomMonth);
@@ -535,13 +538,11 @@ class ReservationController
             $markArrayMonth = $this->calendarMarkArrayService->getCalendarMarkArray($restocked_availabilityRoomMonth);
 
             //値段データも取得。 １～月末日まで。価格は在庫戻しと関係ないので、修正前の配列を使う。
-            $oldresult_year = date('Y', $oldresult['reservation']['checkin_date']);
-            $oldresult_month = date('m', $oldresult['reservation']['checkin_date']);
-            $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($oldresult['reservation']['room_id'], $oldresult_year, $oldresult_month);
-            $pricesMonth = $pricesAllPlan[$oldresult['reservation']['plan']];
+            $result_year = date('Y', $_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date']);
+            $result_month = date('m', $_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date']);
+            $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($_SESSION['reserve_update_new']['room_id'] ?? $oldresult['reservation']['room_id'], $result_year, $result_month);
+            $pricesMonth = $pricesAllPlan[$_SESSION['reserve_update_new']['plan'] ?? $oldresult['reservation']['plan']];
 
-            //旧予約の部屋種類をもとに、プラン一覧データを取得。
-            $roomplansData = $this->getPlansDataService->getPlansData();
 
             //カレンダー生成用、在庫カレンダー最後尾の日付
             $maxDate = $this->maxCheckoutService->getMaxCheckout();
@@ -549,26 +550,33 @@ class ReservationController
             $maxMonth = $maxDate['maxMonth'];
 
 
+            //見積初期表示用の$estimateをビューに与える。戻るボタンでもどった時はセッション変数を優先、そうでなければ旧予約情報をもとに。
+            $estimate = $_SESSION['reserve_update_new']['total_price'] ?? $this->pricesCalendarService->getEstimate($oldresult['reservation']['room_id'], $oldresult['reservation']['plan'], $oldresult['reservation']['person'], $oldresult['reservation']['checkin_date'], $oldresult['reservation']['checkout_date']);
 
-            //差し戻し用に、リストック状態のカレンダー表示用データ&カレンダー１日の曜日をセッション変数で保持。
+
+
+            //差し戻し用に、リストック状態のカレンダー表示用データ&カレンダー１日の曜日をセッション変数で保持。次の最終確認のバリデーション不合格後のincludeページに与える。
             $_SESSION['reserve_update_calendar'] = [
                 'marks' => $markArrayMonth,
                 'prices'    => $pricesMonth,
                 'start_weekDay' => $start_weekDay,
-                'selectedPlan' => $selectedPlan
+                'selectedPlanName' => $selectedPlanName
             ];
-            //ビュー表示用。
-            $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($oldresult['reservation']['room_id']);
-            $days = $this->yearMonthToDaysService->getDays($oldyear, $oldmonth);
+
+            //ルームの名前一覧。
+            $rooms_name = $this->getRoomInformationService->getRoomsName();
+
+            //ビュー表示用。number_OfRoomは（分かりにくくてごめんなさい）部屋の制限人数。
+            $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id'] ?? $oldresult['reservation']['room_id']);
+            $days = $this->yearMonthToDaysService->getDays($year, $month); //上記の、一か月分の在庫データ関連から変数を引用。戻るボタンで戻っている場合はセッション変数から、そうでなければ旧予約情報から算出。
             $marks = $markArrayMonth;
             $prices = $pricesMonth;
-            $plansData = $roomPlansData;
-            $old_checkin_year = (int)date('Y', strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
-            $old_checkin_month = (int)date('n', strtotime($oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
+            $checkin_year = (int)date('Y', strtotime($_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。
+            $checkin_month = (int)date('n', strtotime($_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date'])); //AJAXカレンダー初期表示用。
             $old_id = htmlspecialchars($oldresult['reservation']['id'], ENT_QUOTES, 'UTF-8');
             $old_room_id = htmlspecialchars($oldresult['reservation']['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($oldresult['reservation']['$room_id']);
+            $room_information = $this->getRoomInformationService->getRoomInformation($oldresult['reservation']['room_id']);
             $old_room_name = $room_information['room_name'];
             $old_comment = htmlspecialchars($oldresult['reservation']['comment'], ENT_QUOTES, 'UTF-8');
             $old_checkin_date = htmlspecialchars($oldresult['reservation']['checkin_date'], ENT_QUOTES, 'UTF-8');
@@ -576,8 +584,23 @@ class ReservationController
             $old_total_price = htmlspecialchars($oldresult['reservation']['total_price'], ENT_QUOTES, 'UTF-8');
             $old_plan = htmlspecialchars($oldresult['reservation']['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-            $pld_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
+            $old_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
             $old_person = htmlspecialchars($oldresult['reservation']['person'], ENT_QUOTES, 'UTF-8');
+
+            $new_room_id = htmlspecialchars($_SESSION['reserve_update_new']['room_id'] ?? $oldresult['reservation']['room_id'], ENT_QUOTES, 'UTF-8');
+            //room_idを部屋の名前（日本語）に変換する。
+            $new_room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_update_new']['room_id']);
+            $new_room_name = $new_room_information['room_name'];
+            $new_comment = htmlspecialchars($_SESSION['reserve_update_new']['comment'] ?? $oldresult['reservation']['comment'], ENT_QUOTES, 'UTF-8');
+            $new_checkin_date = htmlspecialchars($_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date'], ENT_QUOTES, 'UTF-8');
+            $new_checkout_date = htmlspecialchars($_SESSION['reserve_update_new']['checkout_date'] ?? $oldresult['reservation']['checkout_date'], ENT_QUOTES, 'UTF-8');
+            $new_total_price = htmlspecialchars($_SESSION['reserve_update_new']['total_price'] ?? $oldresult['reservation']['total_price'], ENT_QUOTES, 'UTF-8');
+            $new_plan = htmlspecialchars($_SESSION['reserve_update_new']['plan'] ?? $oldresult['reservation']['plan'], ENT_QUOTES, 'UTF-8');
+            //プラン名をプランタイトルに変換する。
+            $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
+            $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'] ?? $oldresult['reservation']['person'], ENT_QUOTES, 'UTF-8');
+
+
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
         } catch (Exception $e) {
@@ -598,6 +621,22 @@ class ReservationController
             echo '不正なリクエストです。';
             exit();
         }
+
+        //バックエンドで料金を再計算。
+        $final_price = $this->pricesCalendarService->getFinalPrice($request);
+
+        //セッション変数を使って、新たな予約内容をビューをまたいで保持可能にする。個人情報は不要。
+        $_SESSION['reserve_update_new'] = [
+            'id' => $_SESSION['reserve_update_old']['id'],
+            'room_id' => $request['room_id'],
+            'comment' => $request['comment'],
+            'checkin_date' => $request['checkin_date'],
+            'checkout_date' => $request['checkout_date'],
+            'total_price' => $final_price,
+            'plan' => $request['plan'],
+            'person' => $request['person']
+        ];
+
 
         //バリデーション。通らなかったら差し戻し。
         $error = $this->updateFormRequest->updateFormValidate($request);
@@ -675,20 +714,7 @@ class ReservationController
                 exit();
             }
 
-            //バックエンドで料金を再計算。
-            $final_price = $this->pricesCalendarService->getFinalPrice($request);
 
-            //セッション変数を使って、新たな予約内容をビューをまたいで保持可能にする。個人情報は不要。
-            $_SESSION['reserve_update_new'] = [
-                'id' => $_SESSION['reserve_update_old']['id'],
-                'room_id' => $request['room_id'],
-                'comment' => $request['comment'],
-                'checkin_date' => $request['checkin_date'],
-                'checkout_date' => $request['checkout_date'],
-                'total_price' => $final_price,
-                'plan' => $request['plan'],
-                'person' => $request['person']
-            ];
 
             //ビュー表示用。
             $id = htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');

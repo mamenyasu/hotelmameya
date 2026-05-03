@@ -20,5 +20,14 @@ class GetRoomInformationService{
         }
     }
 
+    //すべての部屋の名前を配列で取得する操作。
+    public function getRoomsName(){
+        try{
+            $rooms_name=$this->roomModel->getRoomsName();
+            return $rooms_name;
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
 
 }
