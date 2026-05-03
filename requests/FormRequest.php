@@ -22,8 +22,8 @@ class FormRequest{
         //電話番号について
         if($user_telphone==null || trim($user_telphone)==""){
             $error['user_telphone']='電話番号が入力されていません';
-        }elseif(!preg_match('/^[0-9]+$/',$user_telphone)){
-            $error['user_telphone_format']='電話番号は数字のみで入力してください。';
+        }elseif(!preg_match('/^(?!.*--)[0-9\-]+$/',$user_telphone)){
+            $error['user_telphone_format']='電話番号は半角数字のみで入力してください。';
         }elseif(mb_strlen($user_telphone) > 100){
             $error['user_telphone_length']='電話番号は１００文字以内で入力してください。';
         }
@@ -56,9 +56,9 @@ class FormRequest{
         if($checkout_date==null || $checkout_date=""){
             $error['checkout_date']='チェックアウト日が未定です。';
         }
-        if(strtotime($checkin_date) >= strtotime($checkout_date)){
-            $error['date_order']='チェックイン日はチェックアウト日より前にしてください。';
-        }
+        //if(strtotime($checkin_date) >= strtotime($checkout_date)){
+        //    $error['date_order']='チェックイン日はチェックアウト日より後にしてください';
+        //}
 
         //合計金額について
         if($total_price==null || $total_price==""){

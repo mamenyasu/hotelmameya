@@ -20,7 +20,7 @@
     </header>
 
     <div class="reserveForm_container">
-        <h2 class="reserveForm_title">新規予約フォーム</h2>
+        <h2 class="reserveForm_title">新規予約入力フォーム</h2>
 
         <!-- ▼ エラー表示（バリデーション or 在庫エラー） -->
         <?php if (!empty($error)): ?>
@@ -38,16 +38,13 @@
         <?php endif; ?>
         <!-- ▲ エラー表示 -->
 
-        <form action="/reserve/reconfirm" method="POST">
+        <form action="/hotelmameya/reserve/reserve_reconfirm" method="POST">
 
             <!-- 必須 hidden（カレンダーから渡された値） -->
             <input type="hidden" name="room_id" id="room_id" value="<?= $room_id ?>">
             <input type="hidden" name="plan" id="plan" value="<?= $plan ?>">
             <input type="hidden" name="checkin_date" id="checkin_date" value="<?= $checkin_date ?>">
             <input type="hidden" name="checkout_date" id="checkout_date" value="<?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?>">
-
-            <!-- JS 計算用の単価（プラン別価格を入れる） -->
-            <input type="hidden" id="base_price" value="<?= $base_price ?? 0 ?>">
 
             <div class="rserveForm_form-group">
                 <label>部屋</label>
@@ -64,7 +61,7 @@
                 <p><?= htmlspecialchars($checkin_date, ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
-            <div class="reserveForm_form-group">
+            <div class="reserveForm_form-group_mini">
                 <label for="stay_nights">宿泊日数</label>
                 <select name="stay_nights" id="stay_nights" onchange="calcPrice();">
                     <?php for ($i = 1; $i <= 14; $i++): ?>
@@ -80,7 +77,7 @@
             </div>
 
 
-            <div class="reserveForm_form-group">
+            <div class="reserveForm_form-group_mini">
                 <label for="person">人数（最大 <?= $number_OfRoom ?> 名）</label>
                 <select name="person" id="person" onchange="calcPrice()">
                     <?php for ($i = 1; $i <= $number_OfRoom; $i++): ?>
@@ -123,11 +120,11 @@
             <input type="hidden" name="total_price" id="total_price" value="<?= $total_price ?? $estimate ?>">
 
             <div style="margin-top:20px;">
-                <button type="submit">予約内容を確認する</button>
+                <button type="submit" style="height:40px">予約内容を確認する</button>
             </div>
 
         </form>
-        <a href="/hotelmameya/reseve/reserve_calendar" class="btn_back">戻る</a>
+        <a href="/hotelmameya/reserve/reserve_calendar/<?= $room_id ?>" class="btn_back">戻る</a>
     </div>
 
     <script>

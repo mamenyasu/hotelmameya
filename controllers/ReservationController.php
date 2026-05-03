@@ -129,7 +129,7 @@ class ReservationController
     {
         try {
             //ブラウザの戻るボタン対策。
-            $_SESSION['reserve_form_selectedPlan']=$plan;
+            $_SESSION['reserve_form_selectedPlan'] = $plan;
 
             //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
             $hasStockOne = $this->reservationService->hasStockOne($room_id, $year, $month, $day);
@@ -153,7 +153,7 @@ class ReservationController
             //見積初期表示用、チェックイン日の翌日までの一泊。$estimateをビューに与える。
             $checkout_date_estimate = date('Y-m-d', strtotime("$checkin_date +1 day"));
             $person = 1;
-            $estimate = $this->pricesCalendarService->getEstimate($room_id, $plan, $person, $checkin_date, $checkout_date_estimate);
+            $estimate = $_SESSION['reserve_form']['total_price'] ?? $this->pricesCalendarService->getEstimate($room_id, $plan, $person, $checkin_date, $checkout_date_estimate);
 
             //部屋タイプにより制限人数。
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxguest_OfRoom($room_id);
@@ -161,6 +161,18 @@ class ReservationController
             $maxDate = $this->maxCheckoutService->getMaxCheckout();
             $maxYear = $maxDate['maxYear'];
             $maxMonth = $maxDate['maxMonth'];
+
+            //戻るボタンで戻った時のセッション変数優先での、ビューへ与える変数。
+            $stay_nights = intval($_SESSION['reserve_form']['stay_nights'] ?? 1);
+            $person = intval($_SESSION['reserve_form']['person'] ?? 1); //見積用と兼用
+            $user_name = $_SESSION['reserve_form']['user_name'] ?? '';
+            $user_telphone = $_SESSION['reserve_form']['user_telphone'] ?? '';
+            $user_address = $_SESSION['reserve_form']['user_address'] ?? '';
+            $email = $_SESSION['reserve_form']['email'] ?? '';
+            $comment = $_SESSION['reserve_form']['comment'] ?? '';
+            $checkout_date = $_SESSION['reserve_form']['checkout_date'] ?? date('Y-m-d',strtotime("$checkin_date +1 day"));
+
+
             include __DIR__ . '/../views/reserveForm.php';
             exit();
 
@@ -182,7 +194,7 @@ class ReservationController
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
             $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($request['$room_id']);
+            $room_information = $this->getRoomInformationService->getRoomInformation($request['room_id']);
             $room_name = $room_information['room_name'];
             $user_name = htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
             $user_telphone = htmlspecialchars($request['user_telphone'], ENT_QUOTES, 'UTF-8');
@@ -196,6 +208,7 @@ class ReservationController
             //プラン名をプランタイトルに変換する。
             $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
+            $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
             include __DIR__ . '/../views/reserveForm.php';
             exit();
         }
@@ -220,15 +233,32 @@ class ReservationController
                 $total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
                 $plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
-                $plan_title=$this->getPlansDataService->getPlanTitle($plan);
+                $plan_title = $this->getPlansDataService->getPlanTitle($plan);
                 $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
+                $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
                 include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }
             //バックエンドで料金を再計算。
             $final_price = $this->pricesCalendarService->getFinalPrice($request);
 
-            //セッション変数に保持。
+            //セッション変数に保持(「戻る」ボタン用)
+            $_SESSION['reserve_form'] = [
+                'room_id' => $request['room_id'],
+                'plan' => $request['plan'],
+                'stay_nights' => $request['stay_nights'],
+                'person' => $request['person'],
+                'user_name' => $request['user_name'],
+                'user_telphone' => mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'),
+                'user_address' => $request['user_address'],
+                'email' => $request['email'],
+                'comment' => $request['comment'],
+                'checkin_date' => $request['checkin_date'],
+                'checkout_date' => $request['checkout_date'],
+                'total_price' => $request['total_price']
+            ];
+
+            //セッション変数に保持。(予約完了用)
             $_SESSION['reserve'] = [
                 'room_id' => $request['room_id'],
                 'user_name' => $request['user_name'],
@@ -240,13 +270,14 @@ class ReservationController
                 'checkout_date' => $request['checkout_date'],
                 'total_price' => $final_price,
                 'plan' => $request['plan'],
-                'person' => $request['person']
+                'person' => $request['person'],
+                'stay_nights' => $request['stay_nights']
             ];
 
             //最終確認ビュー表示用。
             $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($request['$room_id']);
+            $room_information = $this->getRoomInformationService->getRoomInformation($request['room_id']);
             $room_name = $room_information['room_name'];
             $user_name = htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
             $user_telphone = htmlspecialchars(mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'), ENT_QUOTES, 'UTF-8');
@@ -257,8 +288,13 @@ class ReservationController
             $checkout_date = htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
             $total_price = htmlspecialchars($final_price, ENT_QUOTES, 'UTF-8');
             $plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
+            $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
+            //戻るボタン用
+            $year=date('Y',strtotime($checkin_date));
+            $month=date('m',strtotime($checkin_date));
+            $day=date('d',strtotime($checkin_date));
             //プラン名をプランタイトルに変換する。
-            $plan_title=$this->getPlansDataService->getPlanTitle($plan);
+            $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__ . '/../views/reserveReconfirm.php';
             exit();
@@ -303,8 +339,9 @@ class ReservationController
                 $checkout_date = htmlspecialchars($_SESSION['reserve']['checkout_date'], ENT_QUOTES, 'UTF-8');
                 $total_price = htmlspecialchars($_SESSION['reserve']['total_price'], ENT_QUOTES, 'UTF-8');
                 $plan = htmlspecialchars($_SESSION['reserve']['plan'], ENT_QUOTES, 'UTF-8');
+                $stay_nights = htmlspecialchars($_SESSION['reserve']['stay_nights'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
-                $plan_title=$this->getPlansDataService->getPlanTitle($plan);
+                $plan_title = $this->getPlansDataService->getPlanTitle($plan);
                 $person = htmlspecialchars($_SESSION['reserve']['person'], ENT_QUOTES, 'UTF-8');
                 unset($_SESSION['reserve']);
                 include __DIR__ . '/../views/reserveForm.php';
@@ -393,7 +430,7 @@ class ReservationController
             $total_price = htmlspecialchars($result['reservation']['total_price'], ENT_QUOTES, 'UTF-8');
             $plan = htmlspecialchars($result['reservation']['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-                $plan_title=$this->getPlansDataService->getPlanTitle($plan);
+            $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($result['reservation']['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__ . '/../views/reserveCancelReconfirm.php';
             exit();
@@ -549,7 +586,7 @@ class ReservationController
             $old_total_price = htmlspecialchars($oldresult['reservation']['total_price'], ENT_QUOTES, 'UTF-8');
             $old_plan = htmlspecialchars($oldresult['reservation']['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-                $pld_plan_title=$this->getPlansDataService->getPlanTitle($old_plan);
+            $pld_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
             $old_person = htmlspecialchars($oldresult['reservation']['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
@@ -590,7 +627,7 @@ class ReservationController
             $old_total_price = htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
             $old_plan = htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-                $old_plan_title=$this->getPlansDataService->getPlanTitle($old_plan);
+            $old_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
             $old_person = htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
             $new_room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
@@ -602,7 +639,7 @@ class ReservationController
             $new_total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
             $new_plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-                $new_plan_title=$this->getPlansDataService->getPlanTitle($new_plan);
+            $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
             $new_person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
             include __DIR__ . '/../views/reserveUpdateForm.php';
@@ -629,7 +666,7 @@ class ReservationController
                 $old_total_price = htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
                 $old_plan = htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
-                $old_plan_title=$this->getPlansDataService->getPlanTitle($old_plan);
+                $old_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
                 $old_person = htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
                 $new_room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
                 //room_idを部屋の名前（日本語）に変換する。
@@ -641,7 +678,7 @@ class ReservationController
                 $new_total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
                 $new_plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
-                $new_plan_title=$this->getPlansDataService->getPlanTitle($new_plan);
+                $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
                 $new_person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
                 include __DIR__ . '/../views/reserveUpdateForm.php';
@@ -675,7 +712,7 @@ class ReservationController
             $old_total_price = htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
             $old_plan = htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-                $old_plan_title=$this->getPlansDataService->getPlanTitle($old_plan);
+            $old_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
             $old_person = htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
             $new_room_id = htmlspecialchars($_SESSION['reserve_update_new']['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
@@ -687,7 +724,7 @@ class ReservationController
             $new_total_price = htmlspecialchars($_SESSION['reserve_update_new']['total_price'], ENT_QUOTES, 'UTF-8');
             $new_plan = htmlspecialchars($_SESSION['reserve_update_new']['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
-                $new_plan_title=$this->getPlansDataService->getPlanTitle($new_plan);
+            $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
             $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
             include __DIR__ . '/../views/reserveUpdateConfirm.php';
             exit();
@@ -733,7 +770,7 @@ class ReservationController
                 $old_total_price = htmlspecialchars($_SESSION['reserve_update_old']['total_price'], ENT_QUOTES, 'UTF-8');
                 $old_plan = htmlspecialchars($_SESSION['reserve_update_old']['plan'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
-                $old_plan_title=$this->getPlansDataService->getPlanTitle($old_plan);
+                $old_plan_title = $this->getPlansDataService->getPlanTitle($old_plan);
                 $old_person = htmlspecialchars($_SESSION['reserve_update_old']['person'], ENT_QUOTES, 'UTF-8');
                 $new_room_id = htmlspecialchars($_SESSION['reserve_update_new']['room_id'], ENT_QUOTES, 'UTF-8');
                 //room_idを部屋の名前（日本語）に変換する。
@@ -745,7 +782,7 @@ class ReservationController
                 $new_total_price = htmlspecialchars($_SESSION['reserve_update_new']['total_price'], ENT_QUOTES, 'UTF-8');
                 $new_plan = htmlspecialchars($_SESSION['reserve_update_new']['plan'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
-                $new_plan_title=$this->getPlansDataService->getPlanTitle($new_plan);
+                $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
                 $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
                 unset($_SESSION['reserve_update_new']);

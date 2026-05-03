@@ -6,7 +6,7 @@
 .btn_back{
     display: block;
     width: 150px;
-    margin: 40px auto;
+    margin: 30px auto;
     padding: 10px 20px;
     background-color: #8c5e3c;
     color: #fff;
@@ -439,7 +439,26 @@
     box-sizing: border-box;
     margin: 0 auto;
     display: block;
+    background-color: #faf7f3;
+    /* ほんのり和紙風の白 */
 }
+
+/*テキスト入力系２*/
+.reserveForm_form-group_mini{
+    width: 40%;
+    max-width: 40%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    display: block;
+    background-color: #faf7f3;
+    /* ほんのり和紙風の白 */
+}
+
 
 /* 備考欄 */
 .reserveForm_form-group textarea {
@@ -468,9 +487,112 @@
 }
 
 .reserveForm_title {
-    background-color: #8c5e3c;
-    width: 250px;
+    border-top: 2px solid #8c5e3c;
+    border-bottom: 2px solid #8c5e3c;
+    width: 400px;
     height: auto;
     text-align: center;
-    margin: 0 auto;
+    margin: 20px auto;
 }
+
+/*新規予約の最終確認画面*/
+/* 全体コンテナ */
+.reserveConfirm_container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+/* タイトル */
+.reserveConfirm_title {
+    font-size: 26px;
+    margin-bottom: 10px;
+    color: #4a3f2f; /* 落ち着いた茶色 */
+    font-weight: bold;
+}
+
+/* サブタイトル */
+.reserveConfirm_subtitle {
+    font-size: 16px;
+    color: #6b5e4b;
+    margin-bottom: 25px;
+}
+
+/* 内容ボックス（和紙風背景） */
+.reserveConfirm_box {
+    background: #faf7f3; /* 和紙っぽい柔らかい白 */
+    border: 1px solid #e5ddd2; /* 和紙の縁っぽい淡い線 */
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 30px;
+}
+
+/* 各行（ラベル＋値） */
+.reserveConfirm_row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #d8cfc2;
+}
+
+.reserveConfirm_row:last-child {
+    border-bottom: none;
+}
+
+/* ラベル */
+.reserveConfirm_row .label {
+    font-weight: bold;
+    color: #4a3f2f;
+    width: 40%;
+    text-align: left;
+}
+
+/* 値 */
+.reserveConfirm_row .value {
+    width: 60%;
+    text-align: right;
+    color: #3a3328;
+}
+
+/* 合計料金 */
+.reserveConfirm_price {
+    margin-top: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #8b5a2b; /* 少し暖色寄りの茶色 */
+}
+
+/* 予約するボタン */
+.reserveConfirm_btn_confirm {
+    display: block;
+    width: 100%;
+    background: #8c6b4f; /* 和モダンの茶色 */
+    color: #fff;
+    padding: 12px 0;
+    border-radius: 6px;
+    font-size: 18px;
+    border: none;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.reserveConfirm_btn_confirm:hover {
+    background: #7a5e45;
+}
+
+/* 戻るボタン */
+.reserveConfirmbtn_back {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #dcd3c7;
+    color: #4a3f2f;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.reserveConfirm_btn_back:hover {
+    background: #c8bfb3;
+}
+
