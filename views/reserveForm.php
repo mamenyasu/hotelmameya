@@ -120,7 +120,7 @@
             <input type="hidden" name="total_price" id="total_price" value="<?= $total_price ?? $estimate ?>">
 
             <div style="margin-top:20px;">
-                <button type="submit" style="height:40px">予約内容を確認する</button>
+                <button type="submit" class="reserveForm_btn_confirm">確認画面へ</button>
             </div>
 
         </form>

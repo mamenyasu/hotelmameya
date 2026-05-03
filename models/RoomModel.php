@@ -7,7 +7,7 @@
         $this->pdo=$pdo;
     }
 
-    //ルーム情報を取得するメソッド。
+    //ルーム情報を取得するメソッド。連想配列で返ってくる。
     public function getRoomInformation($room_id){
         try{
         $stmt=$this->pdo->prepare('SELECT * FROM rooms WHERE id=:room_id');

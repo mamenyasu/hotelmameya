@@ -408,7 +408,7 @@ class ReservationController
             $id = htmlspecialchars($result['reservation']['id'], ENT_QUOTES, 'UTF-8');
             $room_id = htmlspecialchars($result['reservation']['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($result['reservation']['$room_id']);
+            $room_information = $this->getRoomInformationService->getRoomInformation($result['reservation']['room_id']);
             $room_name = $room_information['room_name'];
             $user_name = htmlspecialchars($result['reservation']['user_name'], ENT_QUOTES, 'UTF-8');
             $user_telphone = htmlspecialchars($result['reservation']['user_telphone'], ENT_QUOTES, 'UTF-8');

@@ -8,7 +8,7 @@
     width: 150px;
     margin: 30px auto;
     padding: 10px 20px;
-    background-color: #8c5e3c;
+    background-color: #8c6b4f;
     color: #fff;
     text-decoration: none;
     border-radius: 4px;
@@ -38,7 +38,7 @@
     display: flex;
     gap: 40px;
     list-style: none;
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     font-size: 20px;
     margin-right: 20px;
     margin-top: 20px;
@@ -49,7 +49,7 @@
 }
 
 .sub-menu {
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     display: none;
     position: absolute;
     list-style: none;
@@ -80,7 +80,7 @@
 }
 
 .sub-menu2 {
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     display: none;
     position: absolute;
     list-style: none;
@@ -149,7 +149,7 @@
     background-image: url("/hotelmameya/assets/img/hotelmameya_index_background.webp");
     background-repeat: repeat;
     background-size: 400px 400px;
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
 }
 
 .index_ex section {
@@ -206,7 +206,7 @@
 }
 
 .foods_container {
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
 }
 
 .foods_container img {
@@ -248,7 +248,7 @@
     background-image: url("/hotelmameya/assets/img/hotelmameya_index_background.webp");
     background-repeat: repeat;
     background-size: 400px 400px;
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
 }
 
 .facility_ex section {
@@ -285,10 +285,11 @@
 
 
 .contact_ex {
-    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
 }
 
 .contact_title {
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     text-align: center;
     font-size: 20px;
     color: #4a3b2a;
@@ -370,6 +371,7 @@
 
 /* 予約カレンダー*/
 .calendar-container {
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     width: 100%;
     max-width: 700px;
     margin: 0 auto;
@@ -438,6 +440,7 @@
 /*新規予約入力フォーム*/
 /* 予約フォーム全体 */
 .reserveForm_container {
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     display:block;
     text-align: center;
     width: 90%;
@@ -530,9 +533,26 @@
     margin: 20px auto;
 }
 
+/*最終確認画面へのボタン*/
+.reserveForm_btn_confirm {
+    display: block;
+    width: 100%;
+    background: #8c6b4f; /* 和モダンの茶色 */
+    color: #fff;
+    padding: 12px 0;
+    border-radius: 6px;
+    font-size: 18px;
+    border: none;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+
+
 /*新規予約の最終確認画面*/
 /* 全体コンテナ */
 .reserveConfirm_container {
+    font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
     max-width: 700px;
     margin: 40px auto;
     padding: 20px;
@@ -616,4 +636,195 @@
     background: #7a5e45;
 }
 
+/* ===========================
+   予約キャンセルフォーム専用CSS
+   他と衝突しないよう cancelForm_ で統一
+=========================== */
 
+.cancelForm_ex {
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+    margin: 0;
+    padding: 0;
+}
+
+.cancelForm_container {
+    max-width: 480px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 30px 35px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #e5e1da;
+}
+
+.cancelForm_title {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #3e3a39;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #c8b79e;
+    padding-bottom: 10px;
+}
+
+.cancelForm_error-box {
+    background: #ffe8e6;
+    border-left: 4px solid #d9534f;
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    color: #a94442;
+    font-size: 14px;
+}
+
+.cancelForm_group {
+    margin-bottom: 18px;
+}
+
+.cancelForm_label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #4a4746;
+}
+
+.cancelForm_input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cfc9c2;
+    border-radius: 5px;
+    font-size: 15px;
+    background-color: #faf8f5;
+    box-sizing: border-box;
+}
+
+.cancelForm_input:focus {
+    border-color: #8c5e3c;
+    outline: none;
+    background-color: #fff;
+}
+
+.cancelForm_btn-submit {
+    width: 100%;
+    background: #8c6b4f;
+    color: #fff;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+}
+
+.cancelForm_btn-submit:hover {
+    background: #7a5d45;
+}
+
+.cancelForm_back-link {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    color: #6a5d4d;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.cancelForm_back-link:hover {
+    text-decoration: underline;
+}
+
+/* ===========================
+   予約キャンセル最終確認画面
+   cancelConfirm_ で完全独立
+=========================== */
+
+.cancelConfirm_ex {
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+    margin: 0;
+    padding: 0;
+}
+
+.cancelConfirm_container {
+    max-width: 600px;
+    margin: 60px auto;
+    background: #ffffff;
+    padding: 30px 35px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #e5e1da;
+    text-align: center;
+}
+
+.cancelConfirm_title {
+    font-size: 24px;
+    color: #3e3a39;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #c8b79e;
+    padding-bottom: 10px;
+}
+
+.cancelConfirm_message {
+    font-size: 16px;
+    color: #4a3f2f;
+    margin-bottom: 25px;
+}
+
+.cancelConfirm_box {
+    background: #faf7f3;
+    border: 1px solid #e5ddd2;
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 30px;
+}
+
+.cancelConfirm_row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px dashed #d8cfc2;
+}
+
+.cancelConfirm_row:last-child {
+    border-bottom: none;
+}
+
+.cancelConfirm_row .label {
+    font-weight: bold;
+    color: #4a3f2f;
+    width: 40%;
+    text-align: left;
+}
+
+.cancelConfirm_row .value {
+    width: 60%;
+    text-align: right;
+    color: #3a3328;
+}
+
+.cancelConfirm_btn-cancel {
+    width: 100%;
+    background: #8c6b4f;
+    color: #fff;
+    padding: 12px 0;
+    border-radius: 6px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: 0.2s;
+}
+
+.cancelConfirm_btn-cancel:hover {
+    background: #7a5e45;
+}
+
+.cancelConfirm_back-link {
+    display: block;
+    text-align: center;
+    color: #6a5d4d;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.cancelConfirm_back-link:hover {
+    text-decoration: underline;
+}
