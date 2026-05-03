@@ -32,8 +32,8 @@ class ReservationService{
 
             //予約テーブルに登録。
             $this->reservationsModel->createReservation($request);
-            //部屋（在庫）を減らす。
-            $this->roomAvailabilityModel->decreaseBookedRooms($request);
+            //部屋（在庫）を減らす。=予約数を＋１する。
+            $this->roomAvailabilityModel->increaseBookedRooms($request);
             //結果をコントローラーに返す。
             return ['success'=>true,'message'=>'予約が完了しました。'];
         }catch(Exception $e){
@@ -46,8 +46,8 @@ class ReservationService{
         try{
             //予約取り消し操作。
             $this->reservationsModel->deleteReservation($request);
-            //在庫を復活させる。
-            $this->roomAvailabilityModel->increaseBookedRooms($request);
+            //在庫を復活させる。＝予約数を減らす
+            $this->roomAvailabilityModel->decreaseBookedRooms($request);
             //結果をコントローラーに返す。
             return ['success'=>true,'message'=>'予約がキャンセルされました。'];            
         }catch(Exception $e){
@@ -79,9 +79,9 @@ class ReservationService{
 
             //トランザクション処理開始。
             $this->pdo->beginTransaction();
-            $this->roomAvailabilityModel->increaseBookedRooms($old);
+            $this->roomAvailabilityModel->decreaseBookedRooms($old);
             $this->reservationsModel->updateReservation($request);
-            $this->roomAvailabilityModel->decreaseBookedRooms($request);
+            $this->roomAvailabilityModel->increaseBookedRooms($request);
             $this->pdo->commit(); //成功時はコミット。
                 return ['success'=>true,'message'=>'予約が変更されました。'];
         }catch(Exception $e){

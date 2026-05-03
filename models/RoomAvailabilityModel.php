@@ -28,7 +28,7 @@ class RoomAvailabilityModel{
 
     }
 
-    //指定の種類の部屋の、指定の期間について、booked_rooms（予約数）を＋１するメソッド。
+    //指定の種類の部屋の、指定の期間について、booked_rooms（予約数）を＋１するメソッド。=在庫を減らす
     public function increaseBookedRooms($request){
         try{
         $checkin_date=$request['checkin_date'];
@@ -44,7 +44,7 @@ class RoomAvailabilityModel{
         }
     }
 
-    //指定の種類の部屋の、指定の期間について、booked_rooms(予約数)をー１するメソッド。
+    //指定の種類の部屋の、指定の期間について、booked_rooms(予約数)をー１するメソッド。=在庫を増やす
     public function decreaseBookedRooms($request){
         try{
         $stmt=$this->pdo->prepare('UPDATE room_availability SET booked_rooms = booked_rooms -1 WHERE room_id=:room_id AND stay_date >= :checkin_date AND stay_date < :checkout_date');

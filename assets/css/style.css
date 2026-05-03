@@ -28,7 +28,7 @@
     text-decoration: none;
 }
 
-.nav-menu a:hover {
+.nav-menu>ul a:hover {
     border-bottom: 2px solid #b48a3c;
     /* 和モダンな金茶ライン */
 }
@@ -581,18 +581,4 @@
     background: #7a5e45;
 }
 
-/* 戻るボタン */
-.reserveConfirmbtn_back {
-    display: inline-block;
-    padding: 10px 20px;
-    background: #dcd3c7;
-    color: #4a3f2f;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: 0.2s;
-}
-
-.reserveConfirm_btn_back:hover {
-    background: #c8bfb3;
-}
 

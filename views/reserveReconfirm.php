@@ -107,7 +107,7 @@
         </form>
         <!-- ▲ hidden -->
 
-        <a href="/hotelmameya/reserve/reserve_form/<?= $room_id ?>/<?= $year ?>/<?= $month ?>/<?= $day ?>/<?= $plan ?>" class="reserveConfirm_btn_back">戻る</a>
+        <a href="/hotelmameya/reserve/reserve_form/<?= $room_id ?>/<?= $year ?>/<?= $month ?>/<?= $day ?>/<?= $plan ?>" class="btn_back">戻る</a>
 
     </div>
 
