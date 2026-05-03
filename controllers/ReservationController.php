@@ -170,7 +170,7 @@ class ReservationController
             $user_address = $_SESSION['reserve_form']['user_address'] ?? '';
             $email = $_SESSION['reserve_form']['email'] ?? '';
             $comment = $_SESSION['reserve_form']['comment'] ?? '';
-            $checkout_date = $_SESSION['reserve_form']['checkout_date'] ?? date('Y-m-d',strtotime("$checkin_date +1 day"));
+            $checkout_date = $_SESSION['reserve_form']['checkout_date'] ?? date('Y-m-d', strtotime("$checkin_date +1 day"));
 
 
             include __DIR__ . '/../views/reserveForm.php';
@@ -290,9 +290,9 @@ class ReservationController
             $plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
             $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
             //戻るボタン用
-            $year=date('Y',strtotime($checkin_date));
-            $month=date('m',strtotime($checkin_date));
-            $day=date('d',strtotime($checkin_date));
+            $year = date('Y', strtotime($checkin_date));
+            $month = date('m', strtotime($checkin_date));
+            $day = date('d', strtotime($checkin_date));
             //プラン名をプランタイトルに変換する。
             $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
@@ -316,6 +316,7 @@ class ReservationController
     public function reserve_confirm()
     {
         if (!isset($_SESSION['reserve'])) {
+            unset($_SESSION['reserve_form']);
             echo "不正なリクエストです。";
             exit();
         }
@@ -323,37 +324,26 @@ class ReservationController
         try {
             //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。できなかったら差し戻し。
             $result = $this->reservationService->reserve($_SESSION['reserve']);
+            // セッションは必ず破棄
+            unset($_SESSION['reserve']);
+            unset($_SESSION['reserve_form']);
+
             if ($result['success'] == false) {
                 $message = htmlspecialchars($result['message'], ENT_QUOTES, 'UTF-8');
-                $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve']['room_id']);
-                $room_id = htmlspecialchars($_SESSION['reserve']['room_id'], ENT_QUOTES, 'UTF-8');
-                //room_idを部屋の名前（日本語）に変換する。
-                $room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve']['$room_id']);
-                $room_name = $room_information['room_name'];
-                $user_name = htmlspecialchars($_SESSION['reserve']['user_name'], ENT_QUOTES, 'UTF-8');
-                $user_telphone = htmlspecialchars($_SESSION['reserve']['user_telphone'], ENT_QUOTES, 'UTF-8');
-                $user_address = htmlspecialchars($_SESSION['reserve']['user_address'], ENT_QUOTES, 'UTF-8');
-                $email = htmlspecialchars($_SESSION['reserve']['email'], ENT_QUOTES, 'UTF-8');
-                $comment = htmlspecialchars($_SESSION['reserve']['comment'], ENT_QUOTES, 'UTF-8');
-                $checkin_date = htmlspecialchars($_SESSION['reserve']['checkin_date'], ENT_QUOTES, 'UTF-8');
-                $checkout_date = htmlspecialchars($_SESSION['reserve']['checkout_date'], ENT_QUOTES, 'UTF-8');
-                $total_price = htmlspecialchars($_SESSION['reserve']['total_price'], ENT_QUOTES, 'UTF-8');
-                $plan = htmlspecialchars($_SESSION['reserve']['plan'], ENT_QUOTES, 'UTF-8');
-                $stay_nights = htmlspecialchars($_SESSION['reserve']['stay_nights'], ENT_QUOTES, 'UTF-8');
-                //プラン名をプランタイトルに変換する。
-                $plan_title = $this->getPlansDataService->getPlanTitle($plan);
-                $person = htmlspecialchars($_SESSION['reserve']['person'], ENT_QUOTES, 'UTF-8');
-                unset($_SESSION['reserve']);
-                include __DIR__ . '/../views/reserveForm.php';
+                include __DIR__ . '/../views/false.php';
                 exit();
             }
-            $message = $result['message'];
+
+            $message = htmlspecialchars($result['message']);
             unset($_SESSION['reserve']);
+            unset($_SESSION['reserve_form']);
             include __DIR__ . '/../views/success.php';
             exit();
+
             //例外処理。
         } catch (Exception $e) {
             unset($_SESSION['reserve']);
+            unset($_SESSION['reserve_form']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
