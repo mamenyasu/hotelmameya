@@ -75,6 +75,41 @@
     display: block;
 }
 
+.has-sub2 {
+    position: relative;
+}
+
+.sub-menu2 {
+    font-family: "Yu Mincho, 'Hiragino Mincho ProN', serif";
+    display: none;
+    position: absolute;
+    list-style: none;
+    font-size: 20px;
+    padding: 30px 0px 20px 0px;
+    margin: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+    left: -73px;
+}
+
+.sub-menu2 li {
+    white-space: nowrap;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin: 0;
+    height: 60px;
+    width: 230px;
+    text-align: center;
+}
+
+.has-sub2:hover .sub-menu2 {
+    display: block;
+}
+
+
+
+
+
 .hero {
     height: 700px;
     /* 好きな高さに調整 */
