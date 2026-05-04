@@ -12,7 +12,6 @@ header("Refresh: 3; URL=/hotelmameya/home/index");
             margin: 0;
             padding: 0;
             font-family: "Hiragino Sans", "Yu Gothic", sans-serif;
-            background: #f7f4ef; /* 和紙のような淡いベージュ */
             color: #333;
         }
 

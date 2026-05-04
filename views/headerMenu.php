@@ -13,8 +13,8 @@
         </li>
         <li class="has-sub2"><a href="#">お問い合わせ</a>
             <ul class="sub-menu2">
-                <li><a href="/hotelmameya/reserve/reserve_cancel_form">予約キャンセル</a></li>
-                <li><a href="/hotelmameya/reserve/reserve_updateVerify_form">予約の変更</a></li>
+                <li><a href="/hotelmameya/reserve/cancel_form">予約キャンセル</a></li>
+                <li><a href="/hotelmameya/reserve/update_verify_form">予約の変更</a></li>
                 <li><a href="/hotelmameya/contact/contact_form">その他のお問い合わせ</a></li>
             </ul>
         </li>
