@@ -157,6 +157,11 @@ class ReservationController
 
             //部屋タイプにより制限人数。
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxguest_OfRoom($room_id);
+
+            //宿泊日数のセレクトボックスの値を生成。
+            $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month, $day);
+
+
             //在庫カレンダー最後尾の日付
             $maxDate = $this->maxCheckoutService->getMaxCheckout();
             $maxYear = $maxDate['maxYear'];
@@ -164,6 +169,10 @@ class ReservationController
 
             //戻るボタンで戻った時のセッション変数優先での、ビューへ与える変数。
             $stay_nights = intval($_SESSION['reserve_form']['stay_nights'] ?? 1);
+            //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
+            if ($stay_nights > count($maxStayNights)) {
+                $stay_nights = count($maxStayNights);
+            }
             $person = intval($_SESSION['reserve_form']['person'] ?? 1); //見積用と兼用
             $user_name = $_SESSION['reserve_form']['user_name'] ?? '';
             $user_telphone = $_SESSION['reserve_form']['user_telphone'] ?? '';
@@ -209,6 +218,10 @@ class ReservationController
             $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
+            //宿泊日数のセレクトボックスの値を生成。
+            $year = date('Y', strtotime($request['$checkin_date']));
+            $month = date('m', strtotime($request['$checkin_date']));
+            $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month);
             include __DIR__ . '/../views/reserveForm.php';
             exit();
         }
@@ -236,6 +249,14 @@ class ReservationController
                 $plan_title = $this->getPlansDataService->getPlanTitle($plan);
                 $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
                 $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
+                //宿泊日数のセレクトボックスの値を生成。
+                $year = date('Y', strtotime($request['$checkin_date']));
+                $month = date('m', strtotime($request['$checkin_date']));
+                $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month);
+                //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
+                if ($stay_nights > count($maxStayNights)) {
+                    $stay_nights = count($maxStayNights);
+                }
                 include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }

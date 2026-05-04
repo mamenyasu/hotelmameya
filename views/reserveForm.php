@@ -64,7 +64,7 @@
             <div class="reserveForm_form-group_mini">
                 <label for="stay_nights">宿泊日数</label>
                 <select name="stay_nights" id="stay_nights" onchange="calcPrice();">
-                    <?php for ($i = 1; $i <= 14; $i++): ?>
+                    <?php for ($i = 1; $i <= count($maxStayNights); $i++): ?>
                         <option value="<?= $i ?>" <?= ($stay_nights ?? 1) == $i ? 'selected' : '' ?>>
                             <?= $i ?> 泊
                         </option>

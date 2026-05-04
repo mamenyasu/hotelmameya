@@ -28,6 +28,29 @@ class RoomAvailabilityModel{
 
     }
 
+
+//指定した種類の部屋の、[指定されたチェックイン日]から[14]日分の在庫データの配列を、昇順で返すメソッド。宿泊日数のセレクトボックス用。
+    public function getAvailabilityTwoWeek($room_id,$year,$month,$day){
+    try{
+        $startYearMonth=sprintf('%04d-%02d-%02d',$year,$month,$day);
+        $endYearMonth=date('Y-m-d',strtotime("$startYearMonth +14 day")); //シングルクォートで囲まないように。変数展開されません。
+
+        $stmt=$this->pdo->prepare("SELECT * FROM room_availability WHERE room_id=:room_id AND stay_date >= :startYearMonth AND stay_date < :endYearMonth ORDER BY stay_date ASC");
+        $stmt->bindValue(':room_id',$room_id,PDO::PARAM_INT);
+        $stmt->bindValue(':startYearMonth',$startYearMonth,PDO::PARAM_STR);
+        $stmt->bindValue(':endYearMonth',$endYearMonth,PDO::PARAM_STR);
+        $stmt->execute();
+        }catch(Exception $e){
+            throw new Exception('データベースエラー：指定の部屋の月在庫データを取得できませんでした');
+        }
+
+        $availablity=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $availablity; //指定した種類の部屋の、一か月分の在庫データを配列で返す。
+
+    }
+
+
+
     //指定の種類の部屋の、指定の期間について、booked_rooms（予約数）を＋１するメソッド。=在庫を減らす
     public function increaseBookedRooms($request){
         try{

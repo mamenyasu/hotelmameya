@@ -2,16 +2,22 @@
 
 require_once __DIR__.'/../models/ReservationsModel.php';
 require_once __DIR__.'/../models/RoomAvailabilityModel.php';
+require_once __DIR__.'/../models/RoomModel.php';
+require_once __DIR__.'/../services/RestockService.php';
 
 class ReservationService{
     private $pdo;
     private $reservationsModel;
     private $roomAvailabilityModel;
+    private $roomModel;
+    private $restockService;
 
     public function __construct($pdo){
         $this->pdo=$pdo;
         $this->reservationsModel=new ReservationsModel($pdo);
         $this->roomAvailabilityModel=new RoomAvailabilityModel($pdo);
+        $this->roomModel = new RoomModel($pdo);
+        $this->restockService = new RestockService();
     }
 
 
@@ -159,6 +165,33 @@ class ReservationService{
             throw $e;
         }
     }
+
+//指定したチェックイン日から宿泊可能な日数を返す操作。宿泊日数セレクトボックス用。maxStaiNights=[１泊,２泊,...]みたいな配列が返る。
+public function makeNumStayNights($room_id,$year,$month,$day){
+    
+    $maxStayNights=[];
+    $room_information=$this->roomModel->getRoomInformation($room_id);
+    $availabilityTwoWeek=$this->roomAvailabilityModel->getAvailabilityTwoWeek($room_id,$year,$month,$day);
+    //サービスを挟んでいないため、いったんSUCESSキーとavailabilityRoomMonthキーを追加。
+    $availability=['SUCCESS' => true,'availabilityRoomMonth' => $availabilityTwoWeek];
+
+    //予約変更の場合はリストックされ、そうではない場合（新規予約の場合）は何もなく、結果としてSUCCESS判定を除いて返ってくる。
+    $availability=$this->restockService->restock($availability);
+
+    for($i=0; $i<14; $i++){
+        if (!isset($availability[$i])) {
+            break; // データがない＝泊まれない
+        } 
+        $total_inventory=$room_information['total_inventory'];
+        $booked_rooms=$availability[$i]['booked_rooms'];
+        if($booked_rooms >= $total_inventory){
+            break;
+        }else{
+            $maxStayNights[]=$i+1;
+        }
+    }
+    return $maxStayNights; //もしmaxStayNightsが空である（一泊もできない）場合、ビュー側で判定し、「部屋の空きがありません」みたいなメッセージを出す予定。
+}
 
 
 }
