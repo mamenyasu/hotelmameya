@@ -27,11 +27,12 @@ class ReservationService{
         try{
             //操作直前に本当に空きがあるか再確認。
             $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
+            $room_information=$this->roomModel->getRoomInformation($request['room_id']);
             if(!$rows){
                 return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
             }
             foreach($rows as $row){
-                if($row['total_rooms'] <= $row['booked_rooms']){
+                if($room_information['total_inventory'] <= $row['booked_rooms']){
                 return ['success'=>false,'message'=>'空きがありません。'];
                 }
             }
@@ -74,11 +75,12 @@ class ReservationService{
             
             //新たに指定された部屋の種類と期間で、空きがあるか確認。
             $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
+            $room_information=$this->roomModel->getRoomInformation($request['room_id']);
             if(!$rows){
                 return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
             }
             foreach($rows as $row){
-                if($row['total_rooms'] <= $row['booked_rooms']){
+                if($room_information['total_inventory'] <= $row['booked_rooms']){
                 return ['success'=>false,'message'=>'空きがありません。'];
                 }
             }
@@ -128,12 +130,13 @@ class ReservationService{
     //指定の種類の部屋に、指定の期間で、空きがあるかをコントローラーに渡すメソッド。
     public function hasStock($request){
         try{
+        $room_information=$this->roomModel->getRoomInformation($request['room_id']);
         $rows=$this->roomAvailabilityModel->getRoomBetweenData($request);
         if(!$rows){
             return ['success'=>false,'message'=>'指定された期間の空き状況が確認できませんでした。'];
         }
         foreach($rows as $row){
-            if($row['total_rooms'] <= $row['booked_rooms']){
+            if($room_information['total_inventory'] <= $row['booked_rooms']){
                 return ['success'=>false,'message'=>'空きがありません。'];
             }
         }
@@ -148,6 +151,7 @@ class ReservationService{
     //カレンダーで選択した日が、最低でも当日一泊出来るか確認するメソッド。
     public function hasStockOne($room_id,$year,$month,$day){
         try{
+            $room_information=$this->roomModel->getRoomInformation($room_id);
             $request['room_id']=$room_id;
             $request['checkin_date']=sprintf('%04d-%02d-%02d',$year,$month,$day);
             $request['checkout_date']=date('Y-m-d',strtotime('+1 days',strtotime(sprintf('%04d-%02d-%02d',$year,$month,$day))));
@@ -156,7 +160,7 @@ class ReservationService{
                 return ['success'=>false,'message'=>'空き状況が確認できませんでした。'];
             }
             foreach($rows as $row){
-                if($row['total_rooms'] <= $row['booked_rooms']){
+                if($room_information['total_inventory'] <= $row['booked_rooms']){
                 return ['success'=>false,'message'=>'空きがありません。'];
                 }
             }
