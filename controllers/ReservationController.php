@@ -173,7 +173,7 @@ class ReservationController
             if ($stay_nights > count($maxStayNights)) {
                 $stay_nights = count($maxStayNights);
             }
-            $stay_nights=htmlspecialchars($stay_nights);
+            $stay_nights = htmlspecialchars($stay_nights);
             $person = intval($_SESSION['reserve_form']['person'] ?? 1); //見積用と兼用
             $user_name = $_SESSION['reserve_form']['user_name'] ?? '';
             $user_telphone = $_SESSION['reserve_form']['user_telphone'] ?? '';
@@ -228,7 +228,7 @@ class ReservationController
             if ($stay_nights > count($maxStayNights)) {
                 $stay_nights = count($maxStayNights);
             }
-            $stay_nights=htmlspecialchars($stay_nights);
+            $stay_nights = htmlspecialchars($stay_nights);
             include __DIR__ . '/../views/reserveForm.php';
             exit();
         }
@@ -265,7 +265,7 @@ class ReservationController
                 if ($stay_nights > count($maxStayNights)) {
                     $stay_nights = count($maxStayNights);
                 }
-                $stay_nights=htmlspecialchars($stay_nights);
+                $stay_nights = htmlspecialchars($stay_nights);
                 include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }
@@ -554,6 +554,7 @@ class ReservationController
             if ($availabilityRoomMonth['success'] == false) {       //空配列が返ってきた場合。
                 unset($_SESSION['reserve_update_old']);
                 unset($_SESSION['reserve_update_new']);
+                unset($_SESSION['reserve_update_calendar']);
                 $message = $availabilityRoomMonth['message'];
                 include __DIR__ . '/../views/false.php';
                 exit();
@@ -643,15 +644,15 @@ class ReservationController
             if ($stay_nights > count($maxStayNights)) {
                 $stay_nights = count($maxStayNights);
             }
-            $stay_nights=htmlspecialchars($stay_nights);
+            $stay_nights = htmlspecialchars($stay_nights);
 
 
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
         } catch (Exception $e) {
-            if (isset($_SESSION['reserve_update_old'])) {
-                unset($_SESSION['reserve_update_old']);
-            }
+            unset($_SESSION['reserve_update_old']);
+            unset($_SESSION['reserve_update_new']);
+            unset($_SESSION['reserve_update_calendar']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -731,7 +732,7 @@ class ReservationController
             if ($stay_nights > count($maxStayNights)) {
                 $stay_nights = count($maxStayNights);
             }
-            $stay_nights=htmlspecialchars($stay_nights);
+            $stay_nights = htmlspecialchars($stay_nights);
 
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
@@ -786,7 +787,7 @@ class ReservationController
                 if ($stay_nights > count($maxStayNights)) {
                     $stay_nights = count($maxStayNights);
                 }
-                $stay_nights=htmlspecialchars($stay_nights);
+                $stay_nights = htmlspecialchars($stay_nights);
 
 
                 include __DIR__ . '/../views/reserveUpdateForm.php';
@@ -825,15 +826,9 @@ class ReservationController
             exit();
             //例外処理。    
         } catch (Exception $e) {
-            if (isset($_SESSION['reserve_update_old'])) {
-                unset($_SESSION['reserve_update_old']);
-            }
-            if (isset($_SESSION['reserve_update_new'])) {
-                unset($_SESSION['reserve_update_new']);
-            }
-            if (isset($_SESSION['reserve_update_calendar'])) {
-                unset($_SESSION['reserve_update_calendar']);
-            }
+            unset($_SESSION['reserve_update_old']);
+            unset($_SESSION['reserve_update_new']);
+            unset($_SESSION['reserve_update_calendar']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
