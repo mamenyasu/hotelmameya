@@ -619,7 +619,7 @@ class ReservationController
 
             $new_room_id = htmlspecialchars($_SESSION['reserve_update_new']['room_id'] ?? $oldresult['reservation']['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
-            $new_room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_update_new']['room_id']);
+            $new_room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_update_new']['room_id'] ?? $oldresult['reservation']['room_id']);
             $new_room_name = $new_room_information['room_name'];
             $new_comment = htmlspecialchars($_SESSION['reserve_update_new']['comment'] ?? $oldresult['reservation']['comment'], ENT_QUOTES, 'UTF-8');
             $new_checkin_date = htmlspecialchars($_SESSION['reserve_update_new']['checkin_date'] ?? $oldresult['reservation']['checkin_date'], ENT_QUOTES, 'UTF-8');
