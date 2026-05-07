@@ -73,7 +73,7 @@
             </div>
             <div class="reserveForm_form-group">
                 <label>チェックアウト日</label>
-                <p id="checkout_display"><?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?></p>
+                <p id="checkout_display"><?= $checkout_date  ?></p>
             </div>
 
 
