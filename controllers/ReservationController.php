@@ -150,11 +150,6 @@ class ReservationController
 
             //$planはhiddenで仕込む!
 
-            //見積初期表示用、チェックイン日の翌日までの一泊。$estimateをビューに与える。
-            $checkout_date_estimate = date('Y-m-d', strtotime("$checkin_date +1 day"));
-            $person = 1;
-            $estimate = $_SESSION['reserve_form']['total_price'] ?? $this->pricesCalendarService->getEstimate($room_id, $plan, $person, $checkin_date, $checkout_date_estimate);
-
             //部屋タイプにより制限人数。
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxguest_OfRoom($room_id);
 
@@ -180,7 +175,16 @@ class ReservationController
             $user_address = $_SESSION['reserve_form']['user_address'] ?? '';
             $email = $_SESSION['reserve_form']['email'] ?? '';
             $comment = $_SESSION['reserve_form']['comment'] ?? '';
-            $checkout_date = $_SESSION['reserve_form']['checkout_date'] ?? date('Y-m-d', strtotime("$checkin_date +1 day"));
+            $checkout_date = date('Y-m-d', strtotime("{$checkin_date} +{$stay_nights} day"));
+
+            //見積り計算
+            $estimate = $this->pricesCalendarService->getEstimate(
+                $room_id,
+                $plan,
+                $person,
+                $checkin_date,
+                $checkout_date
+            );
 
 
             include __DIR__ . '/../views/reserveForm.php';
