@@ -101,7 +101,7 @@ class ReservationController
             //指定された部屋のプランデータを取得。見出しや内容など。
             $plansData = $this->getPlansDataService->getPlansData();
             //初期表示用の、最初のプラン（0=１泊２食付きプラン）
-            $selectedPlan = $_SESSION['reserve_form_selectedPlan'] ?? $plansData[0]['plan_name'];
+            $selectedPlan = $_SESSION['reserve_form']['selectedPlan'] ?? $plansData[0]['plan_name'];
             // 初期表示用の価格配列
             $prices = $pricesAllPlan[$selectedPlan];
             //指定された部屋の人数制限。
@@ -129,7 +129,7 @@ class ReservationController
     {
         try {
             //ブラウザの戻るボタン対策。
-            $_SESSION['reserve_form_selectedPlan'] = $plan;
+            $_SESSION['reserve_form']['selectedPlan'] = $plan;
 
             //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
             $hasStockOne = $this->reservationService->hasStockOne($room_id, $year, $month, $day);
@@ -201,6 +201,8 @@ class ReservationController
         //バリデーション。通らなかったら差し戻し。
         $error = $this->formrequest->formValidate($request);
         if ($error) {
+            //指定された種類の部屋の、指定月のデータを取得。
+            $estimate = $request['total_price'];
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
             $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
             //room_idを部屋の名前（日本語）に変換する。
@@ -229,6 +231,26 @@ class ReservationController
                 $stay_nights = count($maxStayNights);
             }
             $stay_nights = htmlspecialchars($stay_nights);
+            $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+            $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+            //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
+            $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
+            //月初～月末（例：１～３１）のdays配列。
+            $days = $this->yearMonthToDaysService->getDays($year, $month);
+            //指定された部屋のプランデータを取得。見出しや内容など。
+            $plansData = $this->getPlansDataService->getPlansData();
+            //初期表示用の、最初のプラン（0=１泊２食付きプラン）
+            $selectedPlan = $request['plan'];
+            // 初期表示用の価格配列
+            $prices = $pricesAllPlan[$selectedPlan];
+            //指定された部屋の人数制限。
+            $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
+            //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
+            $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
+            //カレンダー生成用、在庫カレンダー最後尾の日付
+            $maxDate = $this->maxCheckoutService->getMaxCheckout();
+            $maxYear = $maxDate['maxYear'];
+            $maxMonth = $maxDate['maxMonth'];
             include __DIR__ . '/../views/reserveForm.php';
             exit();
         }
@@ -237,6 +259,7 @@ class ReservationController
         try {
             $hasStock = $this->reservationService->hasStock($request);
             if ($hasStock['success'] == false) {
+                $estimate = $request['total_price'];
                 $message = $hasStock['message'];
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
                 $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
@@ -266,6 +289,26 @@ class ReservationController
                     $stay_nights = count($maxStayNights);
                 }
                 $stay_nights = htmlspecialchars($stay_nights);
+                $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+                $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+                //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
+                $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
+                //月初～月末（例：１～３１）のdays配列。
+                $days = $this->yearMonthToDaysService->getDays($year, $month);
+                //指定された部屋のプランデータを取得。見出しや内容など。
+                $plansData = $this->getPlansDataService->getPlansData();
+                //初期表示用の、最初のプラン（0=１泊２食付きプラン）
+                $selectedPlan = $request['plan'];
+                // 初期表示用の価格配列
+                $prices = $pricesAllPlan[$selectedPlan];
+                //指定された部屋の人数制限。
+                $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
+                //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
+                $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
+                //カレンダー生成用、在庫カレンダー最後尾の日付
+                $maxDate = $this->maxCheckoutService->getMaxCheckout();
+                $maxYear = $maxDate['maxYear'];
+                $maxMonth = $maxDate['maxMonth'];
                 include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }
@@ -355,12 +398,60 @@ class ReservationController
             //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。できなかったら差し戻し。
             $result = $this->reservationService->reserve($_SESSION['reserve']);
             // セッションは必ず破棄
-            unset($_SESSION['reserve']);
-            unset($_SESSION['reserve_form']);
 
             if ($result['success'] == false) {
+                unset($_SESSION['reserve']);
                 $message = htmlspecialchars($result['message'], ENT_QUOTES, 'UTF-8');
-                include __DIR__ . '/../views/false.php';
+                $estimate = $_SESSION['reserve_form']['total_price'];
+                $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_form']['room_id']);
+                $room_id = htmlspecialchars($_SESSION['reserve_form']['room_id'], ENT_QUOTES, 'UTF-8');
+                //room_idを部屋の名前（日本語）に変換する。
+                $room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_form']['room_id']);
+                $room_name = $room_information['room_name'];
+                $user_name = htmlspecialchars($_SESSION['reserve_form']['user_name'], ENT_QUOTES, 'UTF-8');
+                $user_telphone = htmlspecialchars($_SESSION['reserve_form']['user_telphone'], ENT_QUOTES, 'UTF-8');
+                $user_address = htmlspecialchars($_SESSION['reserve_form']['user_address'], ENT_QUOTES, 'UTF-8');
+                $email = htmlspecialchars($_SESSION['reserve_form']['email'], ENT_QUOTES, 'UTF-8');
+                $comment = htmlspecialchars($_SESSION['reserve_form']['comment'], ENT_QUOTES, 'UTF-8');
+                $checkin_date = htmlspecialchars($_SESSION['reserve_form']['checkin_date'], ENT_QUOTES, 'UTF-8');
+                $checkout_date = htmlspecialchars($_SESSION['reserve_form']['checkout_date'], ENT_QUOTES, 'UTF-8');
+                $total_price = htmlspecialchars($_SESSION['reserve_form']['total_price'], ENT_QUOTES, 'UTF-8');
+                $plan = htmlspecialchars($_SESSION['reserve_form']['plan'], ENT_QUOTES, 'UTF-8');
+                //プラン名をプランタイトルに変換する。
+                $plan_title = $this->getPlansDataService->getPlanTitle($plan);
+                $person = htmlspecialchars($_SESSION['reserve_form']['person'], ENT_QUOTES, 'UTF-8');
+                //宿泊日数のセレクトボックスの値を生成。
+                $year = date('Y', strtotime($_SESSION['reserve_form']['checkin_date']));
+                $month = date('m', strtotime($_SESSION['reserve_form']['checkin_date']));
+                $day = date('d', strtotime($_SESSION['reserve_form']['checkin_date']));
+                $stay_nights = $_SESSION['reserve_form']['stay_nights'];
+                $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month, $day);
+                //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
+                if ($stay_nights > count($maxStayNights)) {
+                    $stay_nights = count($maxStayNights);
+                }
+                $stay_nights = htmlspecialchars($stay_nights);
+                $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+                $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
+                //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
+                $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
+                //月初～月末（例：１～３１）のdays配列。
+                $days = $this->yearMonthToDaysService->getDays($year, $month);
+                //指定された部屋のプランデータを取得。見出しや内容など。
+                $plansData = $this->getPlansDataService->getPlansData();
+                //初期表示用の、最初のプラン（0=１泊２食付きプラン）
+                $selectedPlan = $_SESSION['reserve_form']['plan'];
+                // 初期表示用の価格配列
+                $prices = $pricesAllPlan[$selectedPlan];
+                //指定された部屋の人数制限。
+                $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
+                //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
+                $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
+                //カレンダー生成用、在庫カレンダー最後尾の日付
+                $maxDate = $this->maxCheckoutService->getMaxCheckout();
+                $maxYear = $maxDate['maxYear'];
+                $maxMonth = $maxDate['maxMonth'];
+                include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }
 
