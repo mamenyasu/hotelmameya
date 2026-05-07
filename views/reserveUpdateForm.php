@@ -51,7 +51,26 @@
         <?php include(__DIR__ . '/headerMenu.php'); ?>
     </header>
     <main>
+
         <div class="upd-wrapper">
+
+
+            <!-- ▼ エラー表示（バリデーション or 在庫エラー） -->
+            <?php if (!empty($error)): ?>
+                <div class="reserveForm_error-box">
+                    <?php foreach ($error as $e): ?>
+                        <p><?= htmlspecialchars($e, ENT_QUOTES, 'UTF-8') ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($message)): ?>
+                <div class="reserveForm_error-box">
+                    <p><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></p>
+                </div>
+            <?php endif; ?>
+            <!-- ▲ エラー表示 -->
+
 
             <!-- =========================
        1. 旧予約情報表示ブロック
@@ -258,7 +277,7 @@
             <section class="upd-section upd-change-section">
                 <h2 class="upd-section-title">変更内容の確認</h2>
 
-                <form action="/hotelmameya/reserve/update_confirm" method="post" class="upd-change-form">
+                <form action="/hotelmameya/reserve/update_reconfirm" method="post" class="upd-change-form">
                     <!-- 予約ID（必須） -->
                     <input type="hidden" name="id" value="<?= $old_id ?>">
 

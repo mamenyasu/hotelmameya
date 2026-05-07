@@ -50,7 +50,7 @@
             </div>
 
             <!-- ボタン -->
-            <form action="/hotelmameya/reserve/update" method="post" class="updConfirm_form">
+            <form action="/hotelmameya/reserve/update_confirm" method="post" class="updConfirm_form">
                 <input type="hidden" name="id" value="<?= $id ?>">
 
                 <button type="submit" class="updConfirm_btn updConfirm_btnPrimary">

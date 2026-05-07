@@ -17,7 +17,7 @@ class UpdateFormRequest{
         if($checkin_date==null || $checkin_date==""){
             $error['checkin_date']='チェックイン日が未定です。';
         }
-        if($checkout_date==null || $checkout_date=""){
+        if($checkout_date==null || $checkout_date==""){
             $error['checkout_date']='チェックアウト日が未定です。';
         }
         if(strtotime($checkin_date) >= strtotime($checkout_date)){

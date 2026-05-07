@@ -689,6 +689,7 @@ class ReservationController
         //バリデーション。通らなかったら差し戻し。
         $error = $this->updateFormRequest->updateFormValidate($request);
         if ($error) {
+            $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
             $plansData = $this->getPlansDataService->getPlansData();
             $selectedPlanName = $_SESSION['reserve_update_new']['plan'];
             $selected_plan_title = $this->getPlansDataService->getPlanTitle($selectedPlanName);
@@ -696,11 +697,14 @@ class ReservationController
             $checkin_date = $_SESSION['reserve_update_new']['checkin_date'];
             $year = date('Y', strtotime($checkin_date));
             $month = date('m', strtotime($checkin_date));
+            $checkin_year = $year;
+            $checkin_month = $month;
+            $days = $this->yearMonthToDaysService->getDays($year, $month);
             $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
             $restocked = $this->restockService->restock($availabilityRoomMonth);
-            $markArrayMonth = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
+            $marks = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
             $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
-            $pricesMonth = $pricesAllPlan[$selectedPlanName];
+            $prices = $pricesAllPlan[$selectedPlanName];
             $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($checkin_date);
 
             $old_checkin_year = (int)date('Y', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
@@ -764,11 +768,14 @@ class ReservationController
                 $checkin_date = $_SESSION['reserve_update_new']['checkin_date'];
                 $year = date('Y', strtotime($checkin_date));
                 $month = date('m', strtotime($checkin_date));
+                $checkin_year = $year;
+                $checkin_month = $month;
+                $days = $this->yearMonthToDaysService->getDays($year, $month);
                 $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
                 $restocked = $this->restockService->restock($availabilityRoomMonth);
-                $markArrayMonth = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
+                $marks = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
                 $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
-                $pricesMonth = $pricesAllPlan[$selectedPlanName];
+                $prices = $pricesAllPlan[$selectedPlanName];
                 $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($checkin_date);
 
                 $message = $result['message'];
@@ -849,7 +856,7 @@ class ReservationController
             //プラン名をプランタイトルに変換する。
             $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
             $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
-            include __DIR__ . '/../views/reserveUpdateConfirm.php';
+            include __DIR__ . '/../views/reserveUpdateReconfirm.php';
             exit();
             //例外処理。    
         } catch (Exception $e) {
@@ -877,6 +884,24 @@ class ReservationController
             if ($result['success'] == false) {
                 $message = $result['message'];
                 $id = $_SESSION['reserve_update_old']['id'];
+
+                $plansData = $this->getPlansDataService->getPlansData();
+                $selectedPlanName = $_SESSION['reserve_update_new']['plan'];
+                $selected_plan_title = $this->getPlansDataService->getPlanTitle($selectedPlanName);
+                $room_id = $_SESSION['reserve_update_new']['room_id'];
+                $checkin_date = $_SESSION['reserve_update_new']['checkin_date'];
+                $year = date('Y', strtotime($checkin_date));
+                $month = date('m', strtotime($checkin_date));
+                $checkin_year = $year;
+                $checkin_month = $month;
+                $days = $this->yearMonthToDaysService->getDays($year, $month);
+                $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+                $restocked = $this->restockService->restock($availabilityRoomMonth);
+                $marks = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
+                $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
+                $prices = $pricesAllPlan[$selectedPlanName];
+                $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($checkin_date);
+
                 $old_room_id = htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
                 //room_idを部屋の名前（日本語）に変換する。
                 $room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_update_old']['room_id']);
@@ -902,7 +927,23 @@ class ReservationController
                 $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
                 $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
-                unset($_SESSION['reserve_update_new']);
+
+                $stay_nights = $request['stay_nights'];
+                $room_id_forNights = $request['room_id'];
+                $checkin_date_forNights = $request['checkin_date'];
+                $maxStayNights = $this->reservationService->makeNumStayNights(
+                    $room_id_forNights,
+                    date('Y', strtotime($checkin_date_forNights)),
+                    date('m', strtotime($checkin_date_forNights)),
+                    date('d', strtotime($checkin_date_forNights))
+                );
+                //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
+                if ($stay_nights > count($maxStayNights)) {
+                    $stay_nights = count($maxStayNights);
+                }
+                $stay_nights = htmlspecialchars($stay_nights);
+                $estimate = $_SESSION['reserve_update_new']['total_price'];
+
                 include __DIR__ . '/../views/reserveUpdateForm.php';
                 exit();
             }
