@@ -1397,3 +1397,105 @@
     text-align: center;
   }
 }
+
+/* ============================
+   予約変更 最終確認ページ CSS
+   ============================ */
+
+.updConfirm_main {
+    padding: 40px 0;
+    background: #faf7f2; /* 和紙風の淡いベージュ */
+}
+
+.updConfirm_container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.updConfirm_title {
+    font-size: 26px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #3b2f2f;
+    font-weight: bold;
+}
+
+/* ブロック */
+.updConfirm_block {
+    margin-bottom: 35px;
+    padding: 20px;
+    background: #f7f3ed;
+    border-radius: 10px;
+}
+
+.updConfirm_blockTitle {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #4a3f35;
+    font-weight: bold;
+}
+
+/* グリッド */
+.updConfirm_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 12px;
+}
+
+.updConfirm_row {
+    display: contents;
+}
+
+.updConfirm_label {
+    font-weight: bold;
+    color: #4a3f35;
+}
+
+.updConfirm_value {
+    text-align: right;
+    color: #3b2f2f;
+}
+
+.updConfirm_total .updConfirm_value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #8b0000;
+}
+
+/* ボタン */
+.updConfirm_form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.updConfirm_btn {
+    display: inline-block;
+    padding: 12px 28px;
+    margin: 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: 0.2s;
+}
+
+.updConfirm_btnPrimary {
+    background: #4a3f35;
+    color: #fff;
+}
+
+.updConfirm_btnPrimary:hover {
+    background: #3b2f2f;
+}
+
+.updConfirm_btnSecondary {
+    background: #e8e0d4;
+    color: #3b2f2f;
+}
+
+.updConfirm_btnSecondary:hover {
+    background: #d8cfc2;
+}

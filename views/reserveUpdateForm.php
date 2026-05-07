@@ -8,7 +8,7 @@
 //
 // ■ 新予約（変更後）表示用（初期は旧予約と同じ or セッション）
 // $new_room_id, $new_room_name, $new_comment,
-// $new_checkin_date, $new_checkout_date, $new_total_price,
+// $new_checkin_date, $new_checkout_date, 
 // $new_plan, $new_plan_title, $new_person, $stay_nights
 //
 // ■ カレンダー用

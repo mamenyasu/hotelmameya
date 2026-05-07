@@ -594,7 +594,7 @@ class ReservationController
                 'selectedPlanName' => $selectedPlanName
             ];
             //すべてのルーム情報一覧。
-            $rooms_information_all=$this->getRoomInformationService->getRoomsinformation_all();
+            $rooms_information_all = $this->getRoomInformationService->getRoomsinformation_all();
             //ルームの名前一覧。
             $rooms_name = $this->getRoomInformationService->getRoomsName();
 
@@ -695,6 +695,8 @@ class ReservationController
             $old_checkin_month = (int)date('n', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id = htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
             $old_room_id = htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
+            //すべてのルーム情報一覧。
+            $rooms_information_all = $this->getRoomInformationService->getRoomsinformation_all();
             //room_idを部屋の名前（日本語）に変換する。
             $room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_update_old']['room_id']);
             $old_room_name = $room_information['room_name'];
@@ -713,7 +715,6 @@ class ReservationController
             $new_comment = htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
             $new_checkin_date = htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
             $new_checkout_date = htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
-            $new_total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
             $new_plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
             //プラン名をプランタイトルに変換する。
             $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
@@ -734,6 +735,7 @@ class ReservationController
                 $stay_nights = count($maxStayNights);
             }
             $stay_nights = htmlspecialchars($stay_nights);
+            $estimate=$_SESSION['reserve_update_new']['total_price']; 
 
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
@@ -750,6 +752,8 @@ class ReservationController
                 $old_checkin_month = (int)date('n', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
                 $old_id = htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
                 $old_room_id = htmlspecialchars($_SESSION['reserve_update_old']['room_id'], ENT_QUOTES, 'UTF-8');
+                //すべてのルーム情報一覧。
+                $rooms_information_all = $this->getRoomInformationService->getRoomsinformation_all();
                 //room_idを部屋の名前（日本語）に変換する。
                 $room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_update_old']['room_id']);
                 $old_room_name = $room_information['room_name'];
@@ -768,7 +772,6 @@ class ReservationController
                 $new_comment = htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
                 $new_checkin_date = htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
                 $new_checkout_date = htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
-                $new_total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
                 $new_plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
                 //プラン名をプランタイトルに変換する。
                 $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
@@ -789,8 +792,7 @@ class ReservationController
                     $stay_nights = count($maxStayNights);
                 }
                 $stay_nights = htmlspecialchars($stay_nights);
-
-
+                $estimate=$_SESSION['reserve_update_new']['total_price']; 
                 include __DIR__ . '/../views/reserveUpdateForm.php';
                 exit();
             }
