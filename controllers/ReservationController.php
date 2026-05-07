@@ -689,8 +689,20 @@ class ReservationController
         //バリデーション。通らなかったら差し戻し。
         $error = $this->updateFormRequest->updateFormValidate($request);
         if ($error) {
-            $marks = $_SESSION['reserve_update_calendar']['marks'];
-            $prices = $_SESSION['reserve_update_calendar']['prices'];
+            $plansData = $this->getPlansDataService->getPlansData();
+            $selectedPlanName = $_SESSION['reserve_update_new']['plan'];
+            $selected_plan_title = $this->getPlansDataService->getPlanTitle($selectedPlanName);
+            $room_id = $_SESSION['reserve_update_new']['room_id'];
+            $checkin_date = $_SESSION['reserve_update_new']['checkin_date'];
+            $year = date('Y', strtotime($checkin_date));
+            $month = date('m', strtotime($checkin_date));
+            $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+            $restocked = $this->restockService->restock($availabilityRoomMonth);
+            $markArrayMonth = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
+            $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
+            $pricesMonth = $pricesAllPlan[$selectedPlanName];
+            $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($checkin_date);
+
             $old_checkin_year = (int)date('Y', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
             $old_checkin_month = (int)date('n', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
             $old_id = htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
@@ -735,7 +747,7 @@ class ReservationController
                 $stay_nights = count($maxStayNights);
             }
             $stay_nights = htmlspecialchars($stay_nights);
-            $estimate=$_SESSION['reserve_update_new']['total_price']; 
+            $estimate = $_SESSION['reserve_update_new']['total_price'];
 
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
@@ -745,9 +757,21 @@ class ReservationController
         try {
             $result = $this->reservationService->hasStock($request);
             if ($result['success'] == false) {
+                $plansData = $this->getPlansDataService->getPlansData();
+                $selectedPlanName = $_SESSION['reserve_update_new']['plan'];
+                $selected_plan_title = $this->getPlansDataService->getPlanTitle($selectedPlanName);
+                $room_id = $_SESSION['reserve_update_new']['room_id'];
+                $checkin_date = $_SESSION['reserve_update_new']['checkin_date'];
+                $year = date('Y', strtotime($checkin_date));
+                $month = date('m', strtotime($checkin_date));
+                $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
+                $restocked = $this->restockService->restock($availabilityRoomMonth);
+                $markArrayMonth = $this->calendarMarkArrayService->getCalendarMarkArray($restocked);
+                $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
+                $pricesMonth = $pricesAllPlan[$selectedPlanName];
+                $start_weekDay = $this->weekDayService->getStartWeekDay_From_checkinDate($checkin_date);
+
                 $message = $result['message'];
-                $marks = $_SESSION['reserve_update_calendar']['marks'];
-                $prices = $_SESSION['reserve_update_calendar']['prices'];
                 $old_checkin_year = (int)date('Y', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の年。
                 $old_checkin_month = (int)date('n', strtotime($_SESSION['reserve_update_old']['checkin_date'])); //AJAXカレンダー初期表示用。旧予約の月。
                 $old_id = htmlspecialchars($_SESSION['reserve_update_old']['id'], ENT_QUOTES, 'UTF-8');
@@ -792,7 +816,7 @@ class ReservationController
                     $stay_nights = count($maxStayNights);
                 }
                 $stay_nights = htmlspecialchars($stay_nights);
-                $estimate=$_SESSION['reserve_update_new']['total_price']; 
+                $estimate = $_SESSION['reserve_update_new']['total_price'];
                 include __DIR__ . '/../views/reserveUpdateForm.php';
                 exit();
             }

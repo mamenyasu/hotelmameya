@@ -277,6 +277,9 @@
                         value="<?= $new_person ?>">
                     <input type="hidden" name="comment" id="upd-comment-hidden"
                         value="<?= $new_comment ?>">
+                    <input type="hidden" name="stay_nights" id="upd-stay-nights-hidden"
+                        value="<?= $stay_nights ?>">
+
 
                     <div class="upd-change-grid">
 
@@ -291,6 +294,19 @@
                             <span class="upd-change-label">プラン</span>
                             <span class="upd-change-value" id="upd-plan-name-display">
                                 <?= htmlspecialchars($new_plan_title, ENT_QUOTES, 'UTF-8') ?>
+                            </span>
+                        </div>
+
+                        <div class="upd-change-row">
+                            <span class="upd-change-label">人数</span>
+                            <span class="upd-change-value">
+                                <select id="upd-person-select" class="upd-select">
+                                    <?php for ($i = 1; $i <= $number_OfRoom; $i++): ?>
+                                        <option value="<?= $i ?>" <?= ($i == $new_person) ? 'selected' : '' ?>>
+                                            <?= $i ?>名
+                                        </option>
+                                    <?php endfor; ?>
+                                </select>
                             </span>
                         </div>
 
@@ -389,6 +405,7 @@
         const hiddenPerson = document.getElementById('upd-person-hidden');
         const hiddenComment = document.getElementById('upd-comment-hidden');
 
+
         const displayRoomName = document.getElementById('upd-room-name-display');
         const displayPlanName = document.getElementById('upd-plan-name-display');
         const displayCheckin = document.getElementById('upd-checkin-display');
@@ -396,6 +413,8 @@
         const displayEstimate = document.getElementById('upd-estimate-display');
 
         const staySelect = document.getElementById('upd-stay-nights-select');
+        const hiddenStay = document.getElementById("upd-stay-nights-hidden");
+        const personSelect = document.getElementById("upd-person-select");
 
         const ymYear = document.getElementById('upd-calendar-year');
         const ymMonth = document.getElementById('upd-calendar-month');
@@ -578,8 +597,30 @@
             displayRoomName.textContent =
                 roomSelect.options[roomSelect.selectedIndex].textContent;
 
-            loadCalendar();
-             updateCheckoutAndEstimate();
+            // 部屋ごとの最大人数
+            const roomId = roomSelect.value;
+            fetch(`/hotelmameya/ajax/maxguest/${roomId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) return;
+
+                    const maxGuest = data.maxGuest;
+
+                    // セレクトを作り直す
+                    personSelect.innerHTML = "";
+                    for (let i = 1; i <= maxGuest; i++) {
+                        const opt = document.createElement("option");
+                        opt.value = i;
+                        opt.textContent = `${i}名`;
+                        personSelect.appendChild(opt);
+                    }
+
+                    // hidden も更新
+                    hiddenPerson.value = personSelect.value;
+
+                    loadCalendar();
+                    updateCheckoutAndEstimate();
+                });
         });
 
 
@@ -588,7 +629,6 @@
         // ===============================
         planSelect.addEventListener('change', () => {
             hiddenPlan.value = planSelect.value;
-
             displayPlanName.textContent =
                 planSelect.options[planSelect.selectedIndex].textContent;
 
@@ -600,6 +640,17 @@
         // 泊数変更 → checkout & 見積再計算
         // ===============================
         staySelect.addEventListener('change', () => {
+            hiddenStay.value = staySelect.value;
+
+            updateCheckoutAndEstimate();
+        });
+
+        // ===============================
+        // 人数変更 → checkout & 見積再計算
+        // ===============================
+        personSelect.addEventListener("change", () => {
+            hiddenPerson.value = personSelect.value;
+
             updateCheckoutAndEstimate();
         });
 
