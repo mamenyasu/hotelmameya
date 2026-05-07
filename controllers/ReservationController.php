@@ -598,12 +598,16 @@ class ReservationController
     ////部屋ごとのカレンダー用のデータもビューに渡す。在庫は、予約済みのものを一時的に戻して計算。
     public function reserve_update_form($request)
     {
+        //戻るボタンで戻った時に、verifyのバリデーションを再度通過する為に必要。
+        $_SESSION['reserve_update_verify']['id'] = $request['id'];
+        $_SESSION['reserve_update_verify']['email'] = $request['email'];
+
 
         //予約IDとメールアドレスをバリデーション。キャンセルバリデーションを再利用。
         $error = $this->cancelFormRequest->cancelFormValidate($request);
         if ($error) {
-            $id = htmlspecialchars($request['id'], ENT_QUOTES, 'UTF-8');
-            $email = htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
+            $id = htmlspecialchars($request['id'] ?? $_SESSION['reserve_update_verify']['id'], ENT_QUOTES, 'UTF-8');
+            $email = htmlspecialchars($request['email'] ?? $_SESSION['reserve_update_verify']['email'], ENT_QUOTES, 'UTF-8');
             include __DIR__ . '/../views/reserveUpdateVerifyForm.php';
             exit();
         }
@@ -650,6 +654,7 @@ class ReservationController
                 unset($_SESSION['reserve_update_old']);
                 unset($_SESSION['reserve_update_new']);
                 unset($_SESSION['reserve_update_calendar']);
+                unset($_SESSION['reserve_update_verify']);
                 $message = $availabilityRoomMonth['message'];
                 include __DIR__ . '/../views/false.php';
                 exit();
@@ -749,6 +754,7 @@ class ReservationController
             unset($_SESSION['reserve_update_old']);
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
+            unset($_SESSION['reserve_update_verify']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -958,6 +964,7 @@ class ReservationController
             unset($_SESSION['reserve_update_old']);
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
+            unset($_SESSION['reserve_update_verify']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -1023,9 +1030,9 @@ class ReservationController
                 $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
 
-                $stay_nights = $request['stay_nights'];
-                $room_id_forNights = $request['room_id'];
-                $checkin_date_forNights = $request['checkin_date'];
+                $stay_nights = $_SESSION['reserve_update_new']['stay_nights'];
+                $room_id_forNights = $_SESSION['reserve_update_new']['room_id'];
+                $checkin_date_forNights = $_SESSION['reserve_update_new']['checkin_date'];
                 $maxStayNights = $this->reservationService->makeNumStayNights(
                     $room_id_forNights,
                     date('Y', strtotime($checkin_date_forNights)),
@@ -1046,6 +1053,7 @@ class ReservationController
             unset($_SESSION['reserve_update_old']);
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
+            unset($_SESSION['reserve_update_verify']);
             $message = $result['message'];
             include __DIR__ . '/../views/success.php';
             exit();
@@ -1054,6 +1062,7 @@ class ReservationController
             unset($_SESSION['reserve_update_old']);
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
+            unset($_SESSION['reserve_update_verify']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();

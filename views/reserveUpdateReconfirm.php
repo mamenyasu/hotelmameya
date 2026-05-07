@@ -9,6 +9,8 @@
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="/hotelmameya/assets/css/style.css">
+        <? header("Cache-Control: no-store, no-cache, must-revalidate");
+        header("Pragma: no-cache"); ?>
 </head>
 
 <body>
@@ -56,10 +58,17 @@
                 <button type="submit" class="updConfirm_btn updConfirm_btnPrimary">
                     この内容で変更する
                 </button>
+            </form>
 
-                <a href="/hotelmameya/reserve/update_form" class="updConfirm_btn updConfirm_btnSecondary">
+            <form action="/hotelmameya/reserve/update_form" method="POST" class="updConfirm_form">
+                <input type="hidden" name="id" value="<?= $_SESSION['reserve_update_verify']['id'] ?>">
+                <input type="hidden" name="email" value="<?= $_SESSION['reserve_update_verify']['email'] ?>">
+
+                <button class="updConfirm_btn updConfirm_btnSecondary">
                     戻る
-                </a>
+                </button>
+            </form>
+
             </form>
 
         </section>
