@@ -540,7 +540,7 @@ class ReservationController
             //プランデータを取得。plan_name(英字)やplan_title(日本語)や内容など。
             $plansData = $this->getPlansDataService->getPlansData();
             //初期表示用の、最初のプラン。戻るボタンで戻ってきらセッション変数を優先し、なければ旧予約情報のもので。
-            $selectedPlanName = $_SESSION['reserve_update_new']['plan_name'] ?? $oldresult['reservation']['plan_name'];
+            $selectedPlanName = $_SESSION['reserve_update_new']['plan'] ?? $oldresult['reservation']['plan'];
             //初期表示用のプラン名をプランタイトルに変換する。
             $selected_plan_title = $this->getPlansDataService->getPlanTitle($selectedPlanName);
 
@@ -592,7 +592,8 @@ class ReservationController
                 'start_weekDay' => $start_weekDay,
                 'selectedPlanName' => $selectedPlanName
             ];
-
+            //すべてのルーム情報一覧。
+            $rooms_information_all=$this->getRoomInformationService->getRoomsinformation_all();
             //ルームの名前一覧。
             $rooms_name = $this->getRoomInformationService->getRoomsName();
 

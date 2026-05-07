@@ -31,4 +31,17 @@
             throw new Exception('データベースエラー：部屋情報を取得できませんでした');
         }
     }
+
+    //すべての部屋の情報を取得するメソッド。配列で返ってくる。
+    public function getRoomsInformation_all(){
+         try{
+        $stmt=$this->pdo->prepare('SELECT * FROM rooms');
+        $stmt->execute();
+        $rooms_information_all=$stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rooms_information_all;
+        }catch(Exception $e){
+            throw new Exception('データベースエラー：部屋情報を取得できませんでした');
+        }
+    }
+
 }

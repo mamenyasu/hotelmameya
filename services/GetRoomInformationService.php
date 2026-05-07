@@ -30,4 +30,13 @@ class GetRoomInformationService{
         }
     }
 
+    //すべての部屋の情報を配列で取得する操作。
+     public function getRoomsInformation_all(){
+        try{
+            $room_information_all=$this->roomModel->getRoomsInformation_all();
+            return $room_information_all;
+        }catch(Exception $e){
+            throw $e;
+        }
+    }
 }
