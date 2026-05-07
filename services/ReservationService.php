@@ -39,10 +39,12 @@ class ReservationService{
 
             //予約テーブルに登録。
             $this->reservationsModel->createReservation($request);
+            //予約IDを取得。
+            $reservationId=$this->pdo->lastInsertId();
             //部屋（在庫）を減らす。=予約数を＋１する。
             $this->roomAvailabilityModel->increaseBookedRooms($request);
             //結果をコントローラーに返す。
-            return ['success'=>true,'message'=>'予約が完了しました。'];
+            return ['success'=>true,'message'=>"予約が完了しました。\n予約IDは".$reservationId.'です。'];
         }catch(Exception $e){
             throw $e;
         }

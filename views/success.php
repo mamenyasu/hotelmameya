@@ -55,7 +55,7 @@ header("Refresh: 3; URL=/hotelmameya/home/index");
 <div class="container">
 
     <div class="message-box">
-        <?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?>
+        <?= nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')) ?>
     </div>
 
     <div class="redirect">
