@@ -478,7 +478,7 @@ class ReservationController
     //SUCESSページに飛ぶ前の緩衝用ページ
     public function reserve_success_buffer(){
         $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve_success?message='.urlencode($message));
+        header('Location:/hotelmameya/reserve/reserve_success?message='.urlencode($message));
     }
     //SUCCESSページ表示
     public function reserve_success(){
@@ -592,7 +592,7 @@ class ReservationController
     //SUCESSページに飛ぶ前の緩衝用ページ
     public function cancel_success_buffer(){
         $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/cancel_success?message='.urlencode($message));
+        header('Location:/hotelmameya/reserve/cancel_success?message='.urlencode($message));
     }
     //SUCCESSページ表示
     public function cancel_success()
@@ -1091,7 +1091,7 @@ class ReservationController
     //SUCESSページに飛ぶ前の緩衝用ページ
     public function update_success_buffer(){
         $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/update_success?message='.urlencode($message));
+        header('Location:/hotelmameya/reserve/update_success?message='.urlencode($message));
     }
     //SUCCESSページ表示
     public function update_success(){
