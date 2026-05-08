@@ -73,7 +73,17 @@
                                 $price = $prices[$day];
                                 $isFull = ($mark === '×');
                                 ?>
-
+                                <?php
+                                // 今日の日付
+                                $today = date('Y-m-d');
+                                // このセルの日付
+                                $cellDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                                // 今日より前なら予約不可にする
+                                if ($cellDate < $today) {
+                                    $mark = '-';
+                                    $isFull = true;
+                                }
+                                ?>
 
                                 <td id="day-<?= $day ?>"
                                     class="day-cell <?= $isFull ? 'full' : '' ?>"
@@ -106,7 +116,7 @@
         </section>
         <seciton>
             <a href="/hotelmameya/home/index" class="btn_back">戻る</a>
-        </section>
+            </section>
     </main>
 
 
@@ -263,6 +273,9 @@
             const year = Number(document.getElementById('currentYear').textContent);
             const month = Number(document.getElementById('currentMonth').textContent);
 
+            // 今日の日付（YYYY-MM-DD）
+            const todayStr = new Date().toISOString().slice(0, 10);
+
             // ① PHP と同じく、最初に <tr> を出す
             let html = '<tr>';
 
@@ -273,9 +286,20 @@
 
             // ③ 日付セル
             days.forEach(day => {
-                const mark = marks[day];
+                let mark = marks[day];
                 const price = prices[day];
-                const isFull = mark === '×';
+                let isFull = mark === '×';
+
+                // このセルの日付
+                const d = String(day).padStart(2, "0");
+                const m = String(month).padStart(2, "0");
+                const dateStr = `${year}-${m}-${d}`;
+
+                // ▼ 過去日は予約不可にする
+                if (dateStr < todayStr) {
+                    mark = "-";
+                    isFull = true; // リンクなしにする
+                }
 
                 const link = `/hotelmameya/reserve/reserve_form/${roomId}/${year}/${month}/${day}/${plan}`;
                 if (isFull) {

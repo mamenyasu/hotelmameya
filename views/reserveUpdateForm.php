@@ -186,6 +186,9 @@
                     <div class="upd-calendar-ym">
                         <span id="upd-calendar-year"><?= (int)$checkin_year ?></span>年
                         <span id="upd-calendar-month"><?= (int)$checkin_month ?></span>月
+                        <span style="display:none;" id="upd-max-year"><?= $maxYear ?></span>
+                        <span style="display:none;" id="upd-max-month"><?= $maxMonth ?></span>
+
                     </div>
                     <button type="button" class="upd-month-btn" id="upd-next-month">&gt;</button>
                 </div>
@@ -228,6 +231,18 @@
                                 $mark   = $marks[$day]   ?? '';
                                 $price  = $prices[$day]  ?? null;
                                 $isFull = ($mark === '×');
+
+                                // ▼ 今日の日付
+                                $today = date('Y-m-d');
+
+                                // ▼ このセルの日付
+                                $cellDate = sprintf('%04d-%02d-%02d', $checkin_year, $checkin_month, $day);
+
+                                // ▼ 今日より前は予約不可（予約変更でも同じ）
+                                if ($cellDate < $today) {
+                                    $mark = '-';
+                                    $isFull = true; // clickable → full にする
+                                }
 
                                 $clickableClass = $isFull ? 'full' : 'clickable';
 
@@ -490,15 +505,25 @@
 
                 const day = Number(daysArray[i]); // "1" → 1
 
-                const mark = marks[day] ?? "";
+                let mark = marks[day] ?? "";
                 const price = prices[day] ?? "";
-                const isFull = (mark === "×");
+                let isFull = (mark === "×");
 
                 const y = ymYear.textContent;
                 const m = ymMonth.textContent.padStart(2, "0");
                 const d = String(day).padStart(2, "0");
 
                 const dateStr = `${y}-${m}-${d}`;
+
+                // ▼ 今日の日付
+                const today = new Date();
+                const todayStr = today.toISOString().slice(0, 10);
+
+                // ▼ 過去日判定（JS版）
+                if (dateStr < todayStr) {
+                    mark = "-";
+                    isFull = true;
+                }
 
                 const clickableClass = isFull ? "full" : "clickable";
                 const selectedClass = (dateStr === selectedDate) ? "selected" : "";
@@ -675,38 +700,88 @@
 
 
         // ===============================
-        // 月送り・月戻し
+        // ボタン制御
+        // ===============================
+        function updUpdateNavButtons() {
+            const year = Number(ymYear.textContent);
+            const month = Number(ymMonth.textContent);
+
+            const today = new Date();
+            const minYear = today.getFullYear();
+            const minMonth = today.getMonth() + 1;
+
+            const maxYear = Number(document.getElementById('upd-max-year').textContent);
+            const maxMonth = Number(document.getElementById('upd-max-month').textContent);
+
+            // ← 今日より前には戻れない
+            prevBtn.disabled = (year === minYear && month === minMonth);
+
+            // → 最大月を超えられない
+            nextBtn.disabled = (year === maxYear && month === maxMonth);
+        }
+
+        // ===============================
+        // 月戻し
         // ===============================
         prevBtn.addEventListener('click', () => {
             let y = Number(ymYear.textContent);
             let m = Number(ymMonth.textContent);
 
+            const today = new Date();
+            const minYear = today.getFullYear();
+            const minMonth = today.getMonth() + 1;
+
+            // 下限チェック
+            if (y === minYear && m === minMonth) return;
+
             m--;
-            if (m === 0) {
-                y--;
+            if (m < 1) {
                 m = 12;
+                y--;
+            }
+
+            // 下限を超えた場合の保険
+            if (y < minYear || (y === minYear && m < minMonth)) {
+                y = minYear;
+                m = minMonth;
             }
 
             ymYear.textContent = y;
             ymMonth.textContent = m;
 
             loadCalendar();
+            updUpdateNavButtons();
         });
-
+        // ===============================
+        // 月送り
+        // ===============================
         nextBtn.addEventListener('click', () => {
             let y = Number(ymYear.textContent);
             let m = Number(ymMonth.textContent);
 
+            const maxYear = Number(document.getElementById('upd-max-year').textContent);
+            const maxMonth = Number(document.getElementById('upd-max-month').textContent);
+
+            // 上限チェック
+            if (y === maxYear && m === maxMonth) return;
+
             m++;
-            if (m === 13) {
-                y++;
+            if (m > 12) {
                 m = 1;
+                y++;
+            }
+
+            // 上限を超えた場合の保険
+            if (y > maxYear || (y === maxYear && m > maxMonth)) {
+                y = maxYear;
+                m = maxMonth;
             }
 
             ymYear.textContent = y;
             ymMonth.textContent = m;
 
             loadCalendar();
+            updUpdateNavButtons();
         });
 
 

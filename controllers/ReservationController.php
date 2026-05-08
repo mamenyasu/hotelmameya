@@ -211,8 +211,8 @@ class ReservationController
             $_POST['reserve_token'] !== $_SESSION['reserve_token']
         ) {
             unset($_SESSION['reserve_token']);
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit;
         }
 
@@ -387,7 +387,7 @@ class ReservationController
             //プラン名をプランタイトルに変換する。
             $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
-            $token=$_SESSION['reserve_token'];
+            $token = $_SESSION['reserve_token'];
             include __DIR__ . '/../views/reserveReconfirm.php';
             exit();
 
@@ -409,8 +409,8 @@ class ReservationController
     {
         if (!isset($_SESSION['reserve'])) {
             unset($_SESSION['reserve_form']);
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit();
         }
 
@@ -421,8 +421,8 @@ class ReservationController
             $_POST['reserve_token'] !== $_SESSION['reserve_token']
         ) {
             unset($_SESSION['reserve_token']);
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit;
         }
         unset($_SESSION['reserve_token']);
@@ -594,8 +594,8 @@ class ReservationController
     public function reserve_cancel_confirm()
     {
         if (!isset($_SESSION['reserve_cancel'])) {
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit();
         }
 
@@ -798,8 +798,8 @@ class ReservationController
     public function reserve_update_reconfirm($request)
     {
         if (!isset($_SESSION['reserve_update_old'])) {
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit();
         }
 
@@ -870,7 +870,10 @@ class ReservationController
             $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
             $new_person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
             $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
-
+            //カレンダー生成用、在庫カレンダー最後尾の日付
+            $maxDate = $this->maxCheckoutService->getMaxCheckout();
+            $maxYear = $maxDate['maxYear'];
+            $maxMonth = $maxDate['maxMonth'];
             $stay_nights = $request['stay_nights'];
             $room_id_forNights = $request['room_id'];
             $checkin_date_forNights = $request['checkin_date'];
@@ -942,7 +945,10 @@ class ReservationController
                 $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
                 $new_person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
-
+                //カレンダー生成用、在庫カレンダー最後尾の日付
+                $maxDate = $this->maxCheckoutService->getMaxCheckout();
+                $maxYear = $maxDate['maxYear'];
+                $maxMonth = $maxDate['maxMonth'];
                 $stay_nights = $request['stay_nights'];
                 $room_id_forNights = $request['room_id'];
                 $checkin_date_forNights = $request['checkin_date'];
@@ -1012,8 +1018,8 @@ class ReservationController
     public function reserve_update_confirm()
     {
         if (!isset($_SESSION['reserve_update_old']) || !isset($_SESSION['reserve_update_new'])) {
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit();
         }
         //二重送信防止トークンチェック
@@ -1023,8 +1029,8 @@ class ReservationController
             $_POST['reserve_token'] !== $_SESSION['reserve_token']
         ) {
             unset($_SESSION['reserve_token']);
-            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
-            include __DIR__.'/../views/false.php';
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
             exit;
         }
         unset($_SESSION['reserve_token']);
@@ -1079,7 +1085,10 @@ class ReservationController
                 $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
                 $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
                 $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_update_new']['room_id']);
-
+                //カレンダー生成用、在庫カレンダー最後尾の日付
+                $maxDate = $this->maxCheckoutService->getMaxCheckout();
+                $maxYear = $maxDate['maxYear'];
+                $maxMonth = $maxDate['maxMonth'];
                 $stay_nights = $_SESSION['reserve_update_new']['stay_nights'];
                 $room_id_forNights = $_SESSION['reserve_update_new']['room_id'];
                 $checkin_date_forNights = $_SESSION['reserve_update_new']['checkin_date'];
@@ -1120,6 +1129,4 @@ class ReservationController
             exit();
         }
     }
-
-    
 }
