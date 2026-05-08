@@ -492,7 +492,7 @@ class ReservationController
             unset($_SESSION['reserve']);
             unset($_SESSION['reserve_form']);
             unset($_SESSION['reserve_token']);
-            header('Location:/hotelmameya/reserve/reserve_success_buffer?message=' . urlencode($message));
+            include __DIR__ . '/../views/success.php';
             exit();
 
             //例外処理。
@@ -504,19 +504,6 @@ class ReservationController
             include __DIR__ . '/../views/false.php';
             exit();
         }
-    }
-
-    //SUCESSページに飛ぶ前の緩衝用ページ
-    public function reserve_success_buffer()
-    {
-        $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve/reserve_success?message=' . urlencode($message));
-    }
-    //SUCCESSページ表示
-    public function reserve_success()
-    {
-        $message = isset($_GET['message']) ? htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8') : "";
-        include __DIR__ . '/../views/success.php';
     }
 
 
@@ -617,7 +604,7 @@ class ReservationController
             $result = $this->reservationService->cancel($_SESSION['reserve_cancel']);
             $message = $result['message'];
             unset($_SESSION['reserve_cancel']);
-            header('Location:/hotelmameya/reserve/cancel_success_buffer?message=' . urlencode($message));
+            include __DIR__ . '/../views/success.php';
             exit();
         } catch (Exception $e) {
             $message = $e->getMessage();
@@ -625,19 +612,6 @@ class ReservationController
             include __DIR__ . '/../views/false.php';
             exit();
         }
-    }
-
-    //SUCESSページに飛ぶ前の緩衝用ページ
-    public function cancel_success_buffer()
-    {
-        $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve/cancel_success?message=' . urlencode($message));
-    }
-    //SUCCESSページ表示
-    public function cancel_success()
-    {
-        $message = isset($_GET['message']) ? htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8') : "";
-        include __DIR__ . '/../views/success.php';
     }
 
 
@@ -1132,7 +1106,7 @@ class ReservationController
             unset($_SESSION['reserve_update_verify']);
             unset($_SESSION['reserve_token']);
             $message = $result['message'];
-            header('Location:/hotelmameya/reserve/update_success_buffer?message=' . urlencode($message));
+            include __DIR__ . '/../views/success.php';
             exit();
             //例外処理。        
         } catch (Exception $e) {
@@ -1147,16 +1121,5 @@ class ReservationController
         }
     }
 
-    //SUCESSページに飛ぶ前の緩衝用ページ
-    public function update_success_buffer()
-    {
-        $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve/update_success?message=' . urlencode($message));
-    }
-    //SUCCESSページ表示
-    public function update_success()
-    {
-        $message = isset($_GET['message']) ? htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8') : "";
-        include __DIR__ . '/../views/success.php';
-    }
+    
 }

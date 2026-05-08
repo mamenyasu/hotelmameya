@@ -77,7 +77,7 @@ class ContactController
             $result = $this->contactService->confirm($_SESSION['contact']);
             unset($_SESSION['contact']);
             $message = $result['message'];
-            header('Location:/hotelmameya/contact/contact_success_buffer?message=' . urlencode($message));
+            include __DIR__ . '/../views/success.php';
             exit();
             //例外処理。
         } catch (Exception $e) {
@@ -87,16 +87,5 @@ class ContactController
         }
     }
 
-    //SUCESSページに飛ぶ前の緩衝用ページ
-    public function contact_success_buffer()
-    {
-        $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/contact/contact_success?message=' . urlencode($message));
-    }
-    //SUCCESSページ表示
-    public function contact_success()
-    {
-        $message = isset($_GET['message']) ? htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8') : "";
-        include __DIR__ . '/../views/success.php';
-    }
+    
 }
