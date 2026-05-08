@@ -2,7 +2,7 @@
 
 require_once __DIR__.'/../models/PricesCalendarModel.php';
 require_once __DIR__.'/../models/PlanModel.php';
-require_once __DIR__.'/../services/RoomMOnthPriceService.php';
+require_once __DIR__.'/../services/RoomMonthPriceService.php';
 
 class PricesCalendarService{
 //--プロパティ--

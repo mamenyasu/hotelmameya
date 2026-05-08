@@ -9,4 +9,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 # すべて index.php に転送
-RewriteRule ^ index.php [QSA,L]
+RewriteRule ^(.*)$ index.php [L]
