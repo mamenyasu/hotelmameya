@@ -46,13 +46,20 @@ switch($controller){
             case 'reserve_form' : $ctrl->reserve_form($room_id,$year,$month,$day,$plan); break;
             case 'reserve_reconfirm' : $ctrl->reserve_reconfirm($_POST); break;
             case 'reserve_confirm' : $ctrl->reserve_confirm(); break;
+            case 'reserve_success_buffer': $ctrl->reserve_success_buffer(); break;
+            case 'reserve_success' : $ctrl->reserve_success(); break;
             case 'cancel_form' : $ctrl->reserve_cancel_form(); break;
             case 'cancel_reconfirm' : $ctrl->reserve_cancel_reconfirm($_POST); break;
             case 'cancel_confirm' : $ctrl->reserve_cancel_confirm(); break;
+            case 'cancel_success_buffer': $ctrl->cancel_success_buffer(); break;
+            case 'cancel_success' : $ctrl->cancel_success(); break;
             case 'update_verify_form' : $ctrl->reserve_updateVerify_form(); break;
             case 'update_form' : $ctrl->reserve_update_form($_POST); break;
             case 'update_reconfirm' : $ctrl->reserve_update_reconfirm($_POST); break;
             case 'update_confirm' : $ctrl->reserve_update_confirm(); break;
+            case 'update_success_buffer': $ctrl->update_success_buffer(); break;
+            case 'update_success' : $ctrl->update_success(); break;
+            
             default : echo "404 Not Found"; break;
         }
     break;
