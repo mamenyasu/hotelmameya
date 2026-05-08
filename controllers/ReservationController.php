@@ -185,7 +185,9 @@ class ReservationController
                 $checkin_date,
                 $checkout_date
             );
-
+            //二重送信防止トークン
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
 
             include __DIR__ . '/../views/reserveForm.php';
             exit();
@@ -202,6 +204,18 @@ class ReservationController
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request)
     {
+        //二重送信防止トークンチェック
+        if (
+            empty($_POST['reserve_token']) ||
+            empty($_SESSION['reserve_token']) ||
+            $_POST['reserve_token'] !== $_SESSION['reserve_token']
+        ) {
+            unset($_SESSION['reserve_token']);
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
+            exit;
+        }
+
         //バリデーション。通らなかったら差し戻し。
         $error = $this->formrequest->formValidate($request);
         if ($error) {
@@ -373,6 +387,7 @@ class ReservationController
             //プラン名をプランタイトルに変換する。
             $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
+            $token=$_SESSION['reserve_token'];
             include __DIR__ . '/../views/reserveReconfirm.php';
             exit();
 
@@ -394,14 +409,28 @@ class ReservationController
     {
         if (!isset($_SESSION['reserve'])) {
             unset($_SESSION['reserve_form']);
-            echo "不正なリクエストです。";
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
             exit();
         }
+
+        //二重送信防止トークンチェック
+        if (
+            empty($_POST['reserve_token']) ||
+            empty($_SESSION['reserve_token']) ||
+            $_POST['reserve_token'] !== $_SESSION['reserve_token']
+        ) {
+            unset($_SESSION['reserve_token']);
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
+            exit;
+        }
+        unset($_SESSION['reserve_token']);
+
 
         try {
             //最終的に、セッション変数を使って予約テーブルと在庫テーブルの２つに保存。できなかったら差し戻し。
             $result = $this->reservationService->reserve($_SESSION['reserve']);
-            // セッションは必ず破棄
 
             if ($result['success'] == false) {
                 unset($_SESSION['reserve']);
@@ -462,6 +491,7 @@ class ReservationController
             $message = htmlspecialchars($result['message']);
             unset($_SESSION['reserve']);
             unset($_SESSION['reserve_form']);
+            unset($_SESSION['reserve_token']);
             header('Location:/hotelmameya/reserve/reserve_success_buffer?message=' . urlencode($message));
             exit();
 
@@ -469,6 +499,7 @@ class ReservationController
         } catch (Exception $e) {
             unset($_SESSION['reserve']);
             unset($_SESSION['reserve_form']);
+            unset($_SESSION['reserve_token']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -476,12 +507,14 @@ class ReservationController
     }
 
     //SUCESSページに飛ぶ前の緩衝用ページ
-    public function reserve_success_buffer(){
+    public function reserve_success_buffer()
+    {
         $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve/reserve_success?message='.urlencode($message));
+        header('Location:/hotelmameya/reserve/reserve_success?message=' . urlencode($message));
     }
     //SUCCESSページ表示
-    public function reserve_success(){
+    public function reserve_success()
+    {
         $message = isset($_GET['message']) ? htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8') : "";
         include __DIR__ . '/../views/success.php';
     }
@@ -491,14 +524,16 @@ class ReservationController
     //--予約キャンセル-------------------------------------
 
     ////キャンセルフォーム表示。予約IDとメールアドレスを入力してもらう予定。
-    public function reserve_cancel_form(){
+    public function reserve_cancel_form()
+    {
         include __DIR__ . '/../views/reserveCancelForm.php';
         exit();
     }
 
 
     ////キャンセルリクエスト照会メソッド。成功だとキャンセル最終確認ビューへ。
-    public function reserve_cancel_reconfirm($request){
+    public function reserve_cancel_reconfirm($request)
+    {
         //予約IDとメールアドレスをバリデーション。通らなかったら差し戻し。
         $error = $this->cancelFormRequest->cancelFormValidate($request);
         if ($error) {
@@ -569,11 +604,14 @@ class ReservationController
 
 
     ////キャンセル確定メソッド。セッション変数[reserve_cancel]を使ってキャンセルする。
-    public function reserve_cancel_confirm(){
+    public function reserve_cancel_confirm()
+    {
         if (!isset($_SESSION['reserve_cancel'])) {
-            echo "不正なリクエストです。";
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
             exit();
         }
+
 
         try {
             $result = $this->reservationService->cancel($_SESSION['reserve_cancel']);
@@ -590,9 +628,10 @@ class ReservationController
     }
 
     //SUCESSページに飛ぶ前の緩衝用ページ
-    public function cancel_success_buffer(){
+    public function cancel_success_buffer()
+    {
         $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve/cancel_success?message='.urlencode($message));
+        header('Location:/hotelmameya/reserve/cancel_success?message=' . urlencode($message));
     }
     //SUCCESSページ表示
     public function cancel_success()
@@ -785,7 +824,8 @@ class ReservationController
     public function reserve_update_reconfirm($request)
     {
         if (!isset($_SESSION['reserve_update_old'])) {
-            echo '不正なリクエストです。';
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
             exit();
         }
 
@@ -976,6 +1016,9 @@ class ReservationController
             //プラン名をプランタイトルに変換する。
             $new_plan_title = $this->getPlansDataService->getPlanTitle($new_plan);
             $new_person = htmlspecialchars($_SESSION['reserve_update_new']['person'], ENT_QUOTES, 'UTF-8');
+            //二重送信防止トークン
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
             include __DIR__ . '/../views/reserveUpdateReconfirm.php';
             exit();
             //例外処理。    
@@ -995,9 +1038,23 @@ class ReservationController
     public function reserve_update_confirm()
     {
         if (!isset($_SESSION['reserve_update_old']) || !isset($_SESSION['reserve_update_new'])) {
-            echo "不正なリクエストです。";
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
             exit();
         }
+        //二重送信防止トークンチェック
+        if (
+            empty($_POST['reserve_token']) ||
+            empty($_SESSION['reserve_token']) ||
+            $_POST['reserve_token'] !== $_SESSION['reserve_token']
+        ) {
+            unset($_SESSION['reserve_token']);
+            $message="不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__.'/../views/false.php';
+            exit;
+        }
+        unset($_SESSION['reserve_token']);
+
 
         try {
             $result = $this->reservationService->update($_SESSION['reserve_update_new']);
@@ -1073,6 +1130,7 @@ class ReservationController
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
             unset($_SESSION['reserve_update_verify']);
+            unset($_SESSION['reserve_token']);
             $message = $result['message'];
             header('Location:/hotelmameya/reserve/update_success_buffer?message=' . urlencode($message));
             exit();
@@ -1082,6 +1140,7 @@ class ReservationController
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
             unset($_SESSION['reserve_update_verify']);
+            unset($_SESSION['reserve_token']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -1089,15 +1148,15 @@ class ReservationController
     }
 
     //SUCESSページに飛ぶ前の緩衝用ページ
-    public function update_success_buffer(){
+    public function update_success_buffer()
+    {
         $message = isset($_GET['message']) ? $_GET['message'] : '';
-        header('Location:/hotelmameya/reserve/update_success?message='.urlencode($message));
+        header('Location:/hotelmameya/reserve/update_success?message=' . urlencode($message));
     }
     //SUCCESSページ表示
-    public function update_success(){
+    public function update_success()
+    {
         $message = isset($_GET['message']) ? htmlspecialchars($_GET['message'], ENT_QUOTES, 'UTF-8') : "";
         include __DIR__ . '/../views/success.php';
     }
-
-
 }

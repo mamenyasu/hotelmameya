@@ -45,6 +45,8 @@
             <input type="hidden" name="plan" id="plan" value="<?= $plan ?>">
             <input type="hidden" name="checkin_date" id="checkin_date" value="<?= $checkin_date ?>">
             <input type="hidden" name="checkout_date" id="checkout_date" value="<?= $checkout_date ?? date('Y-m-d', strtotime("$checkin_date +1 day")) ?>">
+            <!--二重送信防止トークン-->
+            <input type="hidden" name="reserve_token" value="<?= htmlspecialchars($token) ?>">
 
             <div class="rserveForm_form-group">
                 <label>部屋</label>

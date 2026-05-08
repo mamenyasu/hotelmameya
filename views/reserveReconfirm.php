@@ -13,6 +13,7 @@
         <? header("Cache-Control: no-store, no-cache, must-revalidate");
         header("Pragma: no-cache"); ?>
 </head>
+
 <body>
 
     <header>
@@ -89,7 +90,9 @@
 
         <!-- ▼ 完了ページへ送る hidden -->
         <form action="/hotelmameya/reserve/reserve_confirm" method="POST">
-
+            <!-- 二重送信防止トークン -->
+            <input type="hidden" name="reserve_token" value="<?= htmlspecialchars($token) ?>">
+            
             <input type="hidden" name="room_id" value="<?= $room_id ?>">
             <input type="hidden" name="plan" value="<?= $plan ?>">
             <input type="hidden" name="checkin_date" value="<?= $checkin_date ?>">

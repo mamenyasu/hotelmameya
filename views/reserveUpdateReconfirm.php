@@ -54,6 +54,8 @@
             <!-- ボタン -->
             <form action="/hotelmameya/reserve/update_confirm" method="post" class="updConfirm_form">
                 <input type="hidden" name="id" value="<?= $id ?>">
+                <!--二重送信防止トークン-->
+                <input type="hidden" name="reserve_token" value="<?= htmlspecialchars($token) ?>">
 
                 <button type="submit" class="updConfirm_btn updConfirm_btnPrimary">
                     この内容で変更する

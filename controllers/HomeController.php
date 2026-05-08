@@ -11,6 +11,7 @@ private function clearReservationSessions(){
         unset($_SESSION['reserve_form_selectedPlan']);
         unset($_SESSION['reserve_form']);
         unset($_SESSION['reserve_update_verify']);
+        unset($_SESSION['reserve_token']);
         }
 
 
