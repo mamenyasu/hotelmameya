@@ -677,6 +677,7 @@
                 planSelect.options[planSelect.selectedIndex].textContent;
 
             loadCalendar();
+            updateCheckoutAndEstimate();
         });
 
 
