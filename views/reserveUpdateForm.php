@@ -313,6 +313,8 @@
                         value="<?= $new_comment ?>">
                     <input type="hidden" name="stay_nights" id="upd-stay-nights-hidden"
                         value="<?= $stay_nights ?>">
+                    <!--セッションハイジャック対策-->
+                    <input type="hidden" name="reserve_token" value="<?= $token ?>">
 
 
                     <div class="upd-change-grid">

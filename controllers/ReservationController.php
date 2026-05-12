@@ -194,6 +194,8 @@ class ReservationController
 
             //例外処理。
         } catch (Exception $e) {
+            unset($_SESSION['reserve_token']);
+            unset($_SESSION['reserv_form']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -215,6 +217,7 @@ class ReservationController
             include __DIR__ . '/../views/false.php';
             exit;
         }
+        unset($_SESSION['reserve_token']);
 
         //バリデーション。通らなかったら差し戻し。
         $error = $this->formrequest->formValidate($request);
@@ -269,6 +272,9 @@ class ReservationController
             $maxDate = $this->maxCheckoutService->getMaxCheckout();
             $maxYear = $maxDate['maxYear'];
             $maxMonth = $maxDate['maxMonth'];
+            //二重送信防止トークン
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
             include __DIR__ . '/../views/reserveForm.php';
             exit();
         }
@@ -327,6 +333,9 @@ class ReservationController
                 $maxDate = $this->maxCheckoutService->getMaxCheckout();
                 $maxYear = $maxDate['maxYear'];
                 $maxMonth = $maxDate['maxMonth'];
+                //二重送信防止トークン
+                $token = bin2hex(random_bytes(32));
+                $_SESSION['reserve_token'] = $token;
                 include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }
@@ -384,6 +393,8 @@ class ReservationController
             $year = date('Y', strtotime($checkin_date));
             $month = date('m', strtotime($checkin_date));
             $day = date('d', strtotime($checkin_date));
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
             //プラン名をプランタイトルに変換する。
             $plan_title = $this->getPlansDataService->getPlanTitle($plan);
             $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
@@ -393,9 +404,9 @@ class ReservationController
 
             //例外処理
         } catch (Exception $e) {
-            if (isset($_SESSION['reserve'])) {
-                unset($_SESSION['reserve']);
-            }
+            unset($_SESSION['reserve']);
+            unset($_SESSION['reserve_form']);
+            unset($_SESSION['reserve_token']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -779,6 +790,9 @@ class ReservationController
             }
             $stay_nights = htmlspecialchars($stay_nights);
 
+            //セッションハイジャック防止トークン
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
 
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
@@ -787,6 +801,7 @@ class ReservationController
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
             unset($_SESSION['reserve_update_verify']);
+            unset($_SESSION['reserve_token']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -802,6 +817,19 @@ class ReservationController
             include __DIR__ . '/../views/false.php';
             exit();
         }
+        //トークンチェック
+        if (
+            empty($_POST['reserve_token']) ||
+            empty($_SESSION['reserve_token']) ||
+            $_POST['reserve_token'] !== $_SESSION['reserve_token']
+        ) {
+            unset($_SESSION['reserve_token']);
+            $message = "不正なリクエストです。3秒後にTOPページに戻ります。";
+            include __DIR__ . '/../views/false.php';
+            exit;
+        }
+        unset($_SESSION['reserve_token']);
+
 
         //バックエンドで料金を再計算。
         $final_price = $this->pricesCalendarService->getFinalPrice($request);
@@ -889,6 +917,9 @@ class ReservationController
             }
             $stay_nights = htmlspecialchars($stay_nights);
             $estimate = $_SESSION['reserve_update_new']['total_price'];
+            //セッションハイジャック防止トークン
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
 
             include __DIR__ . '/../views/reserveUpdateForm.php';
             exit();
@@ -964,6 +995,10 @@ class ReservationController
                 }
                 $stay_nights = htmlspecialchars($stay_nights);
                 $estimate = $_SESSION['reserve_update_new']['total_price'];
+                //セッションハイジャック防止トークン
+                $token = bin2hex(random_bytes(32));
+                $_SESSION['reserve_token'] = $token;
+
                 include __DIR__ . '/../views/reserveUpdateForm.php';
                 exit();
             }
@@ -1007,6 +1042,7 @@ class ReservationController
             unset($_SESSION['reserve_update_new']);
             unset($_SESSION['reserve_update_calendar']);
             unset($_SESSION['reserve_update_verify']);
+            unset($_SESSION['reserve_token']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -1104,6 +1140,9 @@ class ReservationController
                 }
                 $stay_nights = htmlspecialchars($stay_nights);
                 $estimate = $_SESSION['reserve_update_new']['total_price'];
+                //セッションハイジャック防止トークン
+                $token = bin2hex(random_bytes(32));
+                $_SESSION['reserve_token'] = $token;
 
                 include __DIR__ . '/../views/reserveUpdateForm.php';
                 exit();
