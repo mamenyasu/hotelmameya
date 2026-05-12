@@ -10,3 +10,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # すべて index.php に転送
 RewriteRule ^(.*)$ index.php [L]
+
+#セッションハイジャック対策
+php_value session.cookie_httponly 1
+php_value session.cookie_samesite Lax
