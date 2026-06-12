@@ -47,7 +47,7 @@ class ReserveFormDto{
 
                 'room_name' => $this->room_name,
                 'plan_title'=> $this->plan_title,
-                '$checkin_date' => $this->checkin_date,
+                'checkin_date' => $this->checkin_date,
                 'number_OfRoom' => $this->number_OfRoom,
                 'maxStayNights' => $this->maxStayNights,
                 'maxDate' => $this->maxDate,

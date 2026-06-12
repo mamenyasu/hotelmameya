@@ -17,6 +17,8 @@ require_once __DIR__ . '/../services/MaxCheckoutService.php';
 
 require_once __DIR__ . '/../dto/ReservationCalendarDto.php';
 require_once __DIR__ . '/../services/ReservationCalendar_buildDtoService.php';
+require_once __DIR__ . '/../dto/ReserveFormDto.php';
+require_once __DIR__ . '/../services/ReserveForm_buildDtoService.php';
 
 
 class ReservationController
@@ -70,7 +72,7 @@ class ReservationController
 
     //--新規予約------------------------------------------
 
-    ////予約カレンダービュー表示メソッド。 DTO＋DTOビルドサービスで責務分離。
+    ////予約カレンダービュー表示メソッド。
     //初期表示ではroom=1(シングル)、当日。
     public function reservationCalendar($room_id = null, $year = null, $month = null)
     {
@@ -84,15 +86,16 @@ class ReservationController
 
     }
 
-    //ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
+
 
     ////予約フォームビュー表示。
-    public function reserve_form($room_id, $year, $month, $day, $plan)
-    {
-        try {
+    public function reserve_form($room_id, $year, $month, $day, $plan){
             //ブラウザの戻るボタン対策。
             $_SESSION['reserve_form']['selectedPlan'] = $plan;
-
+            //二重送信防止トークン
+            $token = bin2hex(random_bytes(32));
+            $_SESSION['reserve_token'] = $token;
+        try{
             //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
             $hasStockOne = $this->reservationService->hasStockOne($room_id, $year, $month, $day);
             if ($hasStockOne['success'] == false) {
@@ -102,62 +105,16 @@ class ReservationController
             }
 
 
-            //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($room_id);
-            $room_name = $room_information['room_name'];
-            //プラン名をプランタイトルに変換する。
-            $plan_title = $this->getPlansDataService->getPlanTitle($plan);
-            //予約フォームを表示。カレンダーで選択した月日がチェックイン日となる。
-            $checkin_date = htmlspecialchars(sprintf('%04d-%02d-%02d', $year, $month, $day));
-
-            //$planはhiddenで仕込む!
-
-            //部屋タイプにより制限人数。
-            $number_OfRoom = $this->maxGuest_OfRoomService->getMaxguest_OfRoom($room_id);
-
-            //宿泊日数のセレクトボックスの値を生成。
-            $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month, $day);
-
-
-            //在庫カレンダー最後尾の日付
-            $maxDate = $this->maxCheckoutService->getMaxCheckout();
-            $maxYear = $maxDate['maxYear'];
-            $maxMonth = $maxDate['maxMonth'];
-
-            //戻るボタンで戻った時のセッション変数優先での、ビューへ与える変数。
-            $stay_nights = intval($_SESSION['reserve_form']['stay_nights'] ?? 1);
-            //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
-            if ($stay_nights > count($maxStayNights)) {
-                $stay_nights = count($maxStayNights);
-            }
-            $stay_nights = htmlspecialchars($stay_nights);
-            $person = intval($_SESSION['reserve_form']['person'] ?? 1); //見積用と兼用
-            $user_name = $_SESSION['reserve_form']['user_name'] ?? '';
-            $user_telphone = $_SESSION['reserve_form']['user_telphone'] ?? '';
-            $user_address = $_SESSION['reserve_form']['user_address'] ?? '';
-            $email = $_SESSION['reserve_form']['email'] ?? '';
-            $comment = $_SESSION['reserve_form']['comment'] ?? '';
-            $checkout_date = date('Y-m-d', strtotime("{$checkin_date} +{$stay_nights} day"));
-
-            //見積り計算
-            $estimate = $this->pricesCalendarService->getEstimate(
-                $room_id,
-                $plan,
-                $person,
-                $checkin_date,
-                $checkout_date
-            );
-            //二重送信防止トークン
-            $token = bin2hex(random_bytes(32));
-            $_SESSION['reserve_token'] = $token;
-
+            $dto=new ReserveFormDto($room_id, $year, $month, $day, $plan);
+            $builder=new ReserveForm_buildDtoService($this->pdo);
+            $builder->build($dto);
+            extract($dto->toViewData());
             include __DIR__ . '/../views/reserveForm.php';
             exit();
-
-            //例外処理。
+       
         } catch (Exception $e) {
             unset($_SESSION['reserve_token']);
-            unset($_SESSION['reserv_form']);
+            unset($_SESSION['reserve_form']);
             $message = $e->getMessage();
             include __DIR__ . '/../views/false.php';
             exit();
@@ -165,6 +122,8 @@ class ReservationController
     }
 
 
+    
+//ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request)
     {
