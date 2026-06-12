@@ -15,6 +15,9 @@ require_once __DIR__ . '/../services/GetRoomInformationService.php';
 require_once __DIR__ . '/../services/WeekDayService.php';
 require_once __DIR__ . '/../services/MaxCheckoutService.php';
 
+require_once __DIR__ . '/../dto/ReservationCalendarDto.php';
+require_once __DIR__ . '/../services/ReservationCalendar_buildDtoService.php';
+
 
 class ReservationController
 {
@@ -67,62 +70,21 @@ class ReservationController
 
     //--新規予約------------------------------------------
 
-    ////予約カレンダービュー表示メソッド。
+    ////予約カレンダービュー表示メソッド。 DTO＋DTOビルドサービスで責務分離。
     //初期表示ではroom=1(シングル)、当日。
     public function reservationCalendar($room_id = null, $year = null, $month = null)
     {
-        if ($room_id === null) {
-            $room_id = 1;
-        }
-        if ($year === null) {
-            $year = date('Y');
-        }
-        if ($month === null) {
-            $month = date('m');
-        }
+        $dto=new ReservationCalendarDto($room_id,$year,$month);
+        $builder=new ReservationCalendar_buildDtoService($this->pdo);
+        $builder->build($dto);
+        extract($dto->toViewdata());
 
-        try {
-            //指定された種類の部屋の、指定月のデータを取得。
-            $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
-            if ($availabilityRoomMonth['success'] == false) {
-                $message = $availabilityRoomMonth['message'];
-                include __DIR__ . '/../views/false.php';
-                exit();
-            }
-            //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($room_id);
-            $room_name = $room_information['room_name'];
-            //mark配列生成。(指定された種類の部屋の、指定月の各日の空き具合（〇△×）)
-            $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
-            //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
-            $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
-            //月初～月末（例：１～３１）のdays配列。
-            $days = $this->yearMonthToDaysService->getDays($year, $month);
-            //指定された部屋のプランデータを取得。見出しや内容など。
-            $plansData = $this->getPlansDataService->getPlansData();
-            //初期表示用の、最初のプラン（0=１泊２食付きプラン）
-            $selectedPlan = $_SESSION['reserve_form']['selectedPlan'] ?? $plansData[0]['plan_name'];
-            // 初期表示用の価格配列
-            $prices = $pricesAllPlan[$selectedPlan];
-            //指定された部屋の人数制限。
-            $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
-            //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
-            $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
-            //カレンダー生成用、在庫カレンダー最後尾の日付
-            $maxDate = $this->maxCheckoutService->getMaxCheckout();
-            $maxYear = $maxDate['maxYear'];
-            $maxMonth = $maxDate['maxMonth'];
             include __DIR__ . '/../views/reservationCalendar.php';
             exit();
 
-            //例外処理。
-        } catch (Exception $e) {
-            $message = $e->getMessage();
-            include __DIR__ . '/../views/false.php';
-            exit();
-        }
     }
 
+    //ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
 
     ////予約フォームビュー表示。
     public function reserve_form($room_id, $year, $month, $day, $plan)
