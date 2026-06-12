@@ -77,8 +77,8 @@ class ReservationController
     public function reservationCalendar($room_id = null, $year = null, $month = null)
     {
         $dto=new ReservationCalendarDto($room_id,$year,$month);
-        $builder=new ReservationCalendar_buildDtoService($this->pdo);
-        $builder->build($dto);
+        $dtoBuilder=new ReservationCalendar_buildDtoService($this->pdo);
+        $dtoBuilder->build($dto);
         extract($dto->toViewdata());
 
             include __DIR__ . '/../views/reservationCalendar.php';
@@ -106,8 +106,8 @@ class ReservationController
 
 
             $dto=new ReserveFormDto($room_id, $year, $month, $day, $plan);
-            $builder=new ReserveForm_buildDtoService($this->pdo);
-            $builder->build($dto);
+            $dtoBuilder=new ReserveForm_buildDtoService($this->pdo);
+            $dtoBuilder->build($dto);
             extract($dto->toViewData());
             include __DIR__ . '/../views/reserveForm.php';
             exit();
@@ -122,7 +122,7 @@ class ReservationController
     }
 
 
-    
+
 //ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request)
