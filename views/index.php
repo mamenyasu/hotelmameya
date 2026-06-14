@@ -22,7 +22,7 @@
             </div>
         </section>
         <div class="index_ex">
-            <section class="index_room">
+            <section class="index_room fade-in">
                 <img src="/hotelmameya/assets/img/hotelmameya_index_room.png" alt="トップ部屋画像">
                 <article>
                     <h2>～和風モダンの室内～</h2>
@@ -32,7 +32,7 @@
                         枕の種類も豊富に取り揃え、快眠をお手伝いします。</p>
                 </article>
             </section>
-            <section class="index_restaurant">
+            <section class="index_restaurant fade-in">
                 <article>
                     <h2>～色とりどりの味覚を堪能～</h2>
                     <br>
@@ -50,6 +50,24 @@
 
 
     </main>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const targets = document.querySelectorAll('.fade-in');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('show');
+            }
+        });
+    }, { threshold: 0.2 });
+
+    targets.forEach(target => observer.observe(target));
+});
+</script>
+
+
 
 </body>
 

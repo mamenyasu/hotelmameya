@@ -25,7 +25,13 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 10px;
+    padding: 5px 10px;
+    border: solid 2px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border-radius: 5px;
 }
 
 .nav-menu a {
@@ -121,28 +127,43 @@ header {
 }
 
 
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+}
 
+.fade-in.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 
 
 .hero {
-    height: 700px;
-    /* 好きな高さに調整 */
+    width: 1980px;
+    height: 600px;
+    margin:auto;
     overflow: hidden;
-    /* はみ出した部分を隠す */
+    
 }
 
 .hero img {
+    display:block;
     width: 100%;
     height: auto;
     object-fit: cover;
     /* 画像をトリミングしつつ埋める */
     object-position: center 10%;
     /* ← ここで上をカット */
+    border-radius: 12px; /* 角丸があると影が綺麗 */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
 .index_room {
     display: flex;
+    height: 400px;
+    margin-top:200px;
 }
 
 .index_room img {
@@ -161,9 +182,6 @@ header {
 }
 
 .index_ex {
-    background-image: url("/hotelmameya/assets/img/hotelmameya_index_background.webp");
-    background-repeat: repeat;
-    background-size: 400px 400px;
     font-family: "Yu Mincho", 'Hiragino Mincho ProN', serif;
 }
 
@@ -173,6 +191,13 @@ header {
 
 .index_ex article {
     text-align: center;
+    border: solid 2px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 100px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border-radius: 5px;
 }
 
 .box {
