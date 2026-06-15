@@ -18,6 +18,7 @@ require_once __DIR__ . '/../services/MaxCheckoutService.php';
 require_once __DIR__ . '/../dto/ReserveDto.php';
 require_once __DIR__ . '/../services/ReservationCalendar_buildDtoService.php';
 require_once __DIR__ . '/../services/ReserveForm_buildDtoService.php';
+require_once __DIR__ . '/../services/ReservationReconfirm_buildDtoService.php';
 
 
 
@@ -138,7 +139,6 @@ class ReservationController
 
 
 
-    //ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request)
     {
@@ -158,56 +158,12 @@ class ReservationController
         //バリデーション。通らなかったら差し戻し。
         $error = $this->formrequest->formValidate($request);
         if ($error) {
-            //指定された種類の部屋の、指定月のデータを取得。
-            $estimate = $request['total_price'];
-            $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
-            $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
-            //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($request['room_id']);
-            $room_name = $room_information['room_name'];
-            $user_name = htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
-            $user_telphone = htmlspecialchars($request['user_telphone'], ENT_QUOTES, 'UTF-8');
-            $user_address = htmlspecialchars($request['user_address'], ENT_QUOTES, 'UTF-8');
-            $email = htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
-            $comment = htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
-            $checkin_date = htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
-            $checkout_date = htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
-            $total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
-            $plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
-            //プラン名をプランタイトルに変換する。
-            $plan_title = $this->getPlansDataService->getPlanTitle($plan);
-            $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
-            //宿泊日数のセレクトボックスの値を生成。
-            $year = date('Y', strtotime($request['checkin_date']));
-            $month = date('m', strtotime($request['checkin_date']));
-            $day = date('d', strtotime($request['checkin_date']));
-            $stay_nights = $request['stay_nights'];
-            $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month, $day);
-            //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
-            if ($stay_nights > count($maxStayNights)) {
-                $stay_nights = count($maxStayNights);
-            }
-            $stay_nights = htmlspecialchars($stay_nights);
-            $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
-            $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
-            //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
-            $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
-            //月初～月末（例：１～３１）のdays配列。
-            $days = $this->yearMonthToDaysService->getDays($year, $month);
-            //指定された部屋のプランデータを取得。見出しや内容など。
-            $plansData = $this->getPlansDataService->getPlansData();
-            //初期表示用の、最初のプラン（0=１泊２食付きプラン）
-            $selectedPlan = $request['plan'];
-            // 初期表示用の価格配列
-            $prices = $pricesAllPlan[$selectedPlan];
-            //指定された部屋の人数制限。
-            $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
-            //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
-            $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
-            //カレンダー生成用、在庫カレンダー最後尾の日付
-            $maxDate = $this->maxCheckoutService->getMaxCheckout();
-            $maxYear = $maxDate['maxYear'];
-            $maxMonth = $maxDate['maxMonth'];
+
+            $dto = new ReserveDto($request);
+            $builder = new ReservationReconfirm_buildDtoService($this->pdo);
+            $builder->build($dto);
+            extract($dto->toViewData());
+
             //二重送信防止トークン
             $token = bin2hex(random_bytes(32));
             $_SESSION['reserve_token'] = $token;
@@ -219,56 +175,11 @@ class ReservationController
         try {
             $hasStock = $this->reservationService->hasStock($request);
             if ($hasStock['success'] == false) {
-                $estimate = $request['total_price'];
-                $message = $hasStock['message'];
-                $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($request['room_id']);
-                $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
-                //room_idを部屋の名前（日本語）に変換する。
-                $room_information = $this->getRoomInformationService->getRoomInformation($request['room_id']);
-                $room_name = $room_information['room_name'];
-                $user_name = htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
-                $user_telphone = htmlspecialchars($request['user_telphone'], ENT_QUOTES, 'UTF-8');
-                $user_address = htmlspecialchars($request['user_address'], ENT_QUOTES, 'UTF-8');
-                $email = htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
-                $comment = htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
-                $checkin_date = htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
-                $checkout_date = htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
-                $total_price = htmlspecialchars($request['total_price'], ENT_QUOTES, 'UTF-8');
-                $plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
-                //プラン名をプランタイトルに変換する。
-                $plan_title = $this->getPlansDataService->getPlanTitle($plan);
-                $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
-                //宿泊日数のセレクトボックスの値を生成。
-                $year = date('Y', strtotime($request['checkin_date']));
-                $month = date('m', strtotime($request['checkin_date']));
-                $day = date('d', strtotime($request['checkin_date']));
-                $stay_nights = $request['stay_nights'];
-                $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month, $day);
-                //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
-                if ($stay_nights > count($maxStayNights)) {
-                    $stay_nights = count($maxStayNights);
-                }
-                $stay_nights = htmlspecialchars($stay_nights);
-                $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
-                $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
-                //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
-                $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
-                //月初～月末（例：１～３１）のdays配列。
-                $days = $this->yearMonthToDaysService->getDays($year, $month);
-                //指定された部屋のプランデータを取得。見出しや内容など。
-                $plansData = $this->getPlansDataService->getPlansData();
-                //初期表示用の、最初のプラン（0=１泊２食付きプラン）
-                $selectedPlan = $request['plan'];
-                // 初期表示用の価格配列
-                $prices = $pricesAllPlan[$selectedPlan];
-                //指定された部屋の人数制限。
-                $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
-                //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
-                $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
-                //カレンダー生成用、在庫カレンダー最後尾の日付
-                $maxDate = $this->maxCheckoutService->getMaxCheckout();
-                $maxYear = $maxDate['maxYear'];
-                $maxMonth = $maxDate['maxMonth'];
+                $dto = new ReserveDto($request);
+                $builder = new ReservationReconfirm_buildDtoService($this->pdo);
+                $builder->build($dto);
+                $dto->message = $hasStock['message']; //--メッセージ設定--
+                extract($dto->toViewData());
                 //二重送信防止トークン
                 $token = bin2hex(random_bytes(32));
                 $_SESSION['reserve_token'] = $token;
@@ -310,31 +221,16 @@ class ReservationController
                 'stay_nights' => $request['stay_nights']
             ];
 
-            //最終確認ビュー表示用。
-            $room_id = htmlspecialchars($request['room_id'], ENT_QUOTES, 'UTF-8');
-            //room_idを部屋の名前（日本語）に変換する。
-            $room_information = $this->getRoomInformationService->getRoomInformation($request['room_id']);
-            $room_name = $room_information['room_name'];
-            $user_name = htmlspecialchars($request['user_name'], ENT_QUOTES, 'UTF-8');
-            $user_telphone = htmlspecialchars(mb_convert_kana($request['user_telphone'], 'n', 'UTF-8'), ENT_QUOTES, 'UTF-8');
-            $user_address = htmlspecialchars($request['user_address'], ENT_QUOTES, 'UTF-8');
-            $email = htmlspecialchars($request['email'], ENT_QUOTES, 'UTF-8');
-            $comment = htmlspecialchars($request['comment'], ENT_QUOTES, 'UTF-8');
-            $checkin_date = htmlspecialchars($request['checkin_date'], ENT_QUOTES, 'UTF-8');
-            $checkout_date = htmlspecialchars($request['checkout_date'], ENT_QUOTES, 'UTF-8');
-            $total_price = htmlspecialchars($final_price, ENT_QUOTES, 'UTF-8');
-            $plan = htmlspecialchars($request['plan'], ENT_QUOTES, 'UTF-8');
-            $stay_nights = htmlspecialchars($request['stay_nights'], ENT_QUOTES, 'UTF-8');
-            //戻るボタン用
-            $year = date('Y', strtotime($checkin_date));
-            $month = date('m', strtotime($checkin_date));
-            $day = date('d', strtotime($checkin_date));
+            $dto = new ReserveDto($request);
+            $builder = new ReservationReconfirm_buildDtoService($this->pdo);
+            $builder->build($dto);
+            $dto->user_telphone = htmlspecialchars(mb_convert_kana($dto->user_telphone, 'n', 'UTF-8'), ENT_QUOTES, 'UTF-8');
+            $dto->total_price = htmlspecialchars($final_price, ENT_QUOTES, 'UTF-8');
+
             $token = bin2hex(random_bytes(32));
             $_SESSION['reserve_token'] = $token;
-            //プラン名をプランタイトルに変換する。
-            $plan_title = $this->getPlansDataService->getPlanTitle($plan);
-            $person = htmlspecialchars($request['person'], ENT_QUOTES, 'UTF-8');
-            $token = $_SESSION['reserve_token'];
+
+            extract($dto->toViewData());
             include __DIR__ . '/../views/reserveReconfirm.php';
             exit();
 
@@ -381,56 +277,10 @@ class ReservationController
 
             if ($result['success'] == false) {
                 unset($_SESSION['reserve']);
-                $message = htmlspecialchars($result['message'], ENT_QUOTES, 'UTF-8');
-                $estimate = $_SESSION['reserve_form']['total_price'];
-                $number_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($_SESSION['reserve_form']['room_id']);
-                $room_id = htmlspecialchars($_SESSION['reserve_form']['room_id'], ENT_QUOTES, 'UTF-8');
-                //room_idを部屋の名前（日本語）に変換する。
-                $room_information = $this->getRoomInformationService->getRoomInformation($_SESSION['reserve_form']['room_id']);
-                $room_name = $room_information['room_name'];
-                $user_name = htmlspecialchars($_SESSION['reserve_form']['user_name'], ENT_QUOTES, 'UTF-8');
-                $user_telphone = htmlspecialchars($_SESSION['reserve_form']['user_telphone'], ENT_QUOTES, 'UTF-8');
-                $user_address = htmlspecialchars($_SESSION['reserve_form']['user_address'], ENT_QUOTES, 'UTF-8');
-                $email = htmlspecialchars($_SESSION['reserve_form']['email'], ENT_QUOTES, 'UTF-8');
-                $comment = htmlspecialchars($_SESSION['reserve_form']['comment'], ENT_QUOTES, 'UTF-8');
-                $checkin_date = htmlspecialchars($_SESSION['reserve_form']['checkin_date'], ENT_QUOTES, 'UTF-8');
-                $checkout_date = htmlspecialchars($_SESSION['reserve_form']['checkout_date'], ENT_QUOTES, 'UTF-8');
-                $total_price = htmlspecialchars($_SESSION['reserve_form']['total_price'], ENT_QUOTES, 'UTF-8');
-                $plan = htmlspecialchars($_SESSION['reserve_form']['plan'], ENT_QUOTES, 'UTF-8');
-                //プラン名をプランタイトルに変換する。
-                $plan_title = $this->getPlansDataService->getPlanTitle($plan);
-                $person = htmlspecialchars($_SESSION['reserve_form']['person'], ENT_QUOTES, 'UTF-8');
-                //宿泊日数のセレクトボックスの値を生成。
-                $year = date('Y', strtotime($_SESSION['reserve_form']['checkin_date']));
-                $month = date('m', strtotime($_SESSION['reserve_form']['checkin_date']));
-                $day = date('d', strtotime($_SESSION['reserve_form']['checkin_date']));
-                $stay_nights = $_SESSION['reserve_form']['stay_nights'];
-                $maxStayNights = $this->reservationService->makeNumStayNights($room_id, $year, $month, $day);
-                //もし最新のmaxstayNightsから飛び出ていた場合にstayNightsを補正。
-                if ($stay_nights > count($maxStayNights)) {
-                    $stay_nights = count($maxStayNights);
-                }
-                $stay_nights = htmlspecialchars($stay_nights);
-                $availabilityRoomMonth = $this->reservationService->getAvailabilityRoomMonth($room_id, $year, $month);
-                $marks = $this->calendarMarkArrayService->getCalendarMarkArray($availabilityRoomMonth['availabilityRoomMonth']);
-                //指定された種類の部屋の、指定月の値段表を取得。プランごとの多重配列。
-                $pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($room_id, $year, $month);
-                //月初～月末（例：１～３１）のdays配列。
-                $days = $this->yearMonthToDaysService->getDays($year, $month);
-                //指定された部屋のプランデータを取得。見出しや内容など。
-                $plansData = $this->getPlansDataService->getPlansData();
-                //初期表示用の、最初のプラン（0=１泊２食付きプラン）
-                $selectedPlan = $_SESSION['reserve_form']['plan'];
-                // 初期表示用の価格配列
-                $prices = $pricesAllPlan[$selectedPlan];
-                //指定された部屋の人数制限。
-                $maxGuest_OfRoom = $this->maxGuest_OfRoomService->getMaxGuest_OfRoom($room_id);
-                //カレンダーで、指定月１日が何曜日から始まるか。0=日曜日～
-                $start_weekDay = $this->weekDayService->getStartWeekDay_From_Ym($year, $month);
-                //カレンダー生成用、在庫カレンダー最後尾の日付
-                $maxDate = $this->maxCheckoutService->getMaxCheckout();
-                $maxYear = $maxDate['maxYear'];
-                $maxMonth = $maxDate['maxMonth'];
+                $dto = new ReserveDto($_SESSION['reserve_form']);
+                $builder = new ReservationReconfirm_buildDtoService($this->pdo);
+                $builder->build($dto);
+                $dto->message = htmlspecialchars($result['message'], ENT_QUOTES, 'UTF-8');// 個別メッセージ
                 include __DIR__ . '/../views/reserveForm.php';
                 exit();
             }
@@ -455,6 +305,11 @@ class ReservationController
 
 
 
+
+
+    //ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
+
+    
     //--予約キャンセル-------------------------------------
 
     ////キャンセルフォーム表示。予約IDとメールアドレスを入力してもらう予定。
