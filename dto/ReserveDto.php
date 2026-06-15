@@ -1,7 +1,7 @@
 <?php
 class ReserveDto {
 
-    // --- DTO が保持する全フィールド プロパティ名リスト---
+    // --- DTO が保持する全フィールド プロパティ名のホワイトリスト---
     public const FIELDS = [
         // --- 基本情報 ---
         'room_id',
