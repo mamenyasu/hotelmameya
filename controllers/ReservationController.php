@@ -15,10 +15,10 @@ require_once __DIR__ . '/../services/GetRoomInformationService.php';
 require_once __DIR__ . '/../services/WeekDayService.php';
 require_once __DIR__ . '/../services/MaxCheckoutService.php';
 
-require_once __DIR__ . '/../dto/ReservationCalendarDto.php';
+require_once __DIR__ . '/../dto/ReserveDto.php';
 require_once __DIR__ . '/../services/ReservationCalendar_buildDtoService.php';
-require_once __DIR__ . '/../dto/ReserveFormDto.php';
 require_once __DIR__ . '/../services/ReserveForm_buildDtoService.php';
+
 
 
 class ReservationController
@@ -74,28 +74,37 @@ class ReservationController
 
     ////予約カレンダービュー表示メソッド。
     //初期表示ではroom=1(シングル)、当日。
-    public function reservationCalendar($room_id = null, $year = null, $month = null)
+    public function reservationCalendar($room_id, $year, $month)
     {
-        $dto=new ReservationCalendarDto($room_id,$year,$month);
-        $dtoBuilder=new ReservationCalendar_buildDtoService($this->pdo);
+        $room_id = $room_id ?? 1;
+        $year = $year ?? date('Y');
+        $month = $month ?? date('m');
+
+        $routeParams = [
+            'room_id' => $room_id,
+            'year'    => $year,
+            'month'   => $month,
+        ];
+
+        $dto = new ReserveDto($routeParams);
+        $dtoBuilder = new ReservationCalendar_buildDtoService($this->pdo);
         $dtoBuilder->build($dto);
         extract($dto->toViewdata());
-
-            include __DIR__ . '/../views/reservationCalendar.php';
-            exit();
-
+        include __DIR__ . '/../views/reservationCalendar.php';
+        exit();
     }
 
 
 
     ////予約フォームビュー表示。
-    public function reserve_form($room_id, $year, $month, $day, $plan){
-            //ブラウザの戻るボタン対策。
-            $_SESSION['reserve_form']['selectedPlan'] = $plan;
-            //二重送信防止トークン
-            $token = bin2hex(random_bytes(32));
-            $_SESSION['reserve_token'] = $token;
-        try{
+    public function reserve_form($room_id, $year, $month, $day, $plan)
+    {
+        //ブラウザの戻るボタン対策。
+        $_SESSION['reserve_form']['selectedPlan'] = $plan;
+        //二重送信防止トークン
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['reserve_token'] = $token;
+        try {
             //カレンダーで選択した日が、最低でも当日一泊出来るか再確認。
             $hasStockOne = $this->reservationService->hasStockOne($room_id, $year, $month, $day);
             if ($hasStockOne['success'] == false) {
@@ -104,14 +113,20 @@ class ReservationController
                 exit();
             }
 
+            $routeParams = [
+                'room_id' => $room_id,
+                'year'    => $year,
+                'month'   => $month,
+                'day'     => $day,
+                'plan'    => $plan,
+            ];
 
-            $dto=new ReserveFormDto($room_id, $year, $month, $day, $plan);
-            $dtoBuilder=new ReserveForm_buildDtoService($this->pdo);
+            $dto = new ReserveDto($routeParams);
+            $dtoBuilder = new ReserveForm_buildDtoService($this->pdo);
             $dtoBuilder->build($dto);
             extract($dto->toViewData());
             include __DIR__ . '/../views/reserveForm.php';
             exit();
-       
         } catch (Exception $e) {
             unset($_SESSION['reserve_token']);
             unset($_SESSION['reserve_form']);
@@ -123,7 +138,7 @@ class ReservationController
 
 
 
-//ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
+    //ーーーー以降はDTO＋DTOビルドサービス未実装の為スパゲティコード。現在（2026/6/12） リファクタリング工事中。ーーーーーー
     ////予約内容最終確認用ビュー表示メソッド。
     public function reserve_reconfirm($request)
     {

@@ -10,6 +10,7 @@ require_once __DIR__ . '/../services/MaxGuest_OfRoomService.php';
 require_once __DIR__ . '/../services/GetRoomInformationService.php';
 require_once __DIR__ . '/../services/WeekDayService.php';
 require_once __DIR__ . '/../services/MaxCheckoutService.php';
+require_once __DIR__ . '/../dto/ReserveDto.php';
 
 
 class ReservationCalendar_buildDtoService{
@@ -25,6 +26,7 @@ class ReservationCalendar_buildDtoService{
     private $weekDayService;
     private $maxCheckoutService;
 
+
     public function __construct($pdo){
         $this->reservationService = new ReservationService($pdo);
         $this->calendarMarkArrayService = new CalendarMarkArrayService();
@@ -38,7 +40,7 @@ class ReservationCalendar_buildDtoService{
         $this->maxCheckoutService = new MaxCheckoutService($pdo);
     }
 
-    public function build(ReservationCalendarDto $dto):void{
+    public function build(ReserveDto $dto):void{
 
     try {
             //指定された種類の部屋の、指定月のデータを取得。
@@ -61,7 +63,7 @@ class ReservationCalendar_buildDtoService{
             $dto->pricesAllPlan = $this->pricesCalendarService->getPricesAllPlan($dto->room_id, $dto->year, $dto->month);
 
             //月初～月末（例：１～３１）のdays配列。
-            $dto->days = $this->yearMonthToDaysService->getDays($dto->year, $dto->month);
+            $dto->days= $this->yearMonthToDaysService->getDays($dto->year, $dto->month);
 
             //指定された部屋のプランデータを取得。見出しや内容など。
             $dto->plansData = $this->getPlansDataService->getPlansData();
@@ -80,7 +82,7 @@ class ReservationCalendar_buildDtoService{
 
             //カレンダー生成用、在庫カレンダー最後尾の日付
             $maxDate = $this->maxCheckoutService->getMaxCheckout();
-            $dto->maxDate= $maxDate;
+            $dto->maxDate = $maxDate;
             $dto->maxYear = $maxDate['maxYear'];
             $dto->maxMonth = $maxDate['maxMonth'];
 

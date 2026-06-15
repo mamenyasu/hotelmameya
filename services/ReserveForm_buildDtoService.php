@@ -9,6 +9,7 @@ require_once __DIR__ . '/../services/MaxGuest_OfRoomService.php';
 require_once __DIR__ . '/../services/GetRoomInformationService.php';
 require_once __DIR__ . '/../services/WeekDayService.php';
 require_once __DIR__ . '/../services/MaxCheckoutService.php';
+require_once __DIR__ . '/../dto/ReserveDto.php';
 
 class ReserveForm_buildDtoService{
 
@@ -40,7 +41,7 @@ class ReserveForm_buildDtoService{
 
  } 
 
- public function build(ReserveFormDto $dto):void{
+ public function build(ReserveDto $dto):void{
         try{
             //room_idを部屋の名前（日本語）に変換する。
             $room_information = $this->getRoomInformationService->getRoomInformation($dto->room_id);
